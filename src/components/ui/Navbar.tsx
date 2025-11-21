@@ -5,12 +5,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-
-const navItems = [
-    { name: "Home", path: "/" },
-    { name: "Article", path: "/articles" },
-    { name: "Contact", path: "/contact" },
-];
+import { navItems } from "@/config/data";
 
 export function Navbar() {
     const pathname = usePathname();

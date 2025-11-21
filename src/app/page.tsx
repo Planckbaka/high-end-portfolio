@@ -3,13 +3,7 @@ import { GridBackground } from "@/components/ui/GridBackground";
 import { Hero } from "@/components/ui/Hero";
 import { ProjectCard } from "@/components/ui/ProjectCard";
 import { SelfIntro } from "@/components/ui/SelfIntro";
-
-const projects = [
-  { title: "Lumina", category: "Web Design", year: "2024" },
-  { title: "Apex", category: "Branding", year: "2024" },
-  { title: "Vortex", category: "Development", year: "2023" },
-  { title: "Echo", category: "Art Direction", year: "2023" },
-];
+import { projects } from "@/config/data";
 
 export default function Home() {
   return (
