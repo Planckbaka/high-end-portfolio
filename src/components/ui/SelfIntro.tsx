@@ -1,5 +1,6 @@
 "use client";
 
+import { technologies } from "@/config/data";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 
@@ -75,9 +76,9 @@ export function SelfIntro() {
                                 <ArrowUpRight size={20} className="text-foreground/20" />
                             </div>
                             <div className="flex flex-wrap gap-2">
-                                {['React', 'Next.js', 'TypeScript', 'WebGL', 'Tailwind'].map((tech) => (
-                                    <span key={tech} className="text-[10px] uppercase tracking-wider text-foreground/60 bg-foreground/5 px-2 py-1 rounded">
-                                        {tech}
+                                {technologies.map((tech) => (
+                                    <span key={tech.id} className="text-[10px] uppercase tracking-wider text-foreground/60 bg-foreground/5 px-2 py-1 rounded">
+                                        {tech.name}
                                     </span>
                                 ))}
                             </div>

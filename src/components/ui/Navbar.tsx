@@ -18,9 +18,10 @@ export function Navbar() {
             className="fixed top-0 left-0 w-full z-50 px-4 md:px-12 lg:px-24 py-6 mix-blend-difference text-white"
         >
             <div className="flex justify-between items-center border-b border-white/20 pb-4">
+
                 {/* Logo / Brand */}
                 <div className="flex items-center gap-2">
-                    <div className="w-3 h-3 bg-white" />
+                    <img className="w-4 h-4 bg-white rounded-full object-cover" src="avatar.jpeg" alt="CN" />
                     <span className="font-heading font-bold uppercase tracking-widest text-sm">
                         Portfolio
                     </span>
