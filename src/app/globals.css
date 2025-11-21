@@ -5,10 +5,18 @@
   --foreground: #ededed;
   --accent: #ff4d4d;
   --accent-foreground: #ffffff;
-
-  /* Font variables will be defined in layout.tsx */
   --font-sans: "Inter", sans-serif;
   --font-heading: "Outfit", sans-serif;
+}
+
+[data-theme="dark"] {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+}
+
+[data-theme="light"] {
+  --background: #f5f5f5;
+  --foreground: #000000;
 }
 
 @theme inline {

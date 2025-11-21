@@ -11,11 +11,11 @@ export function GridBackground({ className }: { className?: string }) {
             )}
         >
             {/* Vertical Lines */}
-            <div className="w-px h-full bg-white/5" />
-            <div className="w-px h-full bg-white/5" />
-            <div className="w-px h-full bg-white/5" />
-            <div className="w-px h-full bg-white/5 hidden md:block" />
-            <div className="w-px h-full bg-white/5 hidden lg:block" />
+            <div className="w-px h-full bg-foreground/5" />
+            <div className="w-px h-full bg-foreground/5" />
+            <div className="w-px h-full bg-foreground/5" />
+            <div className="w-px h-full bg-foreground/5 hidden md:block" />
+            <div className="w-px h-full bg-foreground/5 hidden lg:block" />
         </div>
     );
 }

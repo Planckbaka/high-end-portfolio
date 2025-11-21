@@ -3,6 +3,8 @@ import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { SmoothScroll } from "@/lib/smooth-scroll";
 import { cn } from "@/lib/utils";
+import { Navbar } from "@/components/ui/Navbar";
+import { ThemeProvider } from "@/components/ThemeProvider";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -25,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="antialiased">
+    <html lang="en" className="antialiased" suppressHydrationWarning>
       <body
         className={cn(
           inter.variable,
@@ -33,7 +35,15 @@ export default function RootLayout({
           "font-sans bg-background text-foreground overflow-x-hidden"
         )}
       >
-        <SmoothScroll>{children}</SmoothScroll>
+        <ThemeProvider
+          attribute="data-theme"
+          defaultTheme="dark"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Navbar />
+          <SmoothScroll>{children}</SmoothScroll>
+        </ThemeProvider>
       </body>
     </html>
   );

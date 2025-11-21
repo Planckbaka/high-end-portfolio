@@ -25,7 +25,7 @@ export default function Home() {
           <h2 className="text-[10vw] md:text-[6vw] leading-[0.85] font-heading font-bold uppercase tracking-tighter">
             Selected <br /> <span className="text-accent">Works</span>
           </h2>
-          <p className="text-sm uppercase tracking-widest text-white/60 max-w-xs mt-8 md:mt-0">
+          <p className="text-sm uppercase tracking-widest text-foreground/60 max-w-xs mt-8 md:mt-0">
             A collection of projects that define my style and approach to digital design.
           </p>
         </div>
@@ -37,7 +37,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer className="px-4 md:px-12 lg:px-24 py-12 border-t border-white/10 flex justify-between items-center text-sm uppercase tracking-widest text-white/40">
+      <footer className="px-4 md:px-12 lg:px-24 py-12 border-t border-foreground/10 flex justify-between items-center text-sm uppercase tracking-widest text-foreground/60">
         <span>© 2025 Portfolio</span>
         <span>Scroll to top</span>
       </footer>
