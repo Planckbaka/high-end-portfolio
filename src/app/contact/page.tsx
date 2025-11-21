@@ -3,6 +3,7 @@
 import { GridBackground } from "@/components/ui/GridBackground";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
+import { contactDetails, socialLinks } from "@/config/data";
 
 export default function ContactPage() {
     return (
@@ -34,19 +35,19 @@ export default function ContactPage() {
                                     <div className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center group-hover:bg-accent group-hover:text-black transition-colors duration-300">
                                         <Mail size={18} />
                                     </div>
-                                    <span className="text-lg md:text-xl font-light">hello@portfolio.com</span>
+                                    <span className="text-lg md:text-xl font-light">{contactDetails.email}</span>
                                 </li>
                                 <li className="flex items-center gap-4 group cursor-pointer">
                                     <div className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center group-hover:bg-accent group-hover:text-black transition-colors duration-300">
                                         <Phone size={18} />
                                     </div>
-                                    <span className="text-lg md:text-xl font-light">+1 (555) 123-4567</span>
+                                    <span className="text-lg md:text-xl font-light">{contactDetails.phone}</span>
                                 </li>
                                 <li className="flex items-center gap-4 group cursor-pointer">
                                     <div className="w-10 h-10 rounded-full bg-foreground/5 flex items-center justify-center group-hover:bg-accent group-hover:text-black transition-colors duration-300">
                                         <MapPin size={18} />
                                     </div>
-                                    <span className="text-lg md:text-xl font-light">San Francisco, CA</span>
+                                    <span className="text-lg md:text-xl font-light">{contactDetails.location}</span>
                                 </li>
                             </ul>
                         </div>
@@ -54,9 +55,9 @@ export default function ContactPage() {
                         <div>
                             <h3 className="text-sm uppercase tracking-widest text-foreground/60 mb-4">Socials</h3>
                             <div className="flex flex-wrap gap-4">
-                                {['Twitter', 'LinkedIn', 'Instagram', 'GitHub'].map((social) => (
-                                    <a key={social} href="#" className="px-6 py-3 border border-foreground/10 rounded-full hover:bg-foreground hover:text-background transition-all duration-300 uppercase text-xs tracking-widest flex items-center gap-2 group">
-                                        {social}
+                                {socialLinks.map((social) => (
+                                    <a key={social.name} href={social.url} className="px-6 py-3 border border-foreground/10 rounded-full hover:bg-foreground hover:text-background transition-all duration-300 uppercase text-xs tracking-widest flex items-center gap-2 group">
+                                        {social.name}
                                         <ArrowUpRight size={14} className="group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-transform" />
                                     </a>
                                 ))}

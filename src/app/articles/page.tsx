@@ -22,7 +22,7 @@ export default function ArticlesPage() {
                         Articles
                     </h1>
                     <p className="text-sm uppercase tracking-widest text-foreground/60 max-w-md">
-                        Thoughts on design, technology, and the creative process.
+                        Thoughts on Advanced Go dev, Kubernetes, Docker, Kafka, Redis, and Linux system programming.
                     </p>
                 </motion.div>
 
@@ -36,7 +36,7 @@ export default function ArticlesPage() {
                             transition={{ duration: 0.6, delay: index * 0.1 }}
                             className="group border-t border-foreground/10 py-12 hover:bg-foreground/5 transition-colors duration-500 -mx-4 px-4 md:-mx-12 md:px-12 lg:-mx-24 lg:px-24 cursor-pointer"
                         >
-                            <Link href={`#`} className="block"> {/* Placeholder link */}
+                            <Link href={`/articles/${article.slug}`} className="block">
                                 <div className="flex flex-col md:flex-row md:items-baseline justify-between gap-4 md:gap-12">
                                     <div className="md:w-1/4">
                                         <span className="text-xs uppercase tracking-widest text-accent mb-2 block">

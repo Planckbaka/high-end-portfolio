@@ -21,7 +21,7 @@ export function Hero() {
                     </OverflowText>
                 </div>
                 <OverflowText className="text-[12vw] leading-[0.85] font-heading font-bold uppercase tracking-tighter text-foreground/50" delay={0.2}>
-                    & Designer
+                    &  Designer
                 </OverflowText>
             </div>
 

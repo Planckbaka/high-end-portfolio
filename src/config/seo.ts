@@ -1,12 +1,12 @@
 import { Metadata } from "next";
 
 export const siteConfig = {
-    name: "High-End Portfolio",
+    name: "Akiwayne's Portfolio",
     description: "A showcase of modern web design and interaction",
     url: process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000",
     author: {
-        name: "Your Name",
-        email: "your.email@example.com",
+        name: "akiwayne",
+        email: "akiwayne24@gmail.com",
         twitter: "@yourhandle",
     },
     keywords: [

@@ -17,8 +17,13 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
-  title: "Portfolio | High-End Design",
+  title: "Akiwayne's Portfolio",
   description: "A showcase of modern web design and interaction.",
+  icons: {
+    icon: '../../public/avatar.jpeg',
+    shortcut: '../../public/avatar.jpeg',
+    apple: '../../public/avatar.jpeg',
+  }
 };
 
 export default function RootLayout({
