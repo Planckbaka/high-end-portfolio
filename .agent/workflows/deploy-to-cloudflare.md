@@ -21,7 +21,7 @@ description: 如何部署项目到 Cloudflare Pages
    - 进入 **Settings** → **Builds & deployments**
    - 配置如下：
 
-     ```
+     ```text
      Framework preset: Next.js
      Build command: npm run build:cf
      Build output directory: .open-next/assets
@@ -33,7 +33,7 @@ description: 如何部署项目到 Cloudflare Pages
    - 在 **Settings** → **Environment variables** 中添加
    - 例如：
 
-     ```
+     ```bash
      NEXT_PUBLIC_SITE_URL=https://your-site.pages.dev
      NEXT_PUBLIC_SITE_NAME=Your Portfolio
      ```

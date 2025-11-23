@@ -2,6 +2,7 @@
 # 用于通过 Wrangler CLI 部署到 Cloudflare Pages
 
 name = "high-end-portfolio"
+pages_build_output_dir = ".open-next/assets"
 
 # 注意：对于 Cloudflare Pages 项目，大部分配置应该在 Cloudflare Dashboard 中设置
 # 或者通过 wrangler pages deploy 命令的参数传递
