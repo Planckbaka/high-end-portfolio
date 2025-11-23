@@ -41,7 +41,8 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 发送邮件到你的 Gmail
+        // 发送邮件到你的 QQ 邮箱（Resend 测试模式限制）
+        // 注意：免费账户只能发送到注册邮箱，要发送到其他邮箱需要验证域名
         const response = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -50,7 +51,7 @@ export async function POST(request: NextRequest) {
             },
             body: JSON.stringify({
                 from: 'Portfolio Contact <onboarding@resend.dev>', // Resend 提供的发件地址
-                to: ['akiwayne24@gmail.com'], // 你的 Gmail 地址
+                to: ['1229773363@qq.com'], // 你的 QQ 邮箱（Resend 注册邮箱）
                 reply_to: email, // 访客的邮箱，方便你直接回复
                 subject: `New Contact Form Message from ${name}`,
                 html: `

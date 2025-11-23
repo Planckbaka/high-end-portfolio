@@ -59,3 +59,15 @@ next-env.d.ts
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Cloudflare Workers
+.wrangler/
+.dev.vars
+wrangler.toml.backup
+
+# OpenNext (Cloudflare adapter)
+.open-next/
+
+# Logs
+logs/
+*.log
