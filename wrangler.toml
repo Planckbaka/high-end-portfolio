@@ -3,7 +3,7 @@
 
 name = "high-end-portfolio"
 compatibility_date = "2024-11-21"
-pages_build_output_dir = "out"
+pages_build_output_dir = ".open-next/assets"
 
 # 生产环境配置
 [env.production]

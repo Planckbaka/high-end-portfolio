@@ -10,7 +10,7 @@ const nextConfig: NextConfig = {
   },
 
   // 启用静态导出（推荐用于 Cloudflare Pages）
-  output: 'export',
+  // output: 'export', // Disabled for Cloudflare Adapter (SSR)
 };
 
 export default nextConfig;
