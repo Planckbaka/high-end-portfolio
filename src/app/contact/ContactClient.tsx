@@ -18,18 +18,36 @@ export default function ContactClient() {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsSubmitting(true);
+        setSubmitStatus("idle");
 
-        // Simulate form submission (replace with actual API call)
         try {
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            console.log("Form submitted:", formData);
+            const response = await fetch('/api/contact', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to send message');
+            }
+
             setSubmitStatus("success");
             setFormData({ name: "", email: "", message: "" });
+
+            // 3秒后重置状态
+            setTimeout(() => setSubmitStatus("idle"), 3000);
         } catch (error) {
+            console.error('Error sending message:', error);
             setSubmitStatus("error");
+
+            // 5秒后重置错误状态
+            setTimeout(() => setSubmitStatus("idle"), 5000);
         } finally {
             setIsSubmitting(false);
-            setTimeout(() => setSubmitStatus("idle"), 3000);
         }
     };
 

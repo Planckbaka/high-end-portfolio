@@ -29,7 +29,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_US",
-    url: "https://yourportfolio.com",
+    url: "https://high-end-portfolio.1229773363.workers.dev",
     title: "Akiwayne's Portfolio | Creative Developer",
     description: "A modern portfolio showcasing creative development, web design, and engineering.",
     siteName: "Akiwayne's Portfolio",
