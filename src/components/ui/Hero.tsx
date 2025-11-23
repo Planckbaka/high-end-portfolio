@@ -5,7 +5,8 @@ import { motion } from "framer-motion";
 export function Hero() {
     return (
         <section className="relative min-h-screen flex flex-col justify-center px-4 md:px-12 lg:px-24 pt-20">
-            <div className="flex flex-col gap-2 md:gap-4">
+            <h1 className="sr-only">Creative Developer & Designer</h1>
+            <div className="flex flex-col gap-2 md:gap-4" aria-hidden="true">
                 <OverflowText className="text-[12vw] leading-[0.85] font-heading font-bold uppercase tracking-tighter text-foreground">
                     Creative
                 </OverflowText>

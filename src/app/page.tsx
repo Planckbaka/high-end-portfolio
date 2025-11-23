@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { GridBackground } from "@/components/ui/GridBackground";
 import { Hero } from "@/components/ui/Hero";
-import { ProjectCard } from "@/components/ui/ProjectCard";
+import { ProjectList } from "@/components/ui/ProjectList";
 import { SelfIntro } from "@/components/ui/SelfIntro";
 import { projects } from "@/config/data";
 
@@ -24,11 +24,7 @@ export default function Home() {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
-          {projects.map((project, i) => (
-            <ProjectCard key={i} index={i} {...project} />
-          ))}
-        </div>
+        <ProjectList projects={projects} />
       </section>
 
       <footer className="px-4 md:px-12 lg:px-24 py-12 border-t border-foreground/10 flex justify-between items-center text-sm uppercase tracking-widest text-foreground/60">

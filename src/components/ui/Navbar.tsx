@@ -21,7 +21,7 @@ export function Navbar() {
 
                 {/* Logo / Brand */}
                 <div className="flex items-center gap-2">
-                    <img className="w-4 h-4 bg-white rounded-full object-cover" src="avatar.jpeg" alt="CN" />
+                    <img className="w-4 h-4 bg-white rounded-full object-cover" src="/avatar.jpeg" alt="Portfolio Logo" />
                     <span className="font-heading font-bold uppercase tracking-widest text-sm">
                         Portfolio
                     </span>

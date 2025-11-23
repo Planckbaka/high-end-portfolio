@@ -1,16 +1,62 @@
-export const navItems = [
+import type { NavItem, Project, Technology, Article, SocialLink, ContactDetails, SelfIntroData } from "@/types";
+
+export const navItems: NavItem[] = [
     { name: "Home", path: "/" },
     { name: "Article", path: "/articles" },
     { name: "Contact", path: "/contact" },
 ];
 
-export const projects = [
-    { title: "Lumina", category: "Web Design", year: "2024" },
-    { title: "Apex", category: "Branding", year: "2024" },
-    { title: "Vortex", category: "Development", year: "2023" },
-    { title: "Echo", category: "Art Direction", year: "2023" },
+export const projects: Project[] = [
+    {
+        id: "lumina",
+        title: "Lumina",
+        category: "Web Design",
+        year: "2024",
+        agency: "Obys Agency",
+        grid: "Golden Canon",
+        margins: "80 px",
+        powerLines: "6",
+        paddingsSystem: "Used",
+        image: "/images/project-1.svg"
+    },
+    {
+        id: "apex",
+        title: "Apex",
+        category: "Branding",
+        year: "2024",
+        agency: "Obys Agency",
+        grid: "12 Column",
+        margins: "60 px",
+        powerLines: "4",
+        paddingsSystem: "Used",
+        image: "/images/project-2.svg"
+    },
+    {
+        id: "vortex",
+        title: "Vortex",
+        category: "Development",
+        year: "2023",
+        agency: "Obys Agency",
+        grid: "Modular",
+        margins: "40 px",
+        powerLines: "5",
+        paddingsSystem: "Used",
+        image: "/images/project-3.svg"
+    },
+    {
+        id: "echo",
+        title: "Echo",
+        category: "Art Direction",
+        year: "2023",
+        agency: "Obys Agency",
+        grid: "Baseline",
+        margins: "100 px",
+        powerLines: "3",
+        paddingsSystem: "Used",
+        image: "/images/project-4.svg"
+    },
 ];
-export const technologies = [
+export const technologies: Technology[] = [
     { id: 1, name: "Go" },
     { id: 2, name: "Cobra" },
     { id: 3, name: "Kubernetes" },
@@ -22,9 +68,9 @@ export const technologies = [
     { id: 9, name: "Docker" },
     { id: 10, name: "Nginx" },
     { id: 11, name: "CloudFlare" },
-]
+];
 
-export const articles = [
+export const articles: Article[] = [
     {
         id: 1,
         title: "The Future of Digital Interfaces",
@@ -103,15 +149,28 @@ export const articles = [
     }
 ];
 
-export const socialLinks = [
+export const socialLinks: SocialLink[] = [
     { name: 'Twitter', url: '#' },
     { name: 'LinkedIn', url: 'https://www.linkedin.com/in/zhang-weihuang-78753b382/' },
     { name: 'Instagram', url: '#' },
     { name: 'GitHub', url: 'https://github.com/Planckbaka' }
 ];
 
-export const contactDetails = {
+export const contactDetails: ContactDetails = {
     email: "akiwayne24@gmail.com",
     phone: "+86 13960233985",
     location: "Shanghai, China"
+};
+
+export const selfIntroData: SelfIntroData = {
+    heading: {
+        main: "Crafting Digital",
+        sub: "Perfection"
+    },
+    description: "I'm a creative developer obsessed with the intersection of design and engineering. I build pixel-perfect, performant, and accessible interfaces that delight users. My goal is to turn complex problems into simple, beautiful solutions.",
+    roles: ["Creative Dev", "Backend Dev", "Microservices", "Distributed System"],
+    stats: [
+        { id: 1, value: "05", accent: "+", label: "Years Exp." },
+        { id: 2, value: "50", accent: "+", label: "Projects" }
+    ]
 };
