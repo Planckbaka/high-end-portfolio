@@ -14,9 +14,7 @@ vars = { NODE_VERSION = "20" }
 compatibility_flags = ["nodejs_compat"]
 
 # 自定义构建配置（可选）
-[build]
-command = "npm run build"
-cwd = "."
+
 
 # 环境变量（敏感信息请在 Cloudflare Dashboard 中设置）
 # [vars]
