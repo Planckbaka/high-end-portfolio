@@ -1,8 +1,28 @@
-# Cloudflare Pages 配置文件
-# 用于通过 Wrangler CLI 部署到 Cloudflare Pages
+# Cloudflare Workers 配置文件
+# 用于部署 Next.js 应用到 Cloudflare Workers
 
 name = "high-end-portfolio"
-pages_build_output_dir = ".open-next/assets"
+main = ".open-next/worker.js"
+compatibility_date = "2024-11-21"
+compatibility_flags = ["nodejs_compat"]
 
-# 注意：对于 Cloudflare Pages 项目，大部分配置应该在 Cloudflare Dashboard 中设置
-# 或者通过 wrangler pages deploy 命令的参数传递
+# Workers 资源限制
+workers_dev = true
+
+# 资产绑定（用于静态文件）
+[assets]
+directory = ".open-next/assets"
+binding = "ASSETS"
+
+# 环境变量（可选）
+# [vars]
+# NEXT_PUBLIC_SITE_URL = "https://your-domain.com"
+# NEXT_PUBLIC_SITE_NAME = "Your Portfolio"
+
+# 生产环境配置
+[env.production]
+name = "high-end-portfolio"
+workers_dev = false
+# routes = [
+#   { pattern = "your-domain.com/*", zone_name = "your-domain.com" }
+# ]
