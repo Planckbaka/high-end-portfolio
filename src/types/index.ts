@@ -17,13 +17,14 @@ export interface Project {
 
 // Article types
 export interface Article {
-    id: number;
+    id: string | number;
     title: string;
     date: string;
     category: string;
     excerpt: string;
     slug: string;
     content: string;
+    readingTime?: string;
 }
 
 // Technology types

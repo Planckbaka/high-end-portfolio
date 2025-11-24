@@ -4,16 +4,7 @@ import { GridBackground } from "@/components/ui/GridBackground";
 import { motion } from "framer-motion";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
-
-interface Article {
-    id: number;
-    title: string;
-    date: string;
-    category: string;
-    excerpt: string;
-    slug: string;
-    content?: string;
-}
+import type { Article } from "@/types";
 
 export default function ArticleClient({ article }: { article: Article }) {
     return (
@@ -46,9 +37,16 @@ export default function ArticleClient({ article }: { article: Article }) {
                             <span className="text-xs uppercase tracking-widest text-accent mb-2 block">
                                 {article.category}
                             </span>
-                            <span className="text-xs uppercase tracking-widest text-foreground/60">
-                                {article.date}
-                            </span>
+                            <div className="flex flex-col gap-1">
+                                <span className="text-xs uppercase tracking-widest text-foreground/60">
+                                    {article.date}
+                                </span>
+                                {article.readingTime && (
+                                    <span className="text-[10px] uppercase tracking-widest text-foreground/40">
+                                        {article.readingTime}
+                                    </span>
+                                )}
+                            </div>
                         </div>
                         <div className="md:w-3/4">
                             <h1 className="text-4xl md:text-6xl lg:text-7xl font-heading font-bold uppercase leading-[0.9] tracking-tighter mb-8">
@@ -74,7 +72,26 @@ export default function ArticleClient({ article }: { article: Article }) {
                         </div>
                         <div className="md:w-3/4">
                             <div
-                                className="prose prose-lg max-w-none prose-headings:font-heading prose-headings:uppercase prose-headings:tracking-tight prose-headings:text-foreground prose-p:font-light prose-p:text-foreground/80 prose-strong:text-accent prose-a:text-accent prose-blockquote:text-foreground/70 prose-blockquote:border-accent prose-li:text-foreground/80"
+                                className="prose prose-lg max-w-none 
+                                prose-headings:font-heading prose-headings:uppercase prose-headings:tracking-tight prose-headings:text-foreground prose-headings:mt-12 prose-headings:mb-6 prose-headings:no-underline
+                                [&_h2_a]:text-foreground [&_h3_a]:text-foreground [&_h2_a]:no-underline [&_h3_a]:no-underline
+                                prose-h2:text-3xl prose-h3:text-2xl
+                                prose-p:font-light prose-p:text-foreground/90 prose-p:leading-relaxed prose-p:mb-6
+                                prose-strong:text-foreground prose-strong:font-semibold
+                                prose-a:text-accent prose-a:no-underline hover:prose-a:text-accent/80 transition-colors
+                                prose-blockquote:text-foreground/80 prose-blockquote:border-accent prose-blockquote:italic prose-blockquote:pl-6
+                                prose-li:text-foreground/90 prose-li:font-light
+                                
+                                /* Code block styles */
+                                prose-pre:bg-foreground/5 prose-pre:p-4 prose-pre:rounded-sm prose-pre:border prose-pre:border-foreground/10
+                                prose-code:text-accent prose-code:bg-foreground/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded-sm prose-code:font-mono prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
+                                
+                                [&>figure]:my-8 [&>figure]:bg-foreground/5 [&>figure]:rounded-sm [&>figure]:overflow-hidden [&>figure]:border [&>figure]:border-foreground/10
+                                
+                                prose-ul:list-disc prose-ol:list-decimal
+                                prose-hr:border-foreground/10
+                                prose-table:border-collapse prose-th:border prose-th:border-foreground/10 prose-th:p-2 prose-td:border prose-td:border-foreground/10 prose-td:p-2
+                                dark:prose-invert"
                                 dangerouslySetInnerHTML={{ __html: article.content || "" }}
                             />
                         </div>

@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: ['/api/', '/admin/'],
         },
-        sitemap: 'https://yourportfolio.com/sitemap.xml', // Update with your actual domain
+        sitemap: 'https://high-end-portfolio.1229773363.workers.dev/sitemap.xml', // Update with your actual domain
     };
 }

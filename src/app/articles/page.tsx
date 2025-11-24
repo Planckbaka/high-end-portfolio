@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import ArticlesClient from "./ArticlesClient";
+import { getAllArticles } from "@/lib/markdown";
 
 export const metadata: Metadata = {
     title: "Articles",
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
     },
 };
 
-export default function ArticlesPage() {
-    return <ArticlesClient />;
+export default async function ArticlesPage() {
+    const articles = await getAllArticles();
+    return <ArticlesClient articles={articles} />;
 }

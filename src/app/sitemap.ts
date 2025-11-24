@@ -1,8 +1,8 @@
 import { MetadataRoute } from 'next';
-import { articles } from '@/config/data';
+import { getAllArticles } from '@/lib/markdown';
 
-export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://yourportfolio.com'; // Update with your actual domain
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+    const baseUrl = 'https://high-end-portfolio.1229773363.workers.dev';
 
     // Static pages
     const staticPages = [
@@ -26,10 +26,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
         },
     ];
 
-    // Dynamic article pages
+    // Dynamic article pages from Markdown files
+    const articles = await getAllArticles();
     const articlePages = articles.map((article) => ({
         url: `${baseUrl}/articles/${article.slug}`,
-        lastModified: new Date(),
+        lastModified: new Date(article.date),
         changeFrequency: 'monthly' as const,
         priority: 0.7,
     }));
