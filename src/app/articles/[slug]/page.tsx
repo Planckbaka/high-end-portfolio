@@ -2,6 +2,10 @@ import { getAllArticleSlugs, getArticleBySlug } from "@/lib/markdown";
 import ArticleClient from "./ArticleClient";
 import { notFound } from "next/navigation";
 
+// Force static generation for Cloudflare Workers compatibility
+export const dynamic = 'force-static';
+export const revalidate = false;
+
 export async function generateStaticParams() {
     const slugs = getAllArticleSlugs();
     return slugs.map((slug) => ({
