@@ -1,0 +1,26 @@
+# Dependencies
+node_modules
+.next
+.open-next
+.wrangler
+
+# Build outputs
+out
+build
+dist
+
+# Logs
+*.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# OS files
+.DS_Store
+
+# Lock files
+package-lock.json
+pnpm-lock.yaml
+yarn.lock

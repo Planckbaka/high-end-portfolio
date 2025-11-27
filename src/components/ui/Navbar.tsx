@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
@@ -20,15 +21,24 @@ export function Navbar() {
             <div className="flex justify-between items-center border-b border-white/20 pb-4">
 
                 {/* Logo / Brand */}
-                <div className="flex items-center gap-2">
-                    <img className="w-4 h-4 bg-white rounded-full object-cover" src="/avatar.jpeg" alt="Portfolio Logo" />
+                <Link href="/" className="flex items-center gap-2" aria-label="Go to homepage">
+                    <Image
+                        src="/avatar.jpeg"
+                        alt="Portfolio Logo"
+                        width={16}
+                        height={16}
+                        className="rounded-full object-cover"
+                    />
                     <span className="font-heading font-bold uppercase tracking-widest text-sm">
                         Portfolio
                     </span>
-                </div>
+                </Link>
 
                 {/* Navigation - Breadcrumb Style */}
-                <nav className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-2 text-sm uppercase tracking-widest font-medium">
+                <nav
+                    className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-2 text-sm uppercase tracking-widest font-medium"
+                    aria-label="Main navigation"
+                >
                     {navItems.map((item, index) => (
                         <div key={item.path} className="flex items-center gap-2">
                             <Link

@@ -1,8 +1,9 @@
 import { MetadataRoute } from 'next';
 import { getAllArticles } from '@/lib/markdown';
+import { siteConfig } from '@/config/site';
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-    const baseUrl = 'https://high-end-portfolio.1229773363.workers.dev';
+    const baseUrl = siteConfig.url;
 
     // Static pages
     const staticPages = [
@@ -16,13 +17,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
             url: `${baseUrl}/articles`,
             lastModified: new Date(),
             changeFrequency: 'weekly' as const,
-            priority: 0.8,
+            priority: 0.9,
         },
         {
             url: `${baseUrl}/contact`,
             lastModified: new Date(),
-            changeFrequency: 'monthly' as const,
-            priority: 0.5,
+            changeFrequency: 'yearly' as const,
+            priority: 0.7,
         },
     ];
 
@@ -31,8 +32,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const articlePages = articles.map((article) => ({
         url: `${baseUrl}/articles/${article.slug}`,
         lastModified: new Date(article.date),
-        changeFrequency: 'monthly' as const,
-        priority: 0.7,
+        changeFrequency: 'weekly' as const,
+        priority: 0.8,
     }));
 
     return [...staticPages, ...articlePages];

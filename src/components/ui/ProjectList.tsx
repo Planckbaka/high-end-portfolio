@@ -3,6 +3,7 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRef } from "react";
 import type { Project } from "@/types";
 
@@ -22,7 +23,8 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
 
     const formattedIndex = String(index + 1).padStart(2, '0');
 
-    return (
+    // 项目卡片内容
+    const cardContent = (
         <motion.div
             ref={ref}
             initial={{ opacity: 0, y: 50 }}
@@ -125,6 +127,23 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
             </div>
         </motion.div>
     );
+
+    // 如果有 URL，用 Link 包装；否则直接返回卡片
+    if (project.url) {
+        return (
+            <Link
+                href={project.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+                aria-label={`View ${project.title} project`}
+            >
+                {cardContent}
+            </Link>
+        );
+    }
+
+    return cardContent;
 }
 
 export function ProjectList({ projects }: ProjectListProps) {

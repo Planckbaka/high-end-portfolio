@@ -23,6 +23,7 @@ export function ThemeToggle() {
             <div className="relative flex items-center bg-white/5 border border-white/10 rounded-full p-0.5">
                 <button
                     onClick={() => setTheme("dark")}
+                    aria-label="Enable dark mode"
                     className={cn(
                         "relative z-10 px-3 py-1 rounded-full transition-colors duration-300",
                         theme === "dark" ? "text-black" : "text-white/60 hover:text-white/80"
@@ -39,6 +40,7 @@ export function ThemeToggle() {
                 </button>
                 <button
                     onClick={() => setTheme("light")}
+                    aria-label="Enable light mode"
                     className={cn(
                         "relative z-10 px-3 py-1 rounded-full transition-colors duration-300",
                         theme === "light" ? "text-black" : "text-white/60 hover:text-white/80"

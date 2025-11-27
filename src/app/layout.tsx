@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/ui/Navbar";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { siteConfig } from "@/config/site";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -18,6 +19,7 @@ const outfit = Outfit({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteConfig.url),
   title: {
     default: "Akiwayne's Portfolio | Creative Developer",
     template: "%s | Akiwayne's Portfolio"
@@ -26,6 +28,9 @@ export const metadata: Metadata = {
   keywords: ["portfolio", "web design", "creative developer", "frontend", "backend", "Go", "React", "Next.js", "Kubernetes", "microservices"],
   authors: [{ name: "Akiwayne", url: "https://github.com/Planckbaka" }],
   creator: "Akiwayne",
+  alternates: {
+    canonical: "/",
+  },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -67,13 +72,41 @@ export const metadata: Metadata = {
   },
 };
 
+export const viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#f5f5f5" },
+    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+  ],
+};
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // JSON-LD structured data for SEO
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    name: siteConfig.author.name,
+    url: siteConfig.url,
+    sameAs: [
+      siteConfig.author.github,
+      siteConfig.author.linkedin,
+    ],
+    jobTitle: "Creative Developer",
+    description: siteConfig.description,
+    knowsAbout: ["Go", "React", "Next.js", "Kubernetes", "Microservices", "Web Design"],
+  };
+
   return (
     <html lang="en" className="antialiased" suppressHydrationWarning>
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
       <body
         className={cn(
           inter.variable,
@@ -88,8 +121,17 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <ErrorBoundary>
+            {/* Skip to content link for accessibility */}
+            <a
+              href="#main-content"
+              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-accent focus:text-accent-foreground focus:rounded"
+            >
+              Skip to main content
+            </a>
             <Navbar />
-            <SmoothScroll>{children}</SmoothScroll>
+            <SmoothScroll>
+              <main id="main-content">{children}</main>
+            </SmoothScroll>
           </ErrorBoundary>
         </ThemeProvider>
       </body>

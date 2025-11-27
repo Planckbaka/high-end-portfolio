@@ -7,14 +7,18 @@ import { projects } from "@/config/data";
 
 export default function Home() {
   return (
-    <main className="relative w-full overflow-hidden">
+    <div className="relative w-full overflow-hidden">
       <GridBackground />
 
-      <Hero />
+      <section aria-label="Hero section">
+        <Hero />
+      </section>
 
-      <SelfIntro />
+      <section aria-label="About me">
+        <SelfIntro />
+      </section>
 
-      <section className="px-4 md:px-12 lg:px-24 py-24 md:py-32">
+      <section className="px-4 md:px-12 lg:px-24 py-24 md:py-32" aria-label="Selected works">
         <div className="flex flex-col md:flex-row justify-between items-end mb-16 md:mb-24">
           <h2 className="text-[10vw] md:text-[6vw] leading-[0.85] font-heading font-bold uppercase tracking-tighter">
             Selected <br /> <span className="text-accent">Works</span>
@@ -27,10 +31,10 @@ export default function Home() {
         <ProjectList projects={projects} />
       </section>
 
-      <footer className="px-4 md:px-12 lg:px-24 py-12 border-t border-foreground/10 flex justify-between items-center text-sm uppercase tracking-widest text-foreground/60">
+      <footer className="px-4 md:px-12 lg:px-24 py-12 border-t border-foreground/10 flex justify-between items-center text-sm uppercase tracking-widest text-foreground/60" role="contentinfo">
         <span>© 2025 Portfolio</span>
         <span>Scroll to top</span>
       </footer>
-    </main>
+    </div>
   );
 }

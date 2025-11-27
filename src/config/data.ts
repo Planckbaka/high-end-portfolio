@@ -17,7 +17,8 @@ export const projects: Project[] = [
         margins: "80 px",
         powerLines: "6",
         paddingsSystem: "Used",
-        image: "/images/project-1.svg"
+        image: "/images/project-1.svg",
+        url: "https://github.com/Planckbaka" // 替换为你的实际项目链接
     },
     {
         id: "apex",
@@ -29,7 +30,8 @@ export const projects: Project[] = [
         margins: "60 px",
         powerLines: "4",
         paddingsSystem: "Used",
-        image: "/images/project-2.svg"
+        image: "/images/project-2.svg",
+        url: "https://github.com/Planckbaka" // 替换为你的实际项目链接
     },
     {
         id: "vortex",
@@ -41,7 +43,8 @@ export const projects: Project[] = [
         margins: "40 px",
         powerLines: "5",
         paddingsSystem: "Used",
-        image: "/images/project-3.svg"
+        image: "/images/project-3.svg",
+        url: "https://github.com/Planckbaka" // 替换为你的实际项目链接
     },
     {
         id: "echo",
@@ -53,7 +56,8 @@ export const projects: Project[] = [
         margins: "100 px",
         powerLines: "3",
         paddingsSystem: "Used",
-        image: "/images/project-4.svg"
+        image: "/images/project-4.svg",
+        url: "https://github.com/Planckbaka" // 替换为你的实际项目链接
     },
 ];
 export const technologies: Technology[] = [
@@ -170,7 +174,7 @@ export const selfIntroData: SelfIntroData = {
     description: "I'm a creative developer obsessed with the intersection of design and engineering. I build pixel-perfect, performant, and accessible interfaces that delight users. My goal is to turn complex problems into simple, beautiful solutions.",
     roles: ["Creative Dev", "Backend Dev", "Microservices", "Distributed System"],
     stats: [
-        { id: 1, value: "05", accent: "+", label: "Years Exp." },
-        { id: 2, value: "50", accent: "+", label: "Projects" }
+        { id: 1, value: "01", accent: "+", label: "Years Exp." },
+        { id: 2, value: "5", accent: "+", label: "Projects" }
     ]
 };
