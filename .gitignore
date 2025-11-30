@@ -70,3 +70,6 @@ wrangler.toml.backup
 # Logs
 logs/
 *.log
+
+# Personal Assets
+public/resume.pdf

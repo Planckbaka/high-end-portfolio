@@ -4,6 +4,7 @@ import { technologies, selfIntroData } from "@/config/data";
 import { motion } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import { memo } from "react";
+import { MagneticButton } from "./MagneticButton";
 
 interface StatCardProps {
     value: string;
@@ -107,6 +108,18 @@ export function SelfIntro() {
                                     {role}
                                 </motion.div>
                             ))}
+                        </motion.div>
+
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ duration: 0.8, delay: 0.5 }}
+                            className="pt-6"
+                        >
+                            <MagneticButton href="/resume.pdf">
+                                View Resume
+                            </MagneticButton>
                         </motion.div>
                     </div>
 

@@ -44,7 +44,7 @@ export const projects: Project[] = [
         powerLines: "5",
         paddingsSystem: "Used",
         image: "/images/project-3.svg",
-        url: "https://github.com/Planckbaka" // 替换为你的实际项目链接
+        url: "https://github.com/Planckbaka/go-shortenUrl" // 替换为你的实际项目链接
     },
     {
         id: "echo",
