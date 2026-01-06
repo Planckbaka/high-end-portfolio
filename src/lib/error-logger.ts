@@ -4,7 +4,7 @@
  */
 
 interface ErrorContext {
-    componentStack?: string;
+    componentStack?: string | null;
     userAgent?: string;
     url?: string;
     [key: string]: unknown;
