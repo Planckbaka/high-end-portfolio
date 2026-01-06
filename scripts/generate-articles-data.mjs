@@ -21,7 +21,7 @@ const outputFile = path.join(__dirname, '../src/lib/articles-data.json');
  * Calculate reading time
  */
 function getReadingTime(content) {
-    const wordsPerMinute = 200;
+    const wordsPerMinute = 100;
     const words = content.trim().split(/\s+/).length;
     const minutes = Math.ceil(words / wordsPerMinute);
     return `${minutes} min read`;

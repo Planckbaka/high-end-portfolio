@@ -142,6 +142,7 @@ export default function ContactClient() {
                                     id="name"
                                     name="name"
                                     required
+                                    maxLength={100}
                                     value={formData.name}
                                     onChange={handleChange}
                                     className="w-full bg-foreground/5 border-b border-foreground/20 py-3 focus:outline-none focus:border-accent transition-colors text-lg font-light"
@@ -155,6 +156,7 @@ export default function ContactClient() {
                                     id="email"
                                     name="email"
                                     required
+                                    maxLength={254}
                                     value={formData.email}
                                     onChange={handleChange}
                                     className="w-full bg-foreground/5 border-b border-foreground/20 py-3 focus:outline-none focus:border-accent transition-colors text-lg font-light"
@@ -168,6 +170,7 @@ export default function ContactClient() {
                                     id="message"
                                     name="message"
                                     required
+                                    maxLength={5000}
                                     value={formData.message}
                                     onChange={handleChange}
                                     className="w-full bg-foreground/5 border-b border-foreground/20 py-3 focus:outline-none focus:border-accent transition-colors text-lg font-light resize-none"

@@ -30,14 +30,18 @@ export const env = {
 // Type-safe environment variable access
 export type Env = typeof env;
 
-// Validate required environment variables (call this at app startup)
+/**
+ * Validate required environment variables
+ * Call this at app startup to fail fast if required vars are missing
+ */
 export function validateEnv(): void {
     const requiredVars: (keyof typeof env)[] = [];
 
     // Only validate in production
     if (env.isProd) {
-        // Add required production env vars here
-        // Example: requiredVars.push('resendApiKey');
+        // Production environment requires these variables
+        requiredVars.push('resendApiKey');
+        requiredVars.push('siteUrl');
     }
 
     const missing = requiredVars.filter((key) => !env[key]);
@@ -47,4 +51,18 @@ export function validateEnv(): void {
             `Missing required environment variables: ${missing.join(", ")}`
         );
     }
+}
+
+/**
+ * Type guard to check if we're in a server environment
+ */
+export function isServer(): boolean {
+    return typeof window === 'undefined';
+}
+
+/**
+ * Type guard to check if we're in a client environment
+ */
+export function isClient(): boolean {
+    return typeof window !== 'undefined';
 }

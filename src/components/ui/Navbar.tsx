@@ -8,9 +8,39 @@ import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { navItems } from "@/config/data";
 
-export function Navbar() {
+/**
+ * 共享导航链接组件 - 消除桌面端和移动端的代码重复
+ */
+function NavLinks({ className, linkClassName }: { 
+    className?: string; 
+    linkClassName?: string;
+}) {
     const pathname = usePathname();
+    
+    return (
+        <>
+            {navItems.map((item, index) => (
+                <div key={item.path} className="flex items-center gap-2">
+                    <Link
+                        href={item.path}
+                        className={cn(
+                            "transition-colors",
+                            pathname === item.path ? "text-white" : "text-white/60",
+                            linkClassName
+                        )}
+                    >
+                        {item.name}
+                    </Link>
+                    {index < navItems.length - 1 && (
+                        <span className="text-white/20">/</span>
+                    )}
+                </div>
+            ))}
+        </>
+    );
+}
 
+export function Navbar() {
     return (
         <motion.header
             initial={{ y: -100 }}
@@ -34,27 +64,12 @@ export function Navbar() {
                     </span>
                 </Link>
 
-                {/* Navigation - Breadcrumb Style */}
+                {/* Desktop Navigation */}
                 <nav
                     className="absolute left-1/2 -translate-x-1/2 hidden md:flex items-center gap-2 text-sm uppercase tracking-widest font-medium"
                     aria-label="Main navigation"
                 >
-                    {navItems.map((item, index) => (
-                        <div key={item.path} className="flex items-center gap-2">
-                            <Link
-                                href={item.path}
-                                className={cn(
-                                    "hover:text-white/70 transition-colors",
-                                    pathname === item.path ? "text-white" : "text-white/60"
-                                )}
-                            >
-                                {item.name}
-                            </Link>
-                            {index < navItems.length - 1 && (
-                                <span className="text-white/20">/</span>
-                            )}
-                        </div>
-                    ))}
+                    <NavLinks linkClassName="hover:text-white/70" />
                 </nav>
 
                 {/* Right Side: Theme Toggle & Copyright */}
@@ -64,23 +79,9 @@ export function Navbar() {
                 </div>
             </div>
 
-            {/* Mobile Nav (Simple Stack) */}
+            {/* Mobile Navigation */}
             <div className="md:hidden flex justify-center mt-4 gap-4 text-xs uppercase tracking-widest">
-                {navItems.map((item, index) => (
-                    <div key={item.path} className="flex items-center gap-2">
-                        <Link
-                            href={item.path}
-                            className={cn(
-                                pathname === item.path ? "text-white" : "text-white/60"
-                            )}
-                        >
-                            {item.name}
-                        </Link>
-                        {index < navItems.length - 1 && (
-                            <span className="text-white/20">/</span>
-                        )}
-                    </div>
-                ))}
+                <NavLinks />
             </div>
         </motion.header>
     );

@@ -74,7 +74,7 @@ export default function ArticleClient({ article }: { article: Article }) {
                             <div
                                 className="prose prose-lg max-w-none 
                                 prose-headings:font-heading prose-headings:uppercase prose-headings:tracking-tight prose-headings:text-foreground prose-headings:mt-12 prose-headings:mb-6 prose-headings:no-underline
-                                [&_h2_a]:text-foreground [&_h3_a]:text-foreground [&_h2_a]:no-underline [&_h3_a]:no-underline
+                                [&_h2_a]:text-foreground [&_h3_a]:text-foreground [&_h2_a]:no-underline [&_h3_a]:no-underline hover:[&_h2_a]:text-foreground hover:[&_h3_a]:text-foreground
                                 prose-h2:text-3xl prose-h3:text-2xl
                                 prose-p:font-light prose-p:text-foreground/90 prose-p:leading-relaxed prose-p:mb-6
                                 prose-strong:text-foreground prose-strong:font-semibold
@@ -84,7 +84,7 @@ export default function ArticleClient({ article }: { article: Article }) {
                                 
                                 /* Code block styles */
                                 prose-pre:bg-foreground/5 prose-pre:p-4 prose-pre:rounded-sm prose-pre:border prose-pre:border-foreground/10
-                                prose-code:text-accent prose-code:bg-foreground/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded-sm prose-code:font-mono prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
+                                prose-code:text-foreground/80 prose-code:bg-foreground/5 prose-code:px-1 prose-code:py-0.5 prose-code:rounded-sm prose-code:font-mono prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
                                 
                                 [&>figure]:my-8 [&>figure]:bg-foreground/5 [&>figure]:rounded-sm [&>figure]:overflow-hidden [&>figure]:border [&>figure]:border-foreground/10
                                 

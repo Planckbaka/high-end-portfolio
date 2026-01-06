@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { siteConfig } from '@/config/site';
 
 export const runtime = 'edge';
 
@@ -6,6 +7,25 @@ interface ContactFormData {
     name: string;
     email: string;
     message: string;
+}
+
+// 输入长度限制
+const MAX_NAME_LENGTH = 100;
+const MAX_EMAIL_LENGTH = 254;
+const MAX_MESSAGE_LENGTH = 5000;
+
+/**
+ * HTML 转义函数 - 防止 XSS 攻击
+ */
+function escapeHtml(text: string): string {
+    const map: Record<string, string> = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;',
+    };
+    return text.replace(/[&<>"']/g, (char) => map[char]);
 }
 
 export async function POST(request: NextRequest) {
@@ -21,6 +41,26 @@ export async function POST(request: NextRequest) {
             );
         }
 
+        // 验证输入长度
+        if (name.length > MAX_NAME_LENGTH) {
+            return NextResponse.json(
+                { error: `Name must be less than ${MAX_NAME_LENGTH} characters` },
+                { status: 400 }
+            );
+        }
+        if (email.length > MAX_EMAIL_LENGTH) {
+            return NextResponse.json(
+                { error: `Email must be less than ${MAX_EMAIL_LENGTH} characters` },
+                { status: 400 }
+            );
+        }
+        if (message.length > MAX_MESSAGE_LENGTH) {
+            return NextResponse.json(
+                { error: `Message must be less than ${MAX_MESSAGE_LENGTH} characters` },
+                { status: 400 }
+            );
+        }
+
         // 验证邮箱格式
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         if (!emailRegex.test(email)) {
@@ -30,8 +70,9 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 获取 Resend API Key
+        // 获取配置
         const resendApiKey = process.env.RESEND_API_KEY;
+        const contactEmail = process.env.CONTACT_EMAIL || siteConfig.author.email;
 
         if (!resendApiKey) {
             console.error('RESEND_API_KEY is not configured');
@@ -41,8 +82,12 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // 发送邮件到你的 QQ 邮箱（Resend 测试模式限制）
-        // 注意：免费账户只能发送到注册邮箱，要发送到其他邮箱需要验证域名
+        // 转义用户输入防止 XSS
+        const safeName = escapeHtml(name);
+        const safeEmail = escapeHtml(email);
+        const safeMessage = escapeHtml(message);
+
+        // 发送邮件
         const response = await fetch('https://api.resend.com/emails', {
             method: 'POST',
             headers: {
@@ -50,10 +95,10 @@ export async function POST(request: NextRequest) {
                 'Authorization': `Bearer ${resendApiKey}`,
             },
             body: JSON.stringify({
-                from: 'Portfolio Contact <onboarding@resend.dev>', // Resend 提供的发件地址
-                to: ['1229773363@qq.com'], // 你的 QQ 邮箱（Resend 注册邮箱）
-                reply_to: email, // 访客的邮箱，方便你直接回复
-                subject: `New Contact Form Message from ${name}`,
+                from: 'Portfolio Contact <onboarding@resend.dev>',
+                to: [contactEmail],
+                reply_to: email,
+                subject: `New Contact Form Message from ${safeName}`,
                 html: `
           <!DOCTYPE html>
           <html>
@@ -136,30 +181,30 @@ export async function POST(request: NextRequest) {
               <div class="content">
                 <div class="field">
                   <div class="label">Name</div>
-                  <div class="value">${name}</div>
+                  <div class="value">${safeName}</div>
                 </div>
                 
                 <div class="field">
                   <div class="label">Email</div>
                   <div class="value">
-                    <a href="mailto:${email}" style="color: #667eea; text-decoration: none;">${email}</a>
+                    <a href="mailto:${safeEmail}" style="color: #667eea; text-decoration: none;">${safeEmail}</a>
                   </div>
                 </div>
                 
                 <div class="field">
                   <div class="label">Message</div>
-                  <div class="message-box">${message}</div>
+                  <div class="message-box">${safeMessage}</div>
                 </div>
                 
                 <div style="text-align: center;">
-                  <a href="mailto:${email}" class="button">Reply to ${name}</a>
+                  <a href="mailto:${safeEmail}" class="button">Reply to ${safeName}</a>
                 </div>
               </div>
               
               <div class="footer">
                 <p style="margin: 0;">
                   This email was sent from your portfolio contact form<br>
-                  <strong>https://high-end-portfolio.1229773363.workers.dev</strong>
+                  <strong>${siteConfig.url}</strong>
                 </p>
                 <p style="margin: 10px 0 0 0; font-size: 11px; opacity: 0.7;">
                   Sent at ${new Date().toLocaleString('en-US', {

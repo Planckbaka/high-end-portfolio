@@ -5,6 +5,27 @@ A modern, artistic portfolio website built with Next.js, designed to showcase cr
 ![Portfolio Preview](https://grids.obys.agency/og.jpg)
 *(Note: Replace with your own screenshot)*
 
+## 📊 Code Quality & Documentation
+
+**Project Status**: ⭐⭐⭐⭐☆ (4/5) - High Quality, Test Coverage Needed
+
+### Quality Documentation
+
+- 📋 **[Code Review Report](./CODE_REVIEW.md)** - Comprehensive code analysis and recommendations
+- 🚀 **[Implementation Guide](./IMPLEMENTATION_GUIDE.md)** - Step-by-step improvement instructions
+- ✅ **[Quality Checklist](./CHECKLIST.md)** - Pre-commit quality checks
+- 🤝 **[Contributing Guide](./CONTRIBUTING.md)** - Development workflow and standards
+- 📝 **[Review Summary](./REVIEW_SUMMARY.md)** - Quick overview of findings
+
+### Quick Quality Metrics
+
+| Metric | Current | Target | Status |
+|--------|---------|--------|--------|
+| Test Coverage | 0% | 70% | ⚠️ Needs Improvement |
+| TypeScript Strict | ✅ | ✅ | ✅ Excellent |
+| ESLint Errors | 0 | 0 | ✅ Excellent |
+| Documentation | 80% | 90% | 🟡 Good |
+
 ## Features
 
 * **Premium Design**: Minimalist, grid-based layout inspired by high-end design agencies.
