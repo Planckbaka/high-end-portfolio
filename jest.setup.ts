@@ -44,12 +44,14 @@ global.IntersectionObserver = class IntersectionObserver {
     return []
   }
   unobserve() {}
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 } as any
 
 // Suppress console errors in tests (optional)
 const originalError = console.error
 beforeAll(() => {
-  console.error = (...args: any[]) => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  console.error = (...args: unknown[]) => {
     if (
       typeof args[0] === 'string' &&
       args[0].includes('Warning: ReactDOM.render')

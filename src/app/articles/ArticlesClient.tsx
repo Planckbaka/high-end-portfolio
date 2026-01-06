@@ -4,7 +4,7 @@ import { GridBackground } from "@/components/ui/GridBackground";
 import { motion } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import type { Article } from "@/types";
 
 interface ArticlesClientProps {
@@ -108,22 +108,18 @@ function Pagination({ currentPage, totalPages, onPageChange }: {
 }
 
 export default function ArticlesClient({ articles }: ArticlesClientProps) {
-    const [currentPage, setCurrentPage] = useState(1);
+    const [requestedPage, setRequestedPage] = useState(1);
     const [isAnimating, setIsAnimating] = useState(false);
     const itemsPerPage = 5;
     const totalPages = Math.ceil(articles.length / itemsPerPage);
+    
+    // Derive currentPage from requestedPage, clamping to valid range
+    const currentPage = totalPages > 0 ? Math.min(requestedPage, totalPages) : 1;
 
     const currentArticles = articles.slice(
         (currentPage - 1) * itemsPerPage,
         currentPage * itemsPerPage
     );
-
-    // Reset to page 1 if articles change
-    useEffect(() => {
-        if (currentPage > totalPages && totalPages > 0) {
-            setCurrentPage(1);
-        }
-    }, [articles.length, currentPage, totalPages]);
 
     const scrollToTop = () => {
         const mainElement = document.querySelector('main');
@@ -138,7 +134,7 @@ export default function ArticlesClient({ articles }: ArticlesClientProps) {
         if (page === currentPage || isAnimating) return;
 
         setIsAnimating(true);
-        setCurrentPage(page);
+        setRequestedPage(page);
 
         setTimeout(() => {
             scrollToTop();

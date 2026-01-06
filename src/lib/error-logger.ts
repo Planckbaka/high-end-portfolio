@@ -7,7 +7,7 @@ interface ErrorContext {
     componentStack?: string;
     userAgent?: string;
     url?: string;
-    [key: string]: any;
+    [key: string]: unknown;
 }
 
 /**
@@ -39,7 +39,7 @@ export const logError = (error: Error, context?: ErrorContext): void => {
 /**
  * Log warning messages
  */
-export const logWarning = (message: string, context?: Record<string, any>): void => {
+export const logWarning = (message: string, context?: Record<string, unknown>): void => {
     const warningDetails = {
         message,
         timestamp: new Date().toISOString(),

@@ -1,4 +1,5 @@
 import type { Article } from '@/types';
+import articlesDataJson from './articles-data.json';
 
 // Import pre-generated articles data  
 // This file is generated at build time by scripts/generate-articles-data.mjs
@@ -6,7 +7,7 @@ let articlesData: Article[] = [];
 
 try {
     // In Cloudflare Workers environment, we use the pre-generated JSON
-    articlesData = require('./articles-data.json');
+    articlesData = articlesDataJson as Article[];
 } catch (error) {
     console.warn('Failed to load articles data:', error);
     articlesData = [];

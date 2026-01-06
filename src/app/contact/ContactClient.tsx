@@ -69,7 +69,7 @@ export default function ContactClient() {
                     transition={{ duration: 0.8 }}
                 >
                     <h1 className="text-[10vw] md:text-[8vw] leading-[0.85] font-heading font-bold uppercase tracking-tighter mb-16 md:mb-24">
-                        Let's <br /> <span className="text-accent">Connect</span>
+                        Let&apos;s <br /> <span className="text-accent">Connect</span>
                     </h1>
                 </motion.div>
 

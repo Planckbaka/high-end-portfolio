@@ -23,7 +23,7 @@ export class ErrorBoundary extends Component<Props, State> {
         return { hasError: true, error };
     }
 
-    componentDidCatch(error: Error, errorInfo: any) {
+    componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
         // Log error with additional context
         logError(error, {
             componentStack: errorInfo.componentStack,
