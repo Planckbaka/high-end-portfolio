@@ -10,12 +10,15 @@ export function GridBackground({ className }: { className?: string }) {
                 className
             )}
         >
+            {/* Ambient Radial Glow */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[80vw] h-[80vw] max-w-[800px] max-h-[800px] bg-accent/10 md:bg-accent/5 rounded-full blur-[100px] mix-blend-screen opacity-50 dark:opacity-100" />
+            
             {/* Vertical Lines */}
-            <div className="w-px h-full bg-foreground/5" />
-            <div className="w-px h-full bg-foreground/5" />
-            <div className="w-px h-full bg-foreground/5" />
-            <div className="w-px h-full bg-foreground/5 hidden md:block" />
-            <div className="w-px h-full bg-foreground/5 hidden lg:block" />
+            <div className="relative z-10 w-px h-full bg-foreground/[0.02]" />
+            <div className="relative z-10 w-px h-full bg-foreground/[0.02]" />
+            <div className="relative z-10 w-px h-full bg-foreground/[0.02]" />
+            <div className="relative z-10 w-px h-full bg-foreground/[0.02] hidden md:block" />
+            <div className="relative z-10 w-px h-full bg-foreground/[0.02] hidden lg:block" />
         </div>
     );
 }

@@ -13,7 +13,7 @@ interface StatCardProps {
 }
 
 const StatCard = memo(({ value, label, accent }: StatCardProps) => (
-    <div className="bg-foreground/5 p-6 border border-foreground/5 hover:border-accent/50 transition-colors duration-300 flex flex-col justify-between aspect-square group/card">
+    <div className="bg-foreground/[0.02] p-6 border border-foreground/[0.04] hover:border-accent/40 transition-colors duration-300 flex flex-col justify-between aspect-square group/card">
         <ArrowUpRight
             size={20}
             className="self-end text-foreground/20 group-hover/card:text-accent transition-colors duration-300"
@@ -24,7 +24,7 @@ const StatCard = memo(({ value, label, accent }: StatCardProps) => (
                 {value}
                 {accent && <span className="text-accent">{accent}</span>}
             </h3>
-            <p className="text-[10px] uppercase tracking-widest text-foreground/60 mt-2">
+            <p className="text-[10px] uppercase tracking-widest text-muted-foreground mt-2">
                 {label}
             </p>
         </div>
@@ -64,7 +64,7 @@ export function SelfIntro() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-10%" }}
                 transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                className="w-full bg-foreground/5 border border-foreground/10 p-8 md:p-12 lg:p-16 relative overflow-hidden group"
+                className="w-full bg-foreground/[0.02] border border-foreground/[0.04] p-8 md:p-12 lg:p-16 relative overflow-hidden group"
             >
                 {/* Decorative Background Element */}
                 <div className="absolute -top-24 -right-24 w-64 h-64 bg-accent/20 rounded-full blur-[100px] pointer-events-none" aria-hidden="true" />
@@ -81,14 +81,14 @@ export function SelfIntro() {
                             </span>
                             <h2
                                 id="intro-heading"
-                                className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold uppercase leading-[0.9] tracking-tight"
+                                className="text-4xl md:text-5xl lg:text-6xl font-heading font-bold uppercase leading-[0.9] tracking-tight text-foreground"
                             >
                                 {selfIntroData.heading.main} <br />
-                                <span className="text-foreground/50">{selfIntroData.heading.sub}</span>
+                                <span className="text-muted-foreground">{selfIntroData.heading.sub}</span>
                             </h2>
                         </div>
 
-                        <p className="text-base md:text-lg text-foreground/70 leading-relaxed max-w-md font-light">
+                        <p className="text-base md:text-lg text-foreground/80 leading-relaxed max-w-md font-light">
                             {selfIntroData.description}
                         </p>
 
@@ -103,7 +103,7 @@ export function SelfIntro() {
                                 <motion.div
                                     key={role}
                                     variants={itemVariants}
-                                    className="px-4 py-2 border border-foreground/10 rounded-full bg-foreground/5 text-xs uppercase tracking-wider text-foreground/60 hover:bg-foreground/10 transition-colors cursor-default"
+                                    className="px-4 py-2 border border-foreground/[0.05] rounded-full bg-foreground/[0.02] text-xs uppercase tracking-wider text-muted-foreground hover:bg-foreground/[0.05] hover:text-foreground transition-colors cursor-default"
                                 >
                                     {role}
                                 </motion.div>
@@ -134,14 +134,14 @@ export function SelfIntro() {
                             />
                         ))}
 
-                        <div className="col-span-2 bg-foreground/5 p-6 border border-foreground/5 hover:border-accent/50 transition-colors duration-300">
+                        <div className="col-span-2 bg-foreground/[0.02] p-6 border border-foreground/[0.04] hover:border-accent/40 transition-colors duration-300">
                             <div className="flex justify-between items-start mb-4">
                                 <h3 className="text-lg font-heading font-bold text-foreground">Stack</h3>
                                 <ArrowUpRight size={20} className="text-foreground/20" aria-hidden="true" />
                             </div>
                             <div className="flex flex-wrap gap-2">
                                 {technologies.map((tech) => (
-                                    <span key={tech.id} className="text-[10px] uppercase tracking-wider text-foreground/60 bg-foreground/5 px-2 py-1 rounded hover:text-foreground transition-colors">
+                                    <span key={tech.id} className="text-[10px] uppercase tracking-wider text-muted-foreground bg-foreground/[0.03] px-2 py-1 rounded hover:text-foreground hover:bg-foreground/[0.06] transition-colors">
                                         {tech.name}
                                     </span>
                                 ))}

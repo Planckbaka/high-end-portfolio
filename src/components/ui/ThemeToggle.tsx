@@ -19,21 +19,21 @@ export function ThemeToggle() {
 
     return (
         <div className="flex items-center gap-3 text-xs uppercase tracking-widest font-bold">
-            <span className="hidden md:inline-block text-white/60">Dark Mode:</span>
-            <div className="relative flex items-center bg-white/5 border border-white/10 rounded-full p-0.5">
+            <span className="hidden md:inline-block text-foreground/60">Dark Mode:</span>
+            <div className="relative flex items-center bg-foreground/5 border border-foreground/10 rounded-full p-0.5">
                 <button
                     onClick={() => setTheme("dark")}
                     aria-label="Enable dark mode"
                     className={cn(
                         "relative z-10 px-3 py-1 rounded-full transition-colors duration-300",
-                        theme === "dark" ? "text-black" : "text-white/60 hover:text-white/80"
+                        theme === "dark" ? "text-background" : "text-foreground/60 hover:text-foreground/80"
                     )}
                 >
                     On
                     {theme === "dark" && (
                         <motion.div
                             layoutId="activeTheme"
-                            className="absolute inset-0 bg-white rounded-full z-[-1]"
+                            className="absolute inset-0 bg-foreground rounded-full z-[-1]"
                             transition={{ type: "spring", stiffness: 400, damping: 30 }}
                         />
                     )}
@@ -43,14 +43,14 @@ export function ThemeToggle() {
                     aria-label="Enable light mode"
                     className={cn(
                         "relative z-10 px-3 py-1 rounded-full transition-colors duration-300",
-                        theme === "light" ? "text-black" : "text-white/60 hover:text-white/80"
+                        theme === "light" ? "text-background" : "text-foreground/60 hover:text-foreground/80"
                     )}
                 >
                     Off
                     {theme === "light" && (
                         <motion.div
                             layoutId="activeTheme"
-                            className="absolute inset-0 bg-white rounded-full z-[-1]"
+                            className="absolute inset-0 bg-foreground rounded-full z-[-1]"
                             transition={{ type: "spring", stiffness: 400, damping: 30 }}
                         />
                     )}

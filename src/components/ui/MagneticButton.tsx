@@ -55,13 +55,13 @@ export function MagneticButton({
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{ transform }}
-            className={`group relative inline-flex items-center gap-3 px-8 py-4 bg-white/5 border border-white/10 rounded-full overflow-hidden hover:border-accent/50 transition-colors duration-500 ${className}`}
+            className={`group relative inline-flex items-center gap-3 px-8 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-full overflow-hidden hover:border-accent/50 transition-colors duration-500 ${className}`}
         >
             {/* Hover Fill Effect */}
             <div className="absolute inset-0 bg-accent translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-[0.76,0,0.24,1]" />
 
             {/* Content */}
-            <div className="relative z-10 flex items-center gap-2 mix-blend-difference text-white">
+            <div className="relative z-10 flex items-center gap-2 text-foreground group-hover:text-accent-foreground transition-colors duration-300">
                 <FileText size={18} />
                 <span className="uppercase tracking-widest text-sm font-bold">{children}</span>
                 <ArrowUpRight size={18} className="group-hover:rotate-45 transition-transform duration-500" />

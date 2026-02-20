@@ -7,7 +7,7 @@ export function Hero() {
         <section className="relative min-h-screen flex flex-col justify-center px-4 md:px-12 lg:px-24 pt-20">
             <h1 className="sr-only">Creative Developer & Designer</h1>
             <div className="flex flex-col gap-2 md:gap-4" aria-hidden="true">
-                <OverflowText className="text-[12vw] leading-[0.85] font-heading font-bold uppercase tracking-tighter text-foreground">
+                <OverflowText className="text-[12vw] leading-[0.85] font-heading font-bold uppercase tracking-tighter text-foreground drop-shadow-sm">
                     Creative
                 </OverflowText>
                 <div className="flex items-center gap-4 md:gap-8">
@@ -15,13 +15,13 @@ export function Hero() {
                         initial={{ width: 0 }}
                         animate={{ width: "auto" }}
                         transition={{ duration: 1, ease: [0.76, 0, 0.24, 1], delay: 0.5 }}
-                        className="h-[1px] bg-accent flex-1 overflow-hidden"
+                        className="h-[1px] bg-accent flex-1 overflow-hidden opacity-60"
                     />
-                    <OverflowText className="text-[12vw] leading-[0.85] font-heading font-bold uppercase tracking-tighter text-foreground text-right" delay={0.1}>
+                    <OverflowText className="text-[12vw] leading-[0.85] font-heading font-bold uppercase tracking-tighter text-foreground drop-shadow-sm text-right" delay={0.1}>
                         Developer
                     </OverflowText>
                 </div>
-                <OverflowText className="text-[12vw] leading-[0.85] font-heading font-bold uppercase tracking-tighter text-foreground/50" delay={0.2}>
+                <OverflowText className="text-[12vw] leading-[0.85] font-heading font-bold uppercase tracking-tighter text-foreground/40 drop-shadow-sm" delay={0.2}>
                     &  Designer
                 </OverflowText>
             </div>

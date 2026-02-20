@@ -1,209 +1,142 @@
-# High-End Portfolio
+# GKE MCP Server and Gemini CLI Extension
 
-A modern, artistic portfolio website built with Next.js, designed to showcase creative work with premium aesthetics, smooth animations, and a seamless user experience.
+Enable MCP-compatible AI agents to interact with Google Kubernetes Engine.
 
-![Portfolio Preview](https://grids.obys.agency/og.jpg)
-*(Note: Replace with your own screenshot)*
-
-## 📊 Code Quality & Documentation
-
-**Project Status**: ⭐⭐⭐⭐☆ (4/5) - High Quality, Test Coverage Needed
-
-### Quality Documentation
-
-- 📋 **[Code Review Report](./CODE_REVIEW.md)** - Comprehensive code analysis and recommendations
-- 🚀 **[Implementation Guide](./IMPLEMENTATION_GUIDE.md)** - Step-by-step improvement instructions
-- ✅ **[Quality Checklist](./CHECKLIST.md)** - Pre-commit quality checks
-- 🤝 **[Contributing Guide](./CONTRIBUTING.md)** - Development workflow and standards
-- 📝 **[Review Summary](./REVIEW_SUMMARY.md)** - Quick overview of findings
-
-### Quick Quality Metrics
-
-| Metric | Current | Target | Status |
-|--------|---------|--------|--------|
-| Test Coverage | 0% | 70% | ⚠️ Needs Improvement |
-| TypeScript Strict | ✅ | ✅ | ✅ Excellent |
-| ESLint Errors | 0 | 0 | ✅ Excellent |
-| Documentation | 80% | 90% | 🟡 Good |
-
-## Features
-
-* **Premium Design**: Minimalist, grid-based layout inspired by high-end design agencies.
-* **Smooth Animations**: Powered by [Framer Motion](https://www.framer.com/motion/) for complex entrance and scroll animations.
-* **Smooth Scrolling**: Integrated [Lenis](https://github.com/studio-freight/lenis) for a buttery-smooth scroll experience.
-* **Dark/Light Mode**: Fully supported theme switching with a custom toggle and system preference detection.
-* **Responsive**: Flawless experience across desktop, tablet, and mobile devices.
-* **Dynamic Routing**: Includes Home, Articles, and Contact pages with breadcrumb-style navigation.
-* **Configurable Data**: Centralized configuration for easy content updates.
-
-## Tech Stack
-
-* **Framework**: [Next.js 15](https://nextjs.org/) (App Router)
-* **Language**: [TypeScript](https://www.typescriptlang.org/)
-* **Styling**: [Tailwind CSS](https://tailwindcss.com/)
-* **Animations**: [Framer Motion](https://www.framer.com/motion/)
-* **Icons**: [Lucide React](https://lucide.dev/)
-* **Theming**: [next-themes](https://github.com/pacocoursey/next-themes)
+<img src="https://raw.githubusercontent.com/GoogleCloudPlatform/gke-mcp/main/assets/gke-mcp-gemini-cli-demo.gif" alt="A demonstration of using the GKE MCP server with the Gemini CLI" width="600">
 
 ## Installation
 
-Follow these steps to get the project running on your local machine.
+Choose a way to install the MCP Server and then connect your AI to it.
 
-### Prerequisites
+### Use as a Gemini CLI Extension
 
-Ensure you have the following installed:
+1. Install [Gemini CLI](https://github.com/google-gemini/gemini-cli?tab=readme-ov-file#-installation).
 
-* [Node.js](https://nodejs.org/) (v18 or higher recommended)
-* npm, yarn, pnpm, or bun
+2. Install the extension
 
-### Steps
-
-1. **Clone the repository**
-
-    ```bash
-    git clone <your-repo-url>
-    cd high-end-portfolio
-    ```
-
-2. **Install dependencies**
-
-    ```bash
-    npm install
-    # or
-    yarn install
-    # or
-    pnpm install
-    ```
-
-3. **Run the development server**
-
-    ```bash
-    npm run dev
-    ```
-
-4. **Open in browser**
-    Navigate to [http://localhost:3000](http://localhost:3000) to view the application.
-
-## Building for Production
-
-To create an optimized production build:
-
-```bash
-npm run build
+```sh
+gemini extensions install https://github.com/GoogleCloudPlatform/gke-mcp.git
 ```
 
-To start the production server:
+### Use in MCP Clients / Other AIs
 
-```bash
-npm run start
+#### Quick Install (Linux & macOS only)
+
+```sh
+curl -sSL https://raw.githubusercontent.com/GoogleCloudPlatform/gke-mcp/main/install.sh | bash
 ```
 
-## Customization
+#### Manual Install
 
-### Content
+If you haven't already installed Go, follow [these instructions](https://go.dev/doc/install).
 
-You can easily update the website content by modifying the configuration file located at:
-`src/config/data.ts`
+Once Go is installed, run the following command to install gke-mcp:
 
-Here you can change:
-
-* Navigation items
-* Project list
-* Articles
-* Social media links
-* Contact details
-
-### Styling
-
-Global styles and theme variables are defined in `src/app/globals.css`.
-Tailwind configuration can be found in `postcss.config.mjs` (or standard Tailwind config if applicable).
-
-## Project Structure
-
-```
-src/
-├── app/              # Next.js App Router pages and layouts
-│   ├── api/          # API routes (contact form)
-│   ├── articles/     # Blog articles
-│   └── contact/      # Contact page
-├── components/       # Reusable UI components
-│   └── ui/           # Specific UI elements (Navbar, Cards, etc.)
-├── config/           # Centralized data configuration
-├── lib/              # Utilities and helper functions
-└── types/            # TypeScript type definitions
-
-docs/                 # Documentation
-├── setup/            # Setup and configuration guides
-├── deployment/       # Deployment guides
-├── development/      # Development guides
-└── architecture/     # Architecture and design docs
+```sh
+go install github.com/GoogleCloudPlatform/gke-mcp@latest
 ```
 
-## Documentation
+The `gke-mcp` binary will be installed in the directory specified by the `GOBIN` environment variable. If `GOBIN` is not set, it defaults to `$GOPATH/bin` and, if `GOPATH` is also not set, it falls back to `$HOME/go/bin`.
 
-📚 **[Complete Documentation Index](docs/INDEX.md)**
+You can find the exact location by running `go env GOBIN`. If the command returns an empty value, run `go env GOPATH` to find the installation directory.
 
-### Quick Links
+For additional help, refer to the troubleshoot section: [gke-mcp: command not found](TROUBLESHOOTING.md#gke-mcp-command-not-found-on-macos-or-linux).
 
-* **Setup**
-  * [Email Quick Start](docs/setup/EMAIL_QUICKSTART.md) - Set up contact form email
-  * [Email Setup Guide](docs/setup/EMAIL_SETUP.md) - Detailed email configuration
-  
-* **Deployment**
-  * [Workers Deployment](docs/deployment/WORKERS_DEPLOYMENT.md) - Deploy to Cloudflare Workers
-  * [Version Management](docs/deployment/VERSION_MANAGEMENT.md) - Manage project versions
-  
-* **Development**
-  * [Development Guide](docs/development/DEVELOPMENT_GUIDE.md) - Development workflow
-  * [Quick Reference](docs/development/QUICK_REFERENCE.md) - Common commands
+### Add the MCP Server to your AI
 
-## Deployment
+For detailed instructions on how to connect the GKE MCP Server to various AI clients, including cursor, Visual Studio Code, and claude desktop, please refer to our dedicated [installation guide](docs/installation_guide/).
 
-This project is deployed on **Cloudflare Workers** for optimal global performance.
+## MCP Tools
 
-### Live Site
+- `cluster_toolkit`: Creates AI optimized GKE Clusters.
+- `list_clusters`: List your GKE clusters.
+- `get_cluster`: Get detailed about a single GKE Cluster.
+- `create_cluster`: Create a new GKE Cluster.
+- `get_kubeconfig`: Config the kubeconfig to a single GKE Cluster.
+- `giq_generate_manifest`: Generate a GKE manifest for AI/ML inference workloads using Google Inference Quickstart.
+- `list_recommendations`: List recommendations for your GKE clusters.
+- `query_logs`: Query Google Cloud Platform logs using Logging Query Language (LQL).
+- `get_log_schema`: Get the schema for a specific GKE log type.
 
-🌐 **[https://high-end-portfolio.1229773363.workers.dev](https://high-end-portfolio.1229773363.workers.dev)**
+## MCP Commands
 
-### Deploy Your Own
+Commands provide in-context domain specific functionality based on expert knowledge and best practices.
 
-```bash
-# 1. Install dependencies
-npm install
+- `gke-upgrade-risk-report`: GKE control plane upgrade risk report, analyzing the potential risks of upgrading from its current version to the target version. Performs pre-upgrade checks, API deprecations scans, and more.
+- `gke-upgrades-best-practices-risk-report`: GKE control plane upgrade best practices, applied for the specified cluster. Helps making upgrades uneventful.
 
-# 2. Build for Cloudflare Workers
-npm run build:cf
+## MCP Context
 
-# 3. Deploy
-npm run deploy
+In addition to the tools above, a lot of value is provided through the bundled context instructions.
+
+- **Cost**: The provided instructions allows the AI to answer many questions related to GKE costs, including queries related to clusters, namespaces, and Kubernetes workloads.
+
+- **GKE Known Issues**: The provided instructions allows the AI to fetch the latest GKE Known issues and check whether the cluster is affected by one of these known issues.
+
+## Supported MCP Transports
+
+By default, `gke-mcp` uses the [stdio]("https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#stdio") transport. Additionally, the [Streamable HTTP](https://modelcontextprotocol.io/specification/2025-06-18/basic/transports#streamable-http) transport is supported as well.
+
+You can set the transport mode using the following options:
+
+`--server-mode`: transport to use for the server: stdio (default) or http
+
+`--server-port`: server port to use when server-mode is http or sse; defaults to 8080
+
+```sh
+gke-mcp --server-mode http --server-port 8080
 ```
 
-For detailed deployment instructions, see [Workers Deployment Guide](docs/deployment/WORKERS_DEPLOYMENT.md).
+> [!WARNING]
+> When using the `Streamable HTTP` transport, the server listens on all network interfaces (e.g., `0.0.0.0`), which can expose it to any network your machine is connected to.
+> Please ensure you have a firewall ad/or other security measures in place to restrict access if the server is not intended to be public.
 
-## Features in Detail
+### Connecting Gemini CLI to the HTTP Server
 
-### Contact Form with Email Integration
+To connect Gemini CLI to the `gke-mcp` HTTP server, you need to configure the CLI to point to the correct endpoint. You can do this by updating your `~/.gemini/settings.json` file. For a basic setup without authentication, the file should look like this:
 
-- ✅ Integrated with Resend API
-* ✅ Beautiful HTML email templates
-* ✅ Form validation and error handling
-* ✅ Direct email to your inbox
+```json
+{
+  "mcpServers": {
+    "gke": {
+      "httpUrl": "http://127.0.0.1:8080/mcp"
+    }
+  }
+}
+```
 
-See [Email Setup Guide](docs/setup/EMAIL_SETUP.md) for configuration.
+This configuration tells Gemini CLI how to reach the gke-mcp server running on your local machine at port 8080.
 
-### Performance
+## Development
 
-- ⚡ 27ms Worker startup time
-* 🌍 Global CDN distribution
-* 📦 76% size reduction with compression
-* 🚀 Edge computing with Cloudflare Workers
+To compile the binary and update the `gemini-cli` extension with your local changes, follow these steps:
 
-## License
+1. Remove the global gke-mcp configuration
 
-This project is open source and available under the [MIT License](LICENSE).
+   ```sh
+   rm -rf ~/.gemini/extensions/gke-mcp
+   ```
 
-## Acknowledgments
+1. Build the binary from the root of the project:
 
-* Design inspiration from [Obys Agency](https://grids.obys.agency/)
-* Built with [Next.js](https://nextjs.org/)
-* Deployed on [Cloudflare Workers](https://workers.cloudflare.com/)
+   ```sh
+   go build -o gke-mcp .
+   ```
+
+1. Run the installation command to update the extension manifest:
+
+   ```sh
+   ./gke-mcp install gemini-cli --developer
+   ```
+
+   This will make `gemini-cli` use your locally compiled binary.
+
+## Disclaimers
+
+- The Google Cloud Platform Terms of Service (available at [https://cloud.google.com/terms/](https://cloud.google.com/terms/)) and the Data Processing and Security Terms (available at [https://cloud.google.com/terms/data-processing-terms](https://cloud.google.com/terms/data-processing-terms)) do not apply to any component of the GKE MCP Server software.
+- This tool is provided for education and experimentation, and is not an officially supported Google product. It is maintained on a best-effort basis, and may change without notice.
+- This project interacts with Large Language Models and comes with inherent risks.
+  - **Use at Your Own Risk:** This software is experimental, non-deterministic, and provided "AS IS" with NO GUARANTEES or warranties.
+  - **NOT FOR PRODUCTION USE.**
+  - **Data Sensitivity:** Avoid using untrusted data. NEVER input secrets, API keys, or sensitive information.
+  - **Verify Outputs:** LLM responses can be unpredictable and may be inaccurate. Always verify results.

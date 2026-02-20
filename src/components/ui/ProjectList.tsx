@@ -31,7 +31,7 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-10%" }}
             transition={{ duration: 0.8, delay: index * 0.1 }}
-            className="group relative border-t border-foreground/10 py-16 md:py-24 cursor-pointer hover:bg-foreground/[0.02] transition-colors duration-500"
+            className="group relative border-t border-foreground/[0.05] py-16 md:py-24 cursor-pointer hover:bg-foreground/[0.01] transition-colors duration-500"
         >
             <div className="flex flex-col lg:flex-row gap-8 lg:gap-16">
                 {/* Left Column: Details */}
@@ -66,21 +66,21 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
                         </div>
 
                         {/* Specs Table */}
-                        <div className="space-y-0 border-t border-foreground/10 mt-8">
-                            <div className="flex justify-between items-center py-3 border-b border-foreground/5 hover:bg-foreground/[0.02] transition-colors duration-200">
-                                <span className="text-xs uppercase tracking-wider text-foreground/50">Grid</span>
+                        <div className="space-y-0 border-t border-foreground/[0.05] mt-8">
+                            <div className="flex justify-between items-center py-3 border-b border-foreground/[0.03] hover:bg-foreground/[0.01] transition-colors duration-200">
+                                <span className="text-xs uppercase tracking-wider text-muted-foreground">Grid</span>
                                 <span className="text-sm font-medium text-foreground/90">{project.grid}</span>
                             </div>
-                            <div className="flex justify-between items-center py-3 border-b border-foreground/5 hover:bg-foreground/[0.02] transition-colors duration-200">
-                                <span className="text-xs uppercase tracking-wider text-foreground/50">Margins</span>
+                            <div className="flex justify-between items-center py-3 border-b border-foreground/[0.03] hover:bg-foreground/[0.01] transition-colors duration-200">
+                                <span className="text-xs uppercase tracking-wider text-muted-foreground">Margins</span>
                                 <span className="text-sm font-medium text-foreground/90">{project.margins}</span>
                             </div>
-                            <div className="flex justify-between items-center py-3 border-b border-foreground/5 hover:bg-foreground/[0.02] transition-colors duration-200">
-                                <span className="text-xs uppercase tracking-wider text-foreground/50">Power Lines</span>
+                            <div className="flex justify-between items-center py-3 border-b border-foreground/[0.03] hover:bg-foreground/[0.01] transition-colors duration-200">
+                                <span className="text-xs uppercase tracking-wider text-muted-foreground">Power Lines</span>
                                 <span className="text-sm font-medium text-foreground/90">{project.powerLines}</span>
                             </div>
-                            <div className="flex justify-between items-center py-3 border-b border-foreground/5 hover:bg-foreground/[0.02] transition-colors duration-200">
-                                <span className="text-xs uppercase tracking-wider text-foreground/50">Paddings System</span>
+                            <div className="flex justify-between items-center py-3 border-b border-foreground/[0.03] hover:bg-foreground/[0.01] transition-colors duration-200">
+                                <span className="text-xs uppercase tracking-wider text-muted-foreground">Paddings System</span>
                                 <span className="text-sm font-medium text-foreground/90">{project.paddingsSystem}</span>
                             </div>
                         </div>

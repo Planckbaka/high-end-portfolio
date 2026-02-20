@@ -1,20 +1,22 @@
 import type { Metadata } from "next";
-import { Inter, Outfit } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SmoothScroll } from "@/lib/smooth-scroll";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/ui/Navbar";
+import { Noise } from "@/components/ui/Noise";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
+import { CustomCursor } from "@/components/ui/CustomCursor";
 import { siteConfig } from "@/config/site";
 
-const inter = Inter({
+const spaceGrotesk = Space_Grotesk({
   variable: "--font-sans",
   subsets: ["latin"],
 });
 
-const outfit = Outfit({
-  variable: "--font-heading",
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-mono",
   subsets: ["latin"],
 });
 
@@ -109,9 +111,9 @@ export default function RootLayout({
       </head>
       <body
         className={cn(
-          inter.variable,
-          outfit.variable,
-          "font-sans bg-background text-foreground overflow-x-hidden"
+          spaceGrotesk.variable,
+          jetbrainsMono.variable,
+          "font-sans bg-background text-foreground overflow-x-hidden cursor-none"
         )}
       >
         <ThemeProvider
@@ -128,7 +130,9 @@ export default function RootLayout({
             >
               Skip to main content
             </a>
+            <CustomCursor />
             <Navbar />
+            <Noise />
             <SmoothScroll>
               <main id="main-content">{children}</main>
             </SmoothScroll>
