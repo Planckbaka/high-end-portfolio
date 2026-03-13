@@ -5,7 +5,13 @@ import { motion, useMotionValue, useSpring } from "framer-motion";
 
 export function CustomCursor() {
     const [isVisible, setIsVisible] = useState(false);
-    
+
+    // Also track if device is touch or screen is very small, to hide cursor.
+    // Lazy initializer avoids a redundant state update + re-render on mount.
+    const [isTouchDevice] = useState(
+        () => typeof window !== "undefined" && ("ontouchstart" in window || navigator.maxTouchPoints > 0)
+    );
+
     // Create motion values for x and y
     const cursorX = useMotionValue(-100);
     const cursorY = useMotionValue(-100);
@@ -19,6 +25,7 @@ export function CustomCursor() {
         const moveCursor = (e: MouseEvent) => {
             cursorX.set(e.clientX - 16); // offset by half the width/height
             cursorY.set(e.clientY - 16);
+            setIsVisible(true);
         };
 
         const handleMouseEnter = () => setIsVisible(true);
@@ -29,21 +36,12 @@ export function CustomCursor() {
         document.body.addEventListener("mouseenter", handleMouseEnter);
         document.body.addEventListener("mouseleave", handleMouseLeave);
 
-        // Initially show cursor if within screen
-        setIsVisible(true);
-
         return () => {
             window.removeEventListener("mousemove", moveCursor);
             document.body.removeEventListener("mouseenter", handleMouseEnter);
             document.body.removeEventListener("mouseleave", handleMouseLeave);
         };
-    }, []);
-
-    // Also track if device is touch or screen is very small, to hide cursor
-    const [isTouchDevice, setIsTouchDevice] = useState(false);
-    useEffect(() => {
-        setIsTouchDevice("ontouchstart" in window || navigator.maxTouchPoints > 0);
-    }, []);
+    }, [cursorX, cursorY]);
 
     if (isTouchDevice) return null;
 

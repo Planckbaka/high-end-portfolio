@@ -3,6 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
+import { memo } from "react";
 import { motion } from "framer-motion";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
@@ -11,7 +12,7 @@ import { navItems } from "@/config/data";
 /**
  * 共享导航链接组件 - 消除桌面端和移动端的代码重复
  */
-function NavLinks({ className, linkClassName }: { 
+const NavLinks = memo(function NavLinks({ className, linkClassName }: { 
     className?: string; 
     linkClassName?: string;
 }) {
@@ -38,7 +39,7 @@ function NavLinks({ className, linkClassName }: {
             ))}
         </>
     );
-}
+});
 
 export function Navbar() {
     return (

@@ -4,7 +4,7 @@ import { GridBackground } from "@/components/ui/GridBackground";
 import { motion } from "framer-motion";
 import { ArrowUpRight, Mail, MapPin, Phone } from "lucide-react";
 import { contactDetails, socialLinks } from "@/config/data";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function ContactClient() {
     const [formData, setFormData] = useState({
@@ -14,6 +14,17 @@ export default function ContactClient() {
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [submitStatus, setSubmitStatus] = useState<"idle" | "success" | "error">("idle");
+
+    // Auto-reset submitStatus after a delay, with proper cleanup to prevent
+    // stale timers if the component unmounts or the status changes again.
+    useEffect(() => {
+        if (submitStatus === "idle") return;
+
+        const delay = submitStatus === "success" ? 3000 : 5000;
+        const timer = setTimeout(() => setSubmitStatus("idle"), delay);
+
+        return () => clearTimeout(timer);
+    }, [submitStatus]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -37,15 +48,9 @@ export default function ContactClient() {
 
             setSubmitStatus("success");
             setFormData({ name: "", email: "", message: "" });
-
-            // 3秒后重置状态
-            setTimeout(() => setSubmitStatus("idle"), 3000);
         } catch (error) {
             console.error('Error sending message:', error);
             setSubmitStatus("error");
-
-            // 5秒后重置错误状态
-            setTimeout(() => setSubmitStatus("idle"), 5000);
         } finally {
             setIsSubmitting(false);
         }
