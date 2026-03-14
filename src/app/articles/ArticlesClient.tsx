@@ -4,19 +4,19 @@ import { GridBackground } from "@/components/ui/GridBackground";
 import { motion } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { memo, useCallback, useMemo, useState } from "react";
 import type { Article } from "@/types";
 
 interface ArticlesClientProps {
     articles: Article[];
 }
 
-function Pagination({ currentPage, totalPages, onPageChange }: {
+const Pagination = memo(function Pagination({ currentPage, totalPages, onPageChange }: {
     currentPage: number;
     totalPages: number;
     onPageChange: (page: number) => void;
 }) {
-    const getPageNumbers = () => {
+    const pageNumbers = useMemo(() => {
         const pages: (number | string)[] = [];
         const maxVisible = 5;
 
@@ -50,7 +50,7 @@ function Pagination({ currentPage, totalPages, onPageChange }: {
         }
 
         return pages;
-    };
+    }, [currentPage, totalPages]);
 
     return (
         <div className="flex justify-center items-center gap-3 mt-24">
@@ -65,7 +65,7 @@ function Pagination({ currentPage, totalPages, onPageChange }: {
             </button>
 
             <div className="flex gap-2">
-                {getPageNumbers().map((page, index) => {
+                {pageNumbers.map((page, index) => {
                     if (page === '...') {
                         return (
                             <span
@@ -105,42 +105,54 @@ function Pagination({ currentPage, totalPages, onPageChange }: {
             </button>
         </div>
     );
-}
+});
+
+const ITEMS_PER_PAGE = 5;
 
 export default function ArticlesClient({ articles }: ArticlesClientProps) {
     const [requestedPage, setRequestedPage] = useState(1);
     const [isAnimating, setIsAnimating] = useState(false);
-    const itemsPerPage = 5;
-    const totalPages = Math.ceil(articles.length / itemsPerPage);
-    
-    // Derive currentPage from requestedPage, clamping to valid range
-    const currentPage = totalPages > 0 ? Math.min(requestedPage, totalPages) : 1;
+    const totalPages = Math.ceil(articles.length / ITEMS_PER_PAGE);
 
-    const currentArticles = articles.slice(
-        (currentPage - 1) * itemsPerPage,
-        currentPage * itemsPerPage
+    // Derive currentPage from requestedPage, clamping to valid range
+    const currentPage = useMemo(
+        () => totalPages > 0 ? Math.min(requestedPage, totalPages) : 1,
+        [requestedPage, totalPages]
     );
 
-    const scrollToTop = () => {
+    const currentArticles = useMemo(
+        () => articles.slice(
+            (currentPage - 1) * ITEMS_PER_PAGE,
+            currentPage * ITEMS_PER_PAGE
+        ),
+        [articles, currentPage]
+    );
+
+    const scrollToTop = useCallback(() => {
         const mainElement = document.querySelector('main');
         if (mainElement) {
             mainElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
         } else {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
-    };
+    }, []);
 
-    const handlePageChange = (page: number) => {
+    const handlePageChange = useCallback((page: number) => {
         if (page === currentPage || isAnimating) return;
 
         setIsAnimating(true);
         setRequestedPage(page);
 
-        setTimeout(() => {
-            scrollToTop();
-            setTimeout(() => setIsAnimating(false), 300);
-        }, 100);
-    };
+        // Double rAF ensures React has flushed state updates and the browser
+        // has painted before we trigger the scroll, avoiding layout thrashing.
+        // The 300 ms timeout matches the fade-in transition duration.
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                scrollToTop();
+                setTimeout(() => setIsAnimating(false), 300);
+            });
+        });
+    }, [currentPage, isAnimating, scrollToTop]);
 
     return (
         <main className="relative w-full min-h-screen overflow-hidden pt-32 pb-24 px-4 md:px-12 lg:px-24">

@@ -2,7 +2,7 @@
 
 import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
 import { ArrowUpRight, FileText } from "lucide-react";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 
 export function MagneticButton({
     children,
@@ -26,7 +26,7 @@ export function MagneticButton({
 
     const transform = useMotionTemplate`translate(${xSpring}px, ${ySpring}px)`;
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const handleMouseMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
         if (!ref.current) return;
 
         const { left, top, width, height } = ref.current.getBoundingClientRect();
@@ -39,12 +39,12 @@ export function MagneticButton({
         // Magnetic strength
         x.set(distanceX * 0.3);
         y.set(distanceY * 0.3);
-    };
+    }, [x, y]);
 
-    const handleMouseLeave = () => {
+    const handleMouseLeave = useCallback(() => {
         x.set(0);
         y.set(0);
-    };
+    }, [x, y]);
 
     return (
         <motion.a

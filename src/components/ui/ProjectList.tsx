@@ -4,14 +4,14 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { ArrowUpRight } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRef } from "react";
+import { memo, useRef } from "react";
 import type { Project } from "@/types";
 
 interface ProjectListProps {
     projects: Project[];
 }
 
-function ProjectItem({ project, index }: { project: Project; index: number }) {
+const ProjectItem = memo(function ProjectItem({ project, index }: { project: Project; index: number }) {
     const ref = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({
         target: ref,
@@ -144,7 +144,7 @@ function ProjectItem({ project, index }: { project: Project; index: number }) {
     }
 
     return cardContent;
-}
+});
 
 export function ProjectList({ projects }: ProjectListProps) {
     return (
