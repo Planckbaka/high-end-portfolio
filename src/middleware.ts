@@ -1,6 +1,17 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 
+/**
+ * Security headers for every page request.
+ *
+ * Next.js 16 deprecates this `middleware` file convention in favour of `proxy`
+ * and warns on every build — but the migration is blocked, not merely pending:
+ * `proxy` always runs on the Node.js runtime ("Route segment config is not
+ * allowed in Proxy file"), and @opennextjs/cloudflare rejects Node.js
+ * middleware outright ("Node.js middleware is not currently supported").
+ * Renaming this file breaks `npm run build:cf`, so it stays as middleware —
+ * which Next still compiles to the edge runtime — until OpenNext supports it.
+ */
 export function middleware(request: NextRequest) {
     const response = NextResponse.next({ request });
 

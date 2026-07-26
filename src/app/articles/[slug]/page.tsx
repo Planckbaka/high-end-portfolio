@@ -24,6 +24,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
         };
     }
 
+    // Per-article share card, pre-rendered at build time by
+    // scripts/generate-og-image.mjs into public/og/articles/<slug>.png.
+    const ogImage = `/og/articles/${slug}.png`;
+
     return {
         /*
          * Bare title only. The root layout defines
@@ -44,13 +48,13 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
             publishedTime: article.date,
             authors: [siteConfig.author.name],
             url: `${siteConfig.url}/articles/${slug}`,
-            images: [siteConfig.ogImage],
+            images: [{ url: ogImage, width: 1200, height: 630, alt: article.title }],
         },
         twitter: {
             card: "summary_large_image",
             title: `${article.title} | ${siteConfig.name}`,
             description: article.excerpt,
-            images: [siteConfig.ogImage],
+            images: [ogImage],
         },
     };
 }
