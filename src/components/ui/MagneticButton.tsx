@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useMotionTemplate, useMotionValue, useSpring } from "framer-motion";
+import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import { ArrowUpRight, FileText } from "lucide-react";
 import { useRef } from "react";
 
@@ -14,6 +14,7 @@ export function MagneticButton({
     className?: string;
 }) {
     const ref = useRef<HTMLAnchorElement>(null);
+    const shouldReduceMotion = useReducedMotion();
 
     // Mouse position relative to the button center
     const x = useMotionValue(0);
@@ -27,7 +28,8 @@ export function MagneticButton({
     const transform = useMotionTemplate`translate(${xSpring}px, ${ySpring}px)`;
 
     const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-        if (!ref.current) return;
+        // Chasing the cursor is exactly the kind of motion this preference opts out of.
+        if (!ref.current || shouldReduceMotion) return;
 
         const { left, top, width, height } = ref.current.getBoundingClientRect();
         const centerX = left + width / 2;
@@ -55,7 +57,7 @@ export function MagneticButton({
             onMouseMove={handleMouseMove}
             onMouseLeave={handleMouseLeave}
             style={{ transform }}
-            className={`group relative inline-flex items-center gap-3 px-8 py-4 bg-foreground/[0.02] border border-foreground/[0.05] rounded-full overflow-hidden hover:border-accent/50 transition-colors duration-500 ${className}`}
+            className={`group relative inline-flex items-center gap-3 px-8 py-4 bg-surface border border-hairline rounded-full overflow-hidden hover:border-accent/50 transition-colors duration-500 ${className}`}
         >
             {/* Hover Fill Effect */}
             <div className="absolute inset-0 bg-accent translate-y-[100%] group-hover:translate-y-0 transition-transform duration-500 ease-[0.76,0,0.24,1]" />

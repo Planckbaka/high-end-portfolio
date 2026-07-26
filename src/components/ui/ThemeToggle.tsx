@@ -3,59 +3,68 @@
 import * as React from "react";
 import { useTheme } from "next-themes";
 import { motion } from "framer-motion";
+import { Moon, Sun } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+const OPTIONS = [
+    { value: "light", label: "Light", Icon: Sun },
+    { value: "dark", label: "Dark", Icon: Moon },
+] as const;
+
 export function ThemeToggle() {
-    const { theme, setTheme } = useTheme();
+    const { setTheme, resolvedTheme } = useTheme();
     const [mounted, setMounted] = React.useState(false);
 
     React.useEffect(() => {
         setMounted(true);
     }, []);
 
+    // Reserve the final footprint so mounting does not shift the navbar.
     if (!mounted) {
-        return <div className="w-32 h-8" />;
+        return <div className="h-8 w-[72px]" aria-hidden="true" />;
     }
 
+    /*
+     * Compare against `resolvedTheme`, not `theme`. With `enableSystem` the
+     * latter can be the literal string "system", which matches neither option
+     * and would leave the control with no visible selection.
+     */
+    const active = resolvedTheme === "light" ? "light" : "dark";
+
     return (
-        <div className="flex items-center gap-3 text-xs uppercase tracking-widest font-bold">
-            <span className="hidden md:inline-block text-foreground/60">Dark Mode:</span>
-            <div className="relative flex items-center bg-foreground/5 border border-foreground/10 rounded-full p-0.5">
-                <button
-                    onClick={() => setTheme("dark")}
-                    aria-label="Enable dark mode"
-                    className={cn(
-                        "relative z-10 px-3 py-1 rounded-full transition-colors duration-300",
-                        theme === "dark" ? "text-background" : "text-foreground/60 hover:text-foreground/80"
-                    )}
-                >
-                    On
-                    {theme === "dark" && (
-                        <motion.div
-                            layoutId="activeTheme"
-                            className="absolute inset-0 bg-foreground rounded-full z-[-1]"
-                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        />
-                    )}
-                </button>
-                <button
-                    onClick={() => setTheme("light")}
-                    aria-label="Enable light mode"
-                    className={cn(
-                        "relative z-10 px-3 py-1 rounded-full transition-colors duration-300",
-                        theme === "light" ? "text-background" : "text-foreground/60 hover:text-foreground/80"
-                    )}
-                >
-                    Off
-                    {theme === "light" && (
-                        <motion.div
-                            layoutId="activeTheme"
-                            className="absolute inset-0 bg-foreground rounded-full z-[-1]"
-                            transition={{ type: "spring", stiffness: 400, damping: 30 }}
-                        />
-                    )}
-                </button>
-            </div>
+        <div
+            role="group"
+            aria-label="Colour theme"
+            className="relative flex items-center gap-0.5 rounded-full border border-hairline bg-surface p-0.5"
+        >
+            {OPTIONS.map(({ value, label, Icon }) => {
+                const isActive = active === value;
+
+                return (
+                    <button
+                        key={value}
+                        type="button"
+                        onClick={() => setTheme(value)}
+                        aria-label={`Switch to ${label.toLowerCase()} theme`}
+                        aria-pressed={isActive}
+                        className={cn(
+                            "relative z-10 grid h-7 w-8 place-items-center rounded-full transition-colors duration-300",
+                            isActive
+                                ? "text-background"
+                                : "text-foreground/45 hover:text-foreground/80"
+                        )}
+                    >
+                        <Icon size={14} strokeWidth={2.25} aria-hidden="true" />
+                        {isActive && (
+                            <motion.span
+                                layoutId="activeTheme"
+                                className="absolute inset-0 -z-10 rounded-full bg-foreground"
+                                transition={{ type: "spring", stiffness: 400, damping: 30 }}
+                            />
+                        )}
+                    </button>
+                );
+            })}
         </div>
     );
 }

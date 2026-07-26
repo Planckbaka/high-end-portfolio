@@ -80,3 +80,14 @@ export interface BaseComponentProps {
     className?: string;
     children?: React.ReactNode;
 }
+
+// Upcoming Topic types
+export interface UpcomingTopic {
+    id: string;
+    title: string;
+    category: string;
+    status: 'planning' | 'outline' | 'drafting' | 'reviewing';
+    estimatedDate: string;
+    description: string;
+}
+

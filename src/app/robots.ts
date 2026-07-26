@@ -1,4 +1,5 @@
 import { MetadataRoute } from 'next';
+import { siteConfig } from '@/config/site';
 
 export default function robots(): MetadataRoute.Robots {
     return {
@@ -7,6 +8,6 @@ export default function robots(): MetadataRoute.Robots {
             allow: '/',
             disallow: ['/api/', '/admin/'],
         },
-        sitemap: 'https://high-end-portfolio.1229773363.workers.dev/sitemap.xml', // Update with your actual domain
+        sitemap: `${siteConfig.url}/sitemap.xml`,
     };
 }

@@ -7,6 +7,7 @@ import remarkGfm from 'remark-gfm';
 import remarkRehype from 'remark-rehype';
 import rehypeSlug from 'rehype-slug';
 import rehypeAutolinkHeadings from 'rehype-autolink-headings';
+import rehypeSanitize from 'rehype-sanitize';
 import rehypeStringify from 'rehype-stringify';
 import { fileURLToPath } from 'url';
 import { dirname } from 'path';
@@ -66,6 +67,7 @@ async function processMarkdown(content) {
         .use(remarkParse)
         .use(remarkGfm)
         .use(remarkRehype)
+        .use(rehypeSanitize)
         .use(rehypeSlug)
         .use(rehypeAutolinkHeadings, {
             behavior: 'wrap',
@@ -133,7 +135,7 @@ async function generateArticlesData() {
     });
 
     // Write to JSON file
-    fs.writeFileSync(outputFile, JSON.stringify(articles, null, 2));
+    fs.writeFileSync(outputFile, JSON.stringify(articles));
     console.log(`✓ Generated articles data: ${outputFile}`);
     console.log(`✓ Total articles: ${articles.length}`);
 }

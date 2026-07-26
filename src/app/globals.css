@@ -1,36 +1,80 @@
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
+/*
+ * Dark variant is driven by next-themes' `data-theme` attribute, NOT by the OS
+ * `prefers-color-scheme` media query. Without this, every `dark:` utility
+ * (dark:prose-invert, dark:opacity-*) follows the operating system while the
+ * rest of the page follows the in-page toggle — the two disagree and text
+ * lands on same-lightness backgrounds.
+ */
+@custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
+
 :root {
-  /* MASTER-LEVEL LIGHT THEME */
-  /* Background: A soft, organic bone/alabaster white to reduce eye strain and look premium */
+  /* ---- LIGHT THEME ---------------------------------------------------- */
+  /* Soft organic bone/alabaster — premium, low eye strain */
   --background: 40 15% 96%;
-  /* Foreground: A very deep, warm charcoal rather than pure black */
+  /* Deep warm charcoal rather than pure black */
   --foreground: 0 0% 12%;
-  /* Accent: A striking, sophisticated Vermilion/Burnt Orange */
-  --accent: 12 85% 55%;
-  --accent-foreground: 0 0% 100%;
-  /* Muted elements: Warm grays */
+  /* Sophisticated vermilion / burnt orange */
+  --accent: 12 85% 48%;
+  --accent-foreground: 40 20% 98%;
   --muted: 40 8% 90%;
-  --muted-foreground: 0 0% 45%;
-  
-  --font-sans: "Space Grotesk", sans-serif;
-  --font-heading: "Space Grotesk", sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  --muted-foreground: 0 0% 38%;
+
+  /*
+   * Surface + border scale.
+   * Light themes need noticeably more contrast than dark ones to read as
+   * "cards": a 2% black wash on bone-white is invisible, while a 2% white
+   * wash on near-black reads clearly. These are tuned per theme instead of
+   * reusing one alpha ramp for both.
+   */
+  --surface: 40 12% 100%;
+  --surface-alpha: 0.55;
+  --surface-raised: 40 10% 100%;
+  --surface-raised-alpha: 0.9;
+  --border-subtle: 30 10% 12%;
+  --border-subtle-alpha: 0.1;
+  --border-strong: 30 10% 12%;
+  --border-strong-alpha: 0.18;
+
+  /* Grain is far more visible on light backgrounds — dial it back */
+  --grain-opacity: 0.018;
+  /* Ambient hero glow */
+  --glow-opacity: 0.5;
+
+  /*
+   * Code blocks stay dark in BOTH themes. It reads as a deliberate editorial
+   * device (and suits a developer blog), and it removes an entire class of
+   * theme bugs: a light-on-light or dark-on-dark code block is impossible when
+   * the surface never changes with the theme.
+   */
+  --code-surface: 0 0% 7%;
+  --code-foreground: 0 0% 88%;
 }
 
 [data-theme="dark"] {
-  /* MASTER-LEVEL DARK THEME */
-  /* Background: Rich, infinite cinematic black with the tiniest hint of warmth */
+  /* ---- DARK THEME ----------------------------------------------------- */
+  /* Rich cinematic black with the faintest warmth */
   --background: 0 0% 4%;
-  /* Foreground: An elegant, slightly dimmed off-white to prevent glare */
+  /* Slightly dimmed off-white to prevent glare */
   --foreground: 0 0% 93%;
-  /* Accent: Bright Vermilion */
   --accent: 12 85% 60%;
-  --accent-foreground: 0 0% 100%;
-  /* Muted elements: Deep charcoal */
+  --accent-foreground: 0 0% 8%;
   --muted: 0 0% 11%;
-  --muted-foreground: 0 0% 60%;
+  --muted-foreground: 0 0% 62%;
+
+  --surface: 0 0% 100%;
+  --surface-alpha: 0.025;
+  --surface-raised: 0 0% 100%;
+  --surface-raised-alpha: 0.045;
+  --border-subtle: 0 0% 100%;
+  --border-subtle-alpha: 0.08;
+  --border-strong: 0 0% 100%;
+  --border-strong-alpha: 0.16;
+
+  --grain-opacity: 0.035;
+  --glow-opacity: 1;
 }
 
 @theme inline {
@@ -41,9 +85,58 @@
   --color-muted: hsl(var(--muted));
   --color-muted-foreground: hsl(var(--muted-foreground));
 
+  --color-surface: hsl(var(--surface) / var(--surface-alpha));
+  --color-surface-raised: hsl(var(--surface-raised) / var(--surface-raised-alpha));
+  --color-hairline: hsl(var(--border-subtle) / var(--border-subtle-alpha));
+  --color-hairline-strong: hsl(var(--border-strong) / var(--border-strong-alpha));
+
+  /*
+   * `--font-sans` / `--font-mono` are supplied by next/font on <body> and
+   * include the metric-matched fallback ("Space Grotesk", "Space Grotesk
+   * Fallback"). Heading type aliases the same stack rather than re-declaring
+   * the family name, which would drop the fallback and reintroduce heading
+   * layout shift on first paint.
+   */
   --font-sans: var(--font-sans);
-  --font-heading: var(--font-heading);
+  --font-heading: var(--font-sans);
   --font-mono: var(--font-mono);
+
+  /*
+   * Fluid display scale. Raw viewport units (text-[12vw]) scale without limit:
+   * 230px at 1920w, 45px at 375w, with nothing controlling either end. clamp()
+   * pins both bounds so the hero stays a hero on a phone and stops growing on
+   * an ultrawide.
+   */
+  --text-display-2xl: clamp(3.25rem, 11.5vw, 13rem);
+  --text-display-2xl--line-height: 0.84;
+  --text-display-2xl--letter-spacing: -0.045em;
+  --text-display-2xl--font-weight: 700;
+
+  --text-display-xl: clamp(2.75rem, 8.5vw, 8.5rem);
+  --text-display-xl--line-height: 0.86;
+  --text-display-xl--letter-spacing: -0.04em;
+  --text-display-xl--font-weight: 700;
+
+  --text-display-lg: clamp(2.25rem, 6vw, 5.5rem);
+  --text-display-lg--line-height: 0.88;
+  --text-display-lg--letter-spacing: -0.035em;
+  --text-display-lg--font-weight: 700;
+
+  --text-display-md: clamp(1.875rem, 4vw, 3.5rem);
+  --text-display-md--line-height: 0.92;
+  --text-display-md--letter-spacing: -0.025em;
+  --text-display-md--font-weight: 700;
+
+  --text-display-sm: clamp(1.5rem, 2.6vw, 2.25rem);
+  --text-display-sm--line-height: 1.05;
+  --text-display-sm--letter-spacing: -0.02em;
+  --text-display-sm--font-weight: 700;
+
+  /* The recurring all-caps micro-label used as an eyebrow throughout */
+  --text-eyebrow: 0.6875rem;
+  --text-eyebrow--line-height: 1.2;
+  --text-eyebrow--letter-spacing: 0.2em;
+  --text-eyebrow--font-weight: 600;
 
   --animate-fade-in: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   --animate-slide-up: slide-up 1s cubic-bezier(0.16, 1, 0.3, 1) forwards;
@@ -93,23 +186,175 @@
   }
 }
 
+/* Consistent page gutter — one source of truth instead of repeating
+   `px-4 md:px-12 lg:px-24` at every call site. */
+@utility gutter {
+  padding-inline: 1rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 3rem;
+  }
+
+  @media (width >= 64rem) {
+    padding-inline: 6rem;
+  }
+}
+
+/* Vertical rhythm for major page sections */
+@utility section-y {
+  padding-block: 6rem;
+
+  @media (width >= 48rem) {
+    padding-block: 8rem;
+  }
+}
+
+/* ---------------------------------------------------------------------------
+ * Entrance reveals
+ *
+ * These were JS-driven (framer-motion `initial={{ opacity: 0 }}` + `animate`).
+ * That makes the *content* conditional on an animation finishing: if the
+ * animation clock misbehaves the text never appears at all. Observed stuck at
+ * opacity 0 in a backgrounded tab (rAF is throttled to ~0 fps) and in headless
+ * Chrome — and the same happens if the JS chunk fails to load.
+ *
+ * As CSS the animation cannot get stuck, needs no JavaScript, paints with the
+ * first frame (better LCP), and is already covered by the reduced-motion block
+ * at the bottom of this file.
+ * ------------------------------------------------------------------------- */
+
+@keyframes reveal-rise {
+  from {
+    opacity: 0;
+    transform: translateY(1.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes reveal-fade {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes reveal-unmask {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@keyframes reveal-rule {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@keyframes reveal-drop {
+  from { transform: translateY(-100%); }
+  to { transform: translateY(0); }
+}
+
+/* Time-based reveal for above-the-fold content. `both` fill keeps the start
+   state during the delay and the end state afterwards. */
+@utility reveal {
+  animation: reveal-rise 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--reveal-delay, 0s);
+}
+
+@utility reveal-fade {
+  animation: reveal-fade 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--reveal-delay, 0s);
+}
+
+/* Signature display-type reveal: slide each line up out of a clipping mask. */
+@utility reveal-unmask {
+  animation: reveal-unmask 1s cubic-bezier(0.76, 0, 0.24, 1) both;
+  animation-delay: var(--reveal-delay, 0s);
+}
+
+@utility reveal-rule {
+  transform-origin: left center;
+  animation: reveal-rule 1s cubic-bezier(0.76, 0, 0.24, 1) both;
+  animation-delay: var(--reveal-delay, 0s);
+}
+
+/* Header sliding into place from above */
+@utility reveal-drop {
+  animation: reveal-drop 0.8s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: var(--reveal-delay, 0s);
+}
+
+/*
+ * Scroll-triggered reveal, driven by a view() timeline.
+ *
+ * Gated behind @supports on purpose: where scroll-driven animations are not
+ * implemented, no animation is applied at all and the content is simply
+ * visible. That is the correct degradation — never "invisible until proven
+ * otherwise".
+ */
+@utility reveal-on-scroll {
+  @supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+      animation: reveal-rise 1s cubic-bezier(0.16, 1, 0.3, 1) both;
+      animation-timeline: view();
+      animation-range: entry 0% cover 22%;
+    }
+  }
+}
+
 @utility glow-shadow {
-  box-shadow: 0 0 40px rgba(255, 87, 51, 0.15); /* Vermilion glow */
+  box-shadow: 0 0 40px hsl(var(--accent) / 0.15);
+}
+
+@utility glow-shadow-hover {
+  transition: box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+
+  &:hover {
+    box-shadow: 0 0 35px hsl(var(--accent) / 0.08), 0 0 10px hsl(var(--accent) / 0.02);
+  }
+}
+
+/* Lining/tabular figures for spec tables and metrics, so columns align */
+@utility nums-tabular {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
+}
+
+/*
+ * Mixed-script titles (this blog's post titles are mostly Chinese with Latin
+ * technical terms mixed in).
+ *
+ * The display scale is tuned for Latin caps: negative tracking and a
+ * sub-1 line-height. Applied to CJK those metrics collide — full-width glyphs
+ * have no side bearings to absorb negative tracking, and 0.9 leading makes
+ * stacked Chinese lines touch. Mixed titles get their own relaxed metrics.
+ */
+@utility title-mixed {
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+  /* Collapse the built-in side space on CJK brackets/punctuation where supported */
+  text-spacing-trim: trim-start;
+  overflow-wrap: break-word;
 }
 
 body {
   background: hsl(var(--background));
-  color: hwb(var(--foreground)); /* Fallback handling by Tailwind but explicit here just in case */
   color: hsl(var(--foreground));
   font-family: var(--font-sans);
-  /* Superior Font Rendering */
+  /* Superior font rendering */
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
   transition: background-color 0.5s ease, color 0.5s ease;
 }
 
-/* Premium Text Selection */
+/* Optical refinement for large display type: real kerning + ligatures. */
+.font-heading {
+  font-kerning: normal;
+  font-feature-settings: "kern" 1, "liga" 1, "calt" 1;
+}
+
+/* Premium text selection */
 ::selection {
   background: hsl(var(--accent) / 0.3);
   color: hsl(var(--foreground));
@@ -119,10 +364,11 @@ body {
   color: hsl(var(--foreground));
 }
 
-/* Accessibility: Focus Styles */
+/* Accessibility: focus styles. A second inset ring keeps the indicator
+   visible where the accent sits on an accent-coloured surface. */
 *:focus-visible {
   outline: 2px solid hsl(var(--accent));
-  outline-offset: 4px;
+  outline-offset: 3px;
   border-radius: 2px;
 }
 
@@ -131,7 +377,136 @@ a:focus-visible,
 input:focus-visible,
 textarea:focus-visible {
   outline: 2px solid hsl(var(--accent));
-  outline-offset: 4px;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 1px hsl(var(--background));
+}
+
+/* ---------------------------------------------------------------------------
+ * Article typography
+ *
+ * @tailwindcss/typography ships its own gray ramp and expects you to flip it
+ * with `dark:prose-invert`. Deriving every colour from the design tokens
+ * instead means prose follows `data-theme` structurally and cannot desync from
+ * the rest of the page — no invert toggle, and no way to end up with grey-700
+ * body copy on a near-black background.
+ * ------------------------------------------------------------------------- */
+.prose {
+  --tw-prose-body: hsl(var(--foreground) / 0.82);
+  --tw-prose-headings: hsl(var(--foreground));
+  --tw-prose-lead: hsl(var(--foreground) / 0.7);
+  --tw-prose-links: hsl(var(--accent));
+  --tw-prose-bold: hsl(var(--foreground));
+  --tw-prose-counters: hsl(var(--foreground) / 0.55);
+  --tw-prose-bullets: hsl(var(--accent) / 0.6);
+  --tw-prose-hr: hsl(var(--border-subtle) / var(--border-subtle-alpha));
+  --tw-prose-quotes: hsl(var(--foreground) / 0.8);
+  --tw-prose-quote-borders: hsl(var(--accent));
+  --tw-prose-captions: hsl(var(--foreground) / 0.55);
+  --tw-prose-kbd: hsl(var(--foreground));
+  --tw-prose-kbd-shadows: var(--foreground);
+  --tw-prose-code: hsl(var(--foreground) / 0.9);
+  --tw-prose-pre-code: hsl(var(--code-foreground));
+  --tw-prose-pre-bg: hsl(var(--code-surface));
+  --tw-prose-th-borders: hsl(var(--border-strong) / var(--border-strong-alpha));
+  --tw-prose-td-borders: hsl(var(--border-subtle) / var(--border-subtle-alpha));
+
+  max-width: none;
+}
+
+/* Gentle tracking rather than the display scale's tight negative value: these
+   headings are frequently Chinese, where full-width glyphs have no side
+   bearings to absorb it. */
+.prose :where(h2, h3, h4) {
+  font-family: var(--font-heading);
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+  text-spacing-trim: trim-start;
+  scroll-margin-top: 8rem;
+}
+
+/* Relax measure and leading for CJK body copy, which needs more air between
+   lines than Latin at the same size. */
+.prose :where(p, li) {
+  line-height: 1.85;
+}
+
+/* rehype-autolink-headings wraps heading text in an anchor. Keep it looking
+   like a heading, with the accent reserved for the hover affordance. */
+.prose :where(h2, h3, h4) a {
+  color: inherit;
+  text-decoration: none;
+  font-weight: inherit;
+}
+
+.prose :where(h2, h3, h4) a:hover {
+  color: hsl(var(--accent));
+}
+
+.prose :where(a):not(:where(h2, h3, h4) a) {
+  text-decoration-color: hsl(var(--accent) / 0.4);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: text-decoration-color 0.3s ease, color 0.3s ease;
+}
+
+.prose :where(a):not(:where(h2, h3, h4) a):hover {
+  text-decoration-color: hsl(var(--accent));
+}
+
+.prose :where(pre) {
+  border: 1px solid hsl(0 0% 100% / 0.08);
+  border-radius: 0.375rem;
+  font-size: 0.875em;
+}
+
+/* Inline code only — `pre code` inherits the block treatment above. */
+.prose :where(code):not(:where(pre code)) {
+  background: hsl(var(--foreground) / 0.06);
+  border: 1px solid hsl(var(--border-subtle) / var(--border-subtle-alpha));
+  border-radius: 0.25rem;
+  padding: 0.15em 0.4em;
+  font-weight: 500;
+  font-size: 0.875em;
+}
+
+.prose :where(code):not(:where(pre code))::before,
+.prose :where(code):not(:where(pre code))::after {
+  content: none;
+}
+
+.prose :where(blockquote) {
+  border-inline-start-width: 2px;
+  padding-inline-start: 1.5rem;
+  font-style: normal;
+}
+
+.prose :where(figure, img, video) {
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.prose :where(table) {
+  font-size: 0.9375em;
+  font-variant-numeric: tabular-nums;
+}
+
+.prose :where(th) {
+  text-align: start;
+  font-family: var(--font-heading);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 0.75em;
+}
+
+.prose :where(th, td) {
+  padding: 0.625rem 0.75rem;
+}
+
+/* Wide tables and code scroll inside their own box rather than pushing the
+   page sideways. */
+.prose :where(pre, table) {
+  max-width: 100%;
+  overflow-x: auto;
 }
 
 /* Smooth Scroll overrides for Lenis */
@@ -154,4 +529,21 @@ html.lenis body {
 
 .lenis.lenis-scrolling iframe {
   pointer-events: none;
+}
+
+/* Custom cursor - only on hover-capable devices */
+@media (hover: hover) and (pointer: fine) {
+  .custom-cursor-active {
+    cursor: none;
+  }
+}
+
+/* Reduced motion: disable non-essential animations */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

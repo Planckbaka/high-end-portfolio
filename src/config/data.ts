@@ -1,4 +1,4 @@
-import type { NavItem, Project, Technology, Article, SocialLink, ContactDetails, SelfIntroData } from "@/types";
+import type { NavItem, Project, Technology, SocialLink, ContactDetails, SelfIntroData, UpcomingTopic } from "@/types";
 
 export const navItems: NavItem[] = [
     { name: "Home", path: "/" },
@@ -74,85 +74,6 @@ export const technologies: Technology[] = [
     { id: 11, name: "CloudFlare" },
 ];
 
-export const articles: Article[] = [
-    {
-        id: 1,
-        title: "The Future of Digital Interfaces",
-        date: "Oct 24, 2024",
-        category: "Design",
-        excerpt: "exploring how spatial computing and AI are reshaping the way we interact with digital products.",
-        slug: "future-of-digital-interfaces",
-        content: `
-            <p>The digital landscape is on the brink of a revolutionary shift. As spatial computing technologies mature and Artificial Intelligence becomes more deeply integrated into our daily workflows, the traditional screen-based interface is being reimagined.</p>
-            
-            <h3>Beyond the Screen</h3>
-            <p>Spatial computing frees us from the constraints of 2D displays. It allows digital content to coexist with the physical world, creating immersive experiences that are more intuitive and engaging. Imagine manipulating data with your hands or walking through a 3D model of a building before it's even constructed.</p>
-            
-            <h3>AI as a Collaborator</h3>
-            <p>Artificial Intelligence is no longer just a tool; it's becoming a collaborator. Generative AI can help designers iterate faster, developers write cleaner code, and users find information more efficiently. The challenge lies in designing interfaces that facilitate this collaboration seamlessly.</p>
-            
-            <p>As we move forward, the focus must remain on human-centric design. Technology should enhance our capabilities, not replace them. The future of digital interfaces is not just about pixels and code; it's about creating meaningful connections between people and the digital world.</p>
-        `
-    },
-    {
-        id: 2,
-        title: "Mastering Framer Motion",
-        date: "Sep 12, 2024",
-        category: "Development",
-        excerpt: "A deep dive into creating complex animations with React and Framer Motion for high-performance web apps.",
-        slug: "mastering-framer-motion",
-        content: `
-            <p>Animation is a powerful tool in web design. It guides the user's attention, provides feedback, and adds a layer of polish that distinguishes a good app from a great one. Framer Motion has emerged as the go-to library for React developers looking to implement complex animations with ease.</p>
-            
-            <h3>Declarative Animations</h3>
-            <p>One of the key strengths of Framer Motion is its declarative nature. Instead of imperatively managing animation states, you simply define the target state, and the library handles the rest. This makes code easier to read and maintain.</p>
-            
-            <h3>Performance Matters</h3>
-            <p>Animations should never come at the cost of performance. Framer Motion is optimized to run animations off the main thread whenever possible, ensuring a smooth 60fps experience even on lower-end devices.</p>
-            
-            <p>Whether you're building a simple micro-interaction or a complex page transition, mastering Framer Motion will elevate your frontend development skills to the next level.</p>
-        `
-    },
-    {
-        id: 3,
-        title: "Minimalism in 2025",
-        date: "Aug 05, 2024",
-        category: "Trends",
-        excerpt: "Why the 'less is more' philosophy is making a comeback in a world of information overload.",
-        slug: "minimalism-in-2025",
-        content: `
-            <p>In an age where we are constantly bombarded with notifications, ads, and information, minimalism offers a breath of fresh air. It's not just about aesthetic simplicity; it's about clarity of purpose.</p>
-            
-            <h3>Focus on Content</h3>
-            <p>Minimalist design strips away the unnecessary, leaving only what is essential. This forces designers to prioritize content and functionality. Every element on the page must have a reason for being there.</p>
-            
-            <h3>The Return of Typography</h3>
-            <p>With fewer graphical elements to hide behind, typography takes center stage. Bold, expressive typefaces are being used to convey emotion and hierarchy, turning text into a visual element in its own right.</p>
-            
-            <p>Minimalism in 2025 is not about being boring. It's about being bold, direct, and respectful of the user's time and attention.</p>
-        `
-    },
-    {
-        id: 4,
-        title: "Building Accessible Web Apps",
-        date: "Jul 18, 2024",
-        category: "Engineering",
-        excerpt: "Practical tips and strategies for ensuring your applications are usable by everyone.",
-        slug: "building-accessible-web-apps",
-        content: `
-            <p>The web was designed to be universal. It is our responsibility as developers to ensure that the applications we build are accessible to everyone, regardless of their abilities or disabilities.</p>
-            
-            <h3>Semantic HTML</h3>
-            <p>Accessibility starts with semantic HTML. Using the correct tags for the job (buttons for actions, links for navigation, headings for structure) provides a solid foundation that assistive technologies can rely on.</p>
-            
-            <h3>Color and Contrast</h3>
-            <p>Visual impairments are common, so ensuring sufficient color contrast is crucial. Tools like the WCAG contrast checker can help you verify that your design meets the necessary standards.</p>
-            
-            <p>Building accessible web apps is not just a legal requirement; it's a moral one. By designing for inclusivity, we create a better web for everyone.</p>
-        `
-    }
-];
-
 export const socialLinks: SocialLink[] = [
     { name: 'Twitter', url: '#' },
     { name: 'LinkedIn', url: 'https://www.linkedin.com/in/zhang-weihuang-78753b382/' },
@@ -178,3 +99,48 @@ export const selfIntroData: SelfIntroData = {
         { id: 2, value: "5", accent: "+", label: "Projects" }
     ]
 };
+
+export const upcomingTopics: UpcomingTopic[] = [
+    {
+        id: "transformer-scratch",
+        title: "从零构建 Transformer Decoder：PyTorch 手写与 Tensor 维度流转艺术",
+        category: "Transformer & Deep Learning",
+        status: "drafting",
+        estimatedDate: "2026-06-15",
+        description: "沿着 Karpathy 的 2026 教程，用 PyTorch 纯手写多头自注意力机制（MHA），深度拆解序列长度、通道与头数在计算过程中的三维 Tensor 变换拓扑结构。"
+    },
+    {
+        id: "agent-dag",
+        title: "多 Agent 协同编排引擎：基于 Python 状态机与并发 DAG 的调度设计",
+        category: "Agent Orchestration",
+        status: "outline",
+        estimatedDate: "2026-07-05",
+        description: "结合 Python 后端并发与状态机设计，拆解多 Agent 协同中的拓扑执行图（DAG）、记忆切片共享机制，以及异步任务调度器（Scheduler）的设计模式。"
+    },
+    {
+        id: "go-harness",
+        title: "大模型评测基准设计：基于 Go 高并发的吞吐量与准确率评测架构",
+        category: "AI Harness Systems",
+        status: "planning",
+        estimatedDate: "2026-07-25",
+        description: "如何利用 Go 语言的高并发性能（Goroutine/Channel），构建支持数万 Token/s 并发打分、Prompt 动态渲染、精度对齐与自动化回归的 LLM Harness 评测系统。"
+    },
+    {
+        id: "vllm-mem",
+        title: "AI Infra 极速探索：vLLM 核心技术（PagedAttention）原理与显存优化",
+        category: "AI Infrastructure",
+        status: "planning",
+        estimatedDate: "2026-08-15",
+        description: "解密大模型推理优化核心。分析虚拟内存管理（Paging）如何应用在 KV Cache 显存分配中，彻底消除碎片，将显存吞吐量压榨至极限。"
+    },
+    {
+        id: "autograd-go-py",
+        title: "零依赖手写自动求导：计算图反向传播的 Go 与 Python 跨界实现",
+        category: "AI Fundamentals",
+        status: "planning",
+        estimatedDate: "2026-09-05",
+        description: "对比 Python 的“运算符重载”与 Go 的“链式方法链”，手写最精简的 Autograd 自动求导引擎，彻底讲清动态计算图、拓扑排序与链式法则求偏导的本质。"
+    }
+];
+
+
