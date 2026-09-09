@@ -29,12 +29,10 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
+# Environment files (keep the shared example)
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
 
 # vercel
 .vercel
@@ -50,6 +48,14 @@ next-env.d.ts
 *.swo
 *.swn
 
+# Local AI settings and session state
+/.omc/
+/.claude/settings.local.json
+
+# Tool caches
+.swc/
+.ruff_cache/
+
 # OS Generated Files
 .DS_Store
 .DS_Store?
@@ -62,6 +68,8 @@ Thumbs.db
 # Cloudflare Workers
 .wrangler/
 .dev.vars
+.dev.vars.*
+!.dev.vars.example
 wrangler.toml.backup
 
 # OpenNext (Cloudflare adapter)
