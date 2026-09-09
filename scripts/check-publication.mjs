@@ -1,7 +1,6 @@
 // Inspect static HTML, independent of client hydration or SPA navigation.
 import assert from "node:assert/strict";
 import fs from "node:fs/promises";
-import { execFileSync } from "node:child_process";
 import matter from "gray-matter";
 const articles = JSON.parse(await fs.readFile("src/lib/articles-data.json", "utf8"));
 const withoutScripts = (html) => html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
@@ -27,17 +26,12 @@ for (const route of ["about", "projects", "contact", "articles"]) {
 const listing = withoutScripts(await fs.readFile(".next/server/app/articles.html", "utf8"));
 for (const article of articles)
   assert(listing.includes(`/articles/${article.slug}`), "No-JS listing must expose every article");
-const originalFiles = execFileSync("git", ["ls-tree", "--name-only", "HEAD", "content/articles/"])
-  .toString()
-  .trim()
-  .split("\n")
-  .filter((file) => file.endsWith(".md") && !file.endsWith("AGENTS.md"));
+// Immutable pre-rebuild dates also work in CI's shallow checkout, after new articles commit.
+const { dates } = JSON.parse(await fs.readFile("scripts/original-article-dates.json", "utf8"));
 let preserved = 0;
-for (const file of originalFiles) {
-  const original = matter(execFileSync("git", ["show", `HEAD:${file}`]).toString()).data;
-  if (!original.title) continue;
+for (const [file, originalDate] of Object.entries(dates)) {
   const current = matter(await fs.readFile(file, "utf8")).data;
-  assert.equal(String(current.date), String(original.date), `${file}: original date changed`);
+  assert.equal(String(current.date), originalDate, `${file}: original date changed`);
   preserved++;
 }
 assert.equal(preserved, 12);

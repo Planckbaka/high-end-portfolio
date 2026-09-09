@@ -1,0 +1,17 @@
+{
+  "sourceRevision": "dcfc4bb",
+  "dates": {
+    "content/articles/10-design-patterns-in-go.md": "2025-12-23",
+    "content/articles/art-of-microservices.md": "2024-06-15",
+    "content/articles/event-driven-architecture-kafka.md": "2024-03-05",
+    "content/articles/future-of-digital-interfaces.md": "2024-10-24",
+    "content/articles/go-wire-for-dev.md": "2026-01-24",
+    "content/articles/kubernetes-for-developers.md": "2024-04-10",
+    "content/articles/linux-system-programming-go.md": "2024-02-15",
+    "content/articles/mastering-framer-motion.md": "2024-09-12",
+    "content/articles/redis-beyond-caching.md": "2024-05-20",
+    "content/articles/the-go-webframe-work.md": "2025-12-21",
+    "content/articles/the-understand-of-kafka.md": "2025-12-21",
+    "content/articles/transaction-in-DDIA.md": "2025-12-31"
+  }
+}
