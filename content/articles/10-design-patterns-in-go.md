@@ -1,330 +1,91 @@
 ---
-title: "10 Design Patterns in Go"
+title: "Ten Go Design Patterns, Judged by Their Tradeoffs"
 date: "2025-12-23"
-category: "Go Design Pattern"
-excerpt: "10 design patterns in go that help you to become a senior"
+updatedAt: "2026-09-09"
+category: "Go"
+excerpt: "Constructors, small interfaces, options, adapters, and other patterns are useful when they clarify ownership and failure\u2014not when they make a service look more sophisticated."
+lang: "en"
+tags: ["Go design", "interfaces", "errors", "maintainability"]
+featured: false
+draft: false
 ---
 
-![Ryo Yamada Hero Image](/images/articles/go-design-patterns/ryo-yamada-hero.png)
+## Patterns should explain a design decision
 
-## 1.构造函数模式｜Constructor Pattern
+A catalog of patterns can help name recurring problems. It can also encourage an implementation to accumulate interfaces and factories before there is any variation to manage. In Go, the useful question is what becomes easier to understand, change, or test after a pattern is introduced.
 
-### 核心价值｜Core Value
+This revised note keeps ten familiar patterns, but evaluates each through a concrete backend concern. There is no claim that memorizing them separates junior and senior engineers. The evidence is in the resulting code: dependencies are visible, failure paths are intentional, and the abstraction is smaller than the problem it solves.
 
-控制依赖关系，而不仅仅是使用struct创建对象
+## 1. Constructors establish valid state
 
-### 代码示例｜Code Example
+A constructor is useful when a value must satisfy an invariant before use. A concurrency gate, for example, rejects a nonpositive capacity. Returning an error at construction is clearer than allowing the first request to discover a configuration problem. Go does not require constructors, and a useful zero value is often even simpler.
 
-```go
-// 构造函数对象
-type UserService struct {
-    repo UserRepository
-}
-// 控制依赖关系，而不仅仅创建对象
-func NewUserService(r UserRepository) *UserService {
-    return &UserService{repo: r}
-}
-```
+Prefer concrete parameter types when the dependency has no meaningful variation. Avoid accepting a broad configuration bag merely because it may grow later. Construction should reveal what the object actually requires, including resources that must eventually be closed.
 
-初级开发者常常使用硬编码依赖，这降低了代码的可复用性，使用构造函数来优雅地注入依赖，是Go语言中推荐的做法。
+## 2. Consumer-owned interfaces describe a need
 
-### 为什么重要？｜Why Important?
+A service that only reads one kind of record should not depend on an interface containing every database operation. Define the small interface near the consumer. This makes a test substitute easier to write and limits the assumptions the service can make.
 
-- 实现了依赖注入
-- 提高了代码的可测试性，耦合性，可维护性
-- 分离了对象创建和业务逻辑
+An interface is not automatically a boundary against change. If it exposes storage-specific transactions and query builders, callers still depend on those semantics. The abstraction should preserve the operations the domain needs rather than renaming a database client method for method.
 
-## 2.接口隔离模式｜Interface Segregation Pattern
+## 3. Functional options manage genuine optionality
 
-### 核心价值｜Core Value
-保持接口精简，只暴露必要的内容
+Functional options can make a constructor with several independent optional settings readable. They are less useful when there are only two required arguments. Options need defaults and validation; the pattern does not decide whether contradictory options should fail or override one another.
 
-### 代码示例｜Code Example
+Repeated options are another hidden policy. If two options set the same timeout, the implementation may use the last value, but that should be predictable. Do not allow option functions to begin background work during configuration unless the lifecycle is explicit.
 
-```go
-type EmailSender interface {
-    Send(to, subject, body string) error
-}
-```
+## 4. Repositories protect a domain boundary
 
-### 为什么重要？｜Why Important?
+A repository can express operations such as reserving inventory or loading an aggregate. That is useful when it keeps query details out of business logic. A generic CRUD wrapper often hides little and can make transaction ownership harder to see.
 
-- 避免了接口臃肿
-- 遵循接口隔离原则
-- 提高代码灵活性和可维护性
+The important test is an invariant across operations. If reserving stock requires an atomic conditional update, splitting it into `Get` and `Save` methods may encourage a race. A smaller domain operation can be safer than a more flexible-looking storage interface.
 
-## 3.函数选项模式｜Functional Options Pattern
+## 5. Error wrapping preserves inspectable causes
 
-### 核心价值｜Core Value
-为对象提供灵活可选的配置，无需定义多个构造函数。
+Wrapping an error with `%w` adds context while allowing callers to inspect the chain with `errors.Is` and `errors.As`. It does not automatically capture a stack trace. This corrects a common overstatement in explanations of Go error handling.
 
-### 代码示例｜Code Example
-```go
-type Product struct {
-    Name  string
-    Price float64
-}
+Decide which errors form part of a public contract. Exposing every storage error through a service boundary can couple callers to an implementation detail. Translate errors where the domain needs a stable meaning, and log them at an ownership boundary that avoids duplicate reports.
 
-type Option func(*Product)
+## 6. Middleware owns cross-cutting request behavior
 
-func NewProduct(options ...Option) *Product {
-    p := &Product{
-        Name:  "Default Product", // 默认值
-        Price: 10.0,
-    }
-    for _, option := range options {
-        option(p)
-    }
-    return p
-}
+Middleware works well for behavior such as request identification, authentication, or timing around an HTTP handler. Its ordering is observable. A timer outside authentication includes rejected requests; a timer inside it may not. A recovery boundary only covers work executed within that boundary.
 
-func WithName(name string) Option {
-    return func(p *Product) {
-        p.Name = name
-    }
-}
+Avoid hiding domain decisions in a global chain. A route-specific authorization rule belongs close enough to the route that a reviewer can discover it. Middleware also needs cancellation propagation and must not retain request objects in unowned background goroutines.
 
-func WithPrice(price float64) Option {
-    return func(p *Product) {
-        p.Price = price
-    }
-}
+## 7. Context carries a request lifetime
 
-// usage
-product := NewProduct(WithName("Laptop"), WithPrice(1200.50))
-```
+Context is a standard propagation mechanism rather than a substitute for every function parameter. Use it for deadlines, cancellation, and narrowly scoped request values. Required business arguments should remain explicit parameters.
 
-### 为什么重要？｜Why Important?
+Calling `cancel` signals intent; it does not prove that a goroutine stopped. A worker must observe the signal, and its owner must wait for completion where that matters. The [bounded concurrency lab](/articles/go-bounded-concurrency) demonstrates this difference with a drain barrier and failure tests.
 
-- 避免构造函数过多（Constructor Overloading）
-- 提供清晰的API
-- 支持可选参数和默认值
-- 符合 Open-Closed Principle（开闭原则），扩展选项无需修改构造函数
+## 8. Strategies isolate a changing policy
 
-## 4.仓储模式｜Repository Pattern
+A strategy can represent an operation whose implementation genuinely varies, such as choosing a retry decision or a pricing rule. A function value may be sufficient; a large interface hierarchy is not required. Keep the strategy's inputs and outputs small enough to test directly.
 
-### 核心价值｜Core Value
-将业务逻辑与数据访问逻辑分离。
+A strategy should not smuggle in unrelated state transitions. If selecting a policy also opens connections or changes global configuration, the call site becomes difficult to reason about. Separate choosing behavior from owning expensive resources.
 
-### 代码示例｜Code Example
+## 9. Adapters preserve meaning across boundaries
 
-```go
-type UserRepository interface {
-    Get(ctx context.Context, id string) (*User, error)
-    Save(ctx context.Context, user *User) error
-}
+An adapter translates a foreign API into the contract the application expects. Renaming fields is the easy part. Timeouts, partial results, error categories, and cancellation are where compatibility usually becomes interesting.
 
-type UserService struct {
-    repo UserRepository
-}
+For a model provider, a stream fragment is not necessarily a complete tool request. An adapter must establish completion before the agent loop executes anything. The [agent-loop article](/articles/go-agent-loop) separates that provider boundary from the host's state transitions.
 
-// 在 Service 中使用
-func (s *UserService) GetUser(ctx context.Context, id string) (*User, error) {
-    return s.repo.Get(ctx, id)
-}
-```
+## 10. Factories centralize construction choices
 
-### 为什么重要？｜Why Important?
+A factory is useful when runtime configuration chooses among concrete implementations. Unknown values should fail explicitly rather than return a nil dependency that causes a panic later. The factory should also explain who closes resources created during partial initialization.
 
-- 数据库无关的应用代码
-- 易于测试（可以使用内存实现 Mock Repository）
-- 支持多种数据源实现（MySQL、Redis、内存等）无缝切换
+If there is one implementation, direct construction is often clearer. The existence of a future alternative is not sufficient evidence to introduce indirection everywhere. Add the factory when it collects a real choice that otherwise leaks through many call sites.
 
-## 5.错误包装模式｜Error Wrapping Pattern
+## Review the combined design
 
-### 核心价值｜Core Value
+These patterns interact. A factory can call constructors, which accept small interfaces and options; middleware can invoke a service that returns wrapped errors. Combining every pattern is not the goal. A good review follows one request and asks whether each layer earns its place.
 
-为错误添加上下文信息，保留原始错误堆栈。
+Test invalid construction, dependency failure, cancellation, and cleanup alongside the happy path. Use deterministic substitutes for external systems, then add integration tests where their semantics matter. A mock repository does not validate database isolation, just as a mock model does not validate a provider protocol.
 
-### 代码示例｜Code Example
+This note is a design review guide, not ten independent runnable programs. The accompanying Go labs provide executable examples of constructor validation, explicit errors, function-based strategies, and cancellation ownership. Run `go test -race ./...` from `labs/go` to inspect those behaviors.
 
-Go 1.13+ 推荐使用标准库的方式：
+## Sources and attribution
 
-```go
-// 使用 fmt.Errorf 包装错误
-err := connectDatabase()
-if err != nil {
-    return fmt.Errorf("无法连接数据库: %w", err)
-}
-
-// 解包并检查特定错误
-if errors.Is(err, sql.ErrNoRows) {
-    // 处理记录不存在的情况
-}
+The earlier version linked to [Coding Plain English's pattern list](https://medium.com/@codingplainenglish/10-design-patterns-in-go-that-separate-juniors-from-seniors-ed2bdf70d1bc). That historical attribution is retained; this revision is an independently written review of tradeoffs.
 
-// 提取特定类型的错误
-var sqlErr *mysql.MySQLError
-if errors.As(err, &sqlErr) {
-    // 处理 MySQL 特定错误
-}
-```
-
-### 为什么重要？｜Why Important?
-
-- 提供更好的错误上下文
-- 支持错误链追踪 (`errors.Is` / `errors.As`)
-- 便于调试和日志记录，避免信息丢失
-
-## 6.中间件模式｜Middleware Pattern
-
-### 核心价值｜Core Value
-在主要逻辑前后添加横切关注点（Cross-cutting concerns）。
-
-### 代码示例｜Code Example
-```go
-type Middleware func(http.Handler) http.Handler
-
-func LoggingMiddleware(next http.Handler) http.Handler {
-    return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-        log.Printf("Starting Request: %s %s", r.Method, r.URL.Path)
-        next.ServeHTTP(w, r)
-        log.Printf("Finished Request: %s %s", r.Method, r.URL.Path)
-    })
-}
-
-// 链式中间件使用
-// handler := LoggingMiddleware(AuthMiddleware(mainHandler))
-```
-
-### 为什么重要？｜Why Important?
-
-- 实现关注点分离
-- 可复用的功能（日志、认证、限流等）
-- 清晰的请求处理链
-
-## 7.上下文模式｜Context Pattern
-
-### 核心价值｜Core Value
-传递请求范围的值、取消信号和截止时间。这是 Go 并发模式的核心。
-
-### 代码示例｜Code Example
-```go
-// 创建带超时的 context
-ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-defer cancel()
-
-// 在函数中使用 context
-func ProcessRequest(ctx context.Context, data string) error {
-    select {
-    case <-ctx.Done():
-        return ctx.Err() // 超时或取消
-    case result := <-doWork(data):
-        return result
-    }
-}
-```
-
-### 为什么重要？｜Why Important?
-- 优雅地处理超时和取消
-- 传递请求级别的数据（如 TraceID、UserInfo）
-- 防止 Goroutine 泄漏
-
-## 8.策略模式｜Strategy Pattern
-
-### 核心价值｜Core Value
-定义一系列算法，使它们可以互换。
-
-### 代码示例｜Code Example
-```go
-type PaymentStrategy interface {
-    Pay(amount float64) error
-}
-
-type CreditCardPayment struct{}
-type PayPalPayment struct{}
-
-func (c *CreditCardPayment) Pay(amount float64) error {
-    fmt.Printf("Paying %.2f using Credit Card\n", amount)
-    return nil
-}
-
-func (p *PayPalPayment) Pay(amount float64) error {
-    fmt.Printf("Paying %.2f using PayPal\n", amount)
-    return nil
-}
-```
-
-### 为什么重要？｜Why Important?
-- 运行时动态选择算法
-- 消除复杂的 if-else 条件语句
-- 符合开闭原则
-
-## 9.适配器模式｜Adapter Pattern
-
-### 核心价值｜Core Value
-将不兼容的接口转换为客户端所期望的接口。
-
-### 代码示例｜Code Example
-```go
-type OldSystem interface {
-    OldMethod() string
-}
-
-type NewSystem interface {
-    NewMethod() string
-}
-
-type Adapter struct {
-    old OldSystem
-}
-
-func (a *Adapter) NewMethod() string {
-    return a.old.OldMethod() // 适配旧接口到新接口
-}
-```
-
-### 为什么重要？｜Why Important?
-- 促进接口兼容性
-- 适配第三方库而无需修改源码
-- 集成遗留代码
-
-## 10.工厂模式｜Factory Pattern
-
-### 核心价值｜Core Value
-封装对象创建逻辑，根据类型生成具体实例。
-
-### 代码示例｜Code Example
-```go
-type PaymentGateway interface {
-    Process(amount float64) error
-}
-
-type PayPalGateway struct{}
-func (p *PayPalGateway) Process(amount float64) error { return nil }
-
-type StripeGateway struct{}
-func (s *StripeGateway) Process(amount float64) error { return nil }
-
-const (
-    PayPal = iota
-    Stripe
-)
-
-func NewPaymentGateway(gatewayType int) PaymentGateway {
-    switch gatewayType {
-    case PayPal:
-        return &PayPalGateway{}
-    case Stripe:
-        return &StripeGateway{}
-    default:
-        return nil
-    }
-}
-```
-
-### 为什么重要？｜Why Important?
-- 集中创建逻辑
-- 简化客户端代码
-- 易于扩展新类型
-
-## 总结｜Conclusion
-
-| 方面 | 初级开发者 | 高级开发者 |
-|------|-----------|-----------|
-| 依赖管理 | 硬编码依赖 | 依赖注入 |
-| 全局状态 | 使用全局变量 | 通过参数传递 |
-| 测试性 | 不考虑测试 | 代码可测试 |
-| 耦合度 | 紧耦合 | 松耦合、可维护 |
-
-### 参考文章｜Reference Articles
-[10 design patterns in go that separate juniors from seniors](https://medium.com/@codingplainenglish/10-design-patterns-in-go-that-separate-juniors-from-seniors-ed2bdf70d1bc)
+For language behavior, consult [Effective Go](https://go.dev/doc/effective_go), [errors](https://pkg.go.dev/errors), and [context](https://pkg.go.dev/context). Apply patterns to a concrete ownership or change problem, then verify the behavior they are supposed to improve.

@@ -1,39 +1,17 @@
-import type { Article } from '@/types';
-import articlesDataJson from './articles-data.json';
-
-// Import pre-generated articles data  
-// This file is generated at build time by scripts/generate-articles-data.mjs
-let articlesData: Article[] = [];
-
-try {
-    // In Cloudflare Workers environment, we use the pre-generated JSON
-    articlesData = articlesDataJson as Article[];
-} catch (error) {
-    console.warn('Failed to load articles data:', error);
-    articlesData = [];
+import type { Article, ArticleSummary } from "@/types";
+import articlesDataJson from "./articles-data.json";
+const articlesData = (articlesDataJson as Article[]).filter((article) => !article.draft);
+export async function getAllArticles(): Promise<ArticleSummary[]> {
+  return articlesData.map((article) => {
+    const { content: _content, toc: _toc, ...summary } = article;
+    void _content;
+    void _toc;
+    return summary;
+  });
 }
-
-/**
- * Get all articles from pre-generated data
- */
-export async function getAllArticles(): Promise<Article[]> {
-    return articlesData.map(article => ({
-        ...article,
-        content: '', // Don't include content for list view
-    }));
-}
-
-/**
- * Get a single article by slug from pre-generated data
- */
 export async function getArticleBySlug(slug: string): Promise<Article | null> {
-    const article = articlesData.find(a => a.slug === slug);
-    return article || null;
+  return articlesData.find((article) => article.slug === slug) || null;
 }
-
-/**
- * Get all article slugs for static generation
- */
 export function getAllArticleSlugs(): string[] {
-    return articlesData.map(a => a.slug);
+  return articlesData.map((article) => article.slug);
 }

@@ -1,35 +1,65 @@
 ---
-title: "Mastering Framer Motion"
+title: "Motion for Technical Interfaces: Animate State, Preserve Reading"
 date: "2024-09-12"
-category: "Development"
-excerpt: "A deep dive into creating complex animations with React and Framer Motion for high-performance web apps."
+updatedAt: "2026-09-09"
+category: "Interface"
+excerpt: "Use animation to explain an interface transition while keeping content readable, keyboard behavior predictable, and reduced-motion preferences respected."
+lang: "en"
+tags: ["motion", "accessibility", "reading", "interaction design"]
+featured: false
+draft: false
 ---
 
-Animation is a powerful tool in web design. It guides the user's attention, provides feedback, and adds a layer of polish that distinguishes a good app from a great one. Framer Motion has emerged as the go-to library for React developers looking to implement complex animations with ease.
+## The content should not wait for the effect
 
-## Declarative Animations
+An article page can look elegant in a recorded demo and still fail readers when its opening animation stalls. If the entire body begins at zero opacity and waits for JavaScript to reveal it, a delayed bundle or interrupted animation becomes a content-availability problem.
 
-One of the key strengths of Framer Motion is its declarative nature. Instead of imperatively managing animation states, you simply define the target state, and the library handles the rest. This makes code easier to read and maintain.
+For a technical blog, the primary task is reading. Motion should support navigation and state changes while the text remains present. A button's pressed state, a menu opening, or a copied-code confirmation can benefit from feedback. A long paragraph does not need to perform an entrance before it becomes readable.
 
-```jsx
-<motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.5 }}
->
-  Hello World
-</motion.div>
-```
+This revision uses the site's own redesign as the concrete case. The old full-screen noise layer, custom cursor, and global scroll interception were removed from the active layout. The new interaction style uses short state transitions and native scrolling.
 
-## Performance Matters
+## Choose the smallest mechanism that explains the change
 
-Animations should never come at the cost of performance. Framer Motion is optimized to run animations off the main thread whenever possible, ensuring a smooth 60fps experience even on lower-end devices.
+CSS transitions are sufficient for many hover, focus, color, and border changes. A React animation library is useful when a transition depends on component state, layout relationships, gestures, or coordinated presence. The library should earn its runtime cost by solving a real interaction problem.
 
-### Key Performance Tips
+An animation is not automatically efficient because it uses a fashionable API. Large visual surfaces, layout changes, expensive filters, and repeated work can still cause poor responsiveness. Measure the actual interaction on the target device instead of treating a particular property as a guarantee.
 
-1. Use `transform` and `opacity` for animations
-2. Avoid animating layout properties
-3. Use `will-change` sparingly
-4. Leverage hardware acceleration
+For this blog, a restrained default is a 150–250ms transition for controls, with no required entrance animation for the article body. The duration is a design choice, not a performance benchmark. It should feel responsive while preserving a clear distinction between states.
 
-Whether you're building a simple micro-interaction or a complex page transition, mastering Framer Motion will elevate your frontend development skills to the next level.
+## Reduced motion is a first-class interaction mode
+
+A reduced-motion preference should change the behavior of effects that involve substantial movement. Removing a large translation while retaining a small opacity or color change can preserve feedback without the same visual motion. Some effects can simply disappear.
+
+The semantic state must remain clear when the animation is absent. If a menu's only indication of opening is a moving icon, add the appropriate expanded state and a visible menu structure. If a copy control changes appearance, provide an accessible status message as well.
+
+Motion's React accessibility guidance provides mechanisms for responding to the preference. In this blog's active page shell, most feedback is simple enough to be handled directly in CSS, including a reduced-motion media query. The design does not require every control to import an animation library.
+
+## Focus and presence are separate concerns
+
+Animating an element out of view does not automatically remove it from keyboard navigation. A hidden menu can still contain focusable links unless its presence and accessibility state are managed deliberately. Likewise, removing a focused element can leave the user without an obvious next position.
+
+A menu should have a clear trigger, predictable keyboard behavior, and a way to close it. When Escape closes an overlay-like interaction, return focus to an appropriate control. A visual fade does not supply any of those rules.
+
+For a simple mobile navigation menu, native disclosure behavior can provide a useful baseline. More complex menus may require additional focus management, but complexity should follow the interaction rather than the desired screenshot.
+
+## Scroll is already an input system
+
+Global smooth-scroll libraries can change how wheel, touch, anchor links, and scroll-driven effects interact. That may suit a visual portfolio, but it adds another layer to test for long-form reading. Browser find, back navigation, keyboard scrolling, and reduced-motion behavior all matter.
+
+Native scrolling provides a strong baseline for an engineering blog. Set scroll offsets so headings are not hidden behind a sticky header. Make table and code overflow local to their containers rather than allowing the entire page to drift sideways.
+
+A reading-progress indicator can be helpful, but it should not compete with the text or imply progress through content the reader cannot see. The redesign prioritizes a navigable table of contents over decorative scrolling effects.
+
+## Test the interface without its ideal conditions
+
+Inspect the page before hydration, with reduced motion enabled, on a narrow viewport, and using only a keyboard. Verify that the content remains visible and controls still communicate their state. A passing component test does not evaluate the browser's actual CSS output or visual hierarchy.
+
+Also test interrupted interactions. Open and close a menu quickly. Copy code when clipboard access is unavailable. Navigate back after changing filters. These cases reveal whether the interface state is reliable independently of its transition timing.
+
+This article does not claim a Motion-library benchmark. It records design and accessibility reasoning used in this site's implementation. The production preview and screenshot checks provide the separate evidence for the actual pages.
+
+## References
+
+- [Motion: accessible animations in React](https://motion.dev/docs/react-accessibility).
+- [MDN prefers-reduced-motion](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-reduced-motion).
+- [Designing interfaces around uncertain work](/articles/future-of-digital-interfaces).

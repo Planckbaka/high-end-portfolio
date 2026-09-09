@@ -1,141 +1,120 @@
-import { NextRequest, NextResponse } from 'next/server';
-import { siteConfig } from '@/config/site';
-import { VALIDATION_LIMITS, RATE_LIMIT, HTTP_STATUS, ERROR_MESSAGES, REGEX } from '@/config/constants';
+import { NextRequest, NextResponse } from "next/server";
+import { siteConfig } from "@/config/site";
+import { RATE_LIMIT, HTTP_STATUS, ERROR_MESSAGES } from "@/config/constants";
+import { contactSchema } from "@/lib/contact-schema";
 
-export const runtime = 'edge';
-
-interface ContactFormData {
-    name: string;
-    email: string;
-    message: string;
-}
+// OpenNext runs Next.js routes through Workers' Node.js compatibility layer.
+export const runtime = "nodejs";
 
 // NOTE: This rate limiter provides deterrence against casual abuse only.
-// In-memory state resets on Worker cold start (every few seconds).
+// State is local to an isolate and is lost when that isolate is replaced.
 // For production-grade rate limiting, use Cloudflare WAF Rate Limiting rules.
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 
 function checkRateLimit(ip: string): boolean {
-    const now = Date.now();
-    const entry = rateLimitMap.get(ip);
+  const now = Date.now();
+  for (const [key, entry] of rateLimitMap) {
+    if (entry.resetTime <= now) rateLimitMap.delete(key);
+  }
+  const entry = rateLimitMap.get(ip);
 
-    if (!entry || now > entry.resetTime) {
-        rateLimitMap.set(ip, {
-            count: 1,
-            resetTime: now + RATE_LIMIT.CONTACT_FORM.WINDOW_MS,
-        });
-        return true;
-    }
-
-    if (entry.count >= RATE_LIMIT.CONTACT_FORM.MAX_REQUESTS) {
-        return false;
-    }
-
-    entry.count++;
+  if (!entry || now > entry.resetTime) {
+    if (rateLimitMap.size >= 10000) return false;
+    rateLimitMap.set(ip, {
+      count: 1,
+      resetTime: now + RATE_LIMIT.CONTACT_FORM.WINDOW_MS,
+    });
     return true;
+  }
+
+  if (entry.count >= RATE_LIMIT.CONTACT_FORM.MAX_REQUESTS) {
+    return false;
+  }
+
+  entry.count++;
+  return true;
 }
 
 function escapeHtml(text: string): string {
-    const map: Record<string, string> = {
-        '&': '&amp;',
-        '<': '&lt;',
-        '>': '&gt;',
-        '"': '&quot;',
-        "'": '&#039;',
-    };
-    return text.replace(/[&<>"']/g, (char) => map[char]);
+  const map: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#039;",
+  };
+  return text.replace(/[&<>"']/g, (char) => map[char]);
 }
 
 export async function POST(request: NextRequest) {
+  try {
+    // Rate limiting
+    const ip = request.headers.get("cf-connecting-ip") || "unknown";
+    if (!checkRateLimit(ip)) {
+      return NextResponse.json(
+        { error: ERROR_MESSAGES.RATE_LIMIT_EXCEEDED },
+        { status: HTTP_STATUS.TOO_MANY_REQUESTS }
+      );
+    }
+
+    // Origin validation (CSRF protection)
+    const origin = request.headers.get("origin");
+    const allowedOrigins = [siteConfig.url, "http://localhost:3000"];
+    if (origin && !allowedOrigins.includes(origin)) {
+      return NextResponse.json({ error: "Invalid origin" }, { status: HTTP_STATUS.FORBIDDEN });
+    }
+
+    let body: unknown;
     try {
-        // Rate limiting
-        const ip = request.headers.get('x-forwarded-for') || request.headers.get('cf-connecting-ip') || 'unknown';
-        if (!checkRateLimit(ip)) {
-            return NextResponse.json(
-                { error: ERROR_MESSAGES.RATE_LIMIT_EXCEEDED },
-                { status: HTTP_STATUS.TOO_MANY_REQUESTS }
-            );
-        }
+      body = await request.json();
+    } catch {
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+    }
+    const parsed = contactSchema.safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { error: "Please check your name, email and message." },
+        { status: 400 }
+      );
+    }
+    const { name, email, message } = parsed.data;
+    const idempotencyKey = request.headers.get("idempotency-key");
+    if (idempotencyKey && !/^[a-zA-Z0-9_-]{16,128}$/.test(idempotencyKey)) {
+      return NextResponse.json({ error: "Invalid submission identifier" }, { status: 400 });
+    }
 
-        // Origin validation (CSRF protection)
-        const origin = request.headers.get('origin');
-        const allowedOrigins = [siteConfig.url, 'http://localhost:3000'];
-        if (origin && !allowedOrigins.includes(origin)) {
-            return NextResponse.json(
-                { error: 'Invalid origin' },
-                { status: HTTP_STATUS.FORBIDDEN }
-            );
-        }
+    // Get config
+    const resendApiKey = process.env.RESEND_API_KEY;
+    const contactEmail = process.env.CONTACT_EMAIL || siteConfig.author.email;
 
-        const body: ContactFormData = await request.json();
-        const { name, email, message } = body;
+    if (!resendApiKey) {
+      console.error("RESEND_API_KEY is not configured");
+      return NextResponse.json(
+        { error: "Email service is not configured. Please contact the administrator." },
+        { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+      );
+    }
 
-        // Validate required fields
-        if (!name || !email || !message) {
-            return NextResponse.json(
-                { error: 'All fields are required' },
-                { status: HTTP_STATUS.BAD_REQUEST }
-            );
-        }
+    // Escape user input to prevent XSS
+    const safeName = escapeHtml(name);
+    const safeEmail = escapeHtml(email);
+    const safeMessage = escapeHtml(message);
 
-        // Validate input lengths
-        if (name.length > VALIDATION_LIMITS.NAME_MAX_LENGTH) {
-            return NextResponse.json(
-                { error: `Name must be less than ${VALIDATION_LIMITS.NAME_MAX_LENGTH} characters` },
-                { status: HTTP_STATUS.BAD_REQUEST }
-            );
-        }
-        if (email.length > VALIDATION_LIMITS.EMAIL_MAX_LENGTH) {
-            return NextResponse.json(
-                { error: `Email must be less than ${VALIDATION_LIMITS.EMAIL_MAX_LENGTH} characters` },
-                { status: HTTP_STATUS.BAD_REQUEST }
-            );
-        }
-        if (message.length > VALIDATION_LIMITS.MESSAGE_MAX_LENGTH) {
-            return NextResponse.json(
-                { error: `Message must be less than ${VALIDATION_LIMITS.MESSAGE_MAX_LENGTH} characters` },
-                { status: HTTP_STATUS.BAD_REQUEST }
-            );
-        }
-
-        // Validate email format
-        if (!REGEX.EMAIL.test(email)) {
-            return NextResponse.json(
-                { error: 'Invalid email format' },
-                { status: HTTP_STATUS.BAD_REQUEST }
-            );
-        }
-
-        // Get config
-        const resendApiKey = process.env.RESEND_API_KEY;
-        const contactEmail = process.env.CONTACT_EMAIL || siteConfig.author.email;
-
-        if (!resendApiKey) {
-            console.error('RESEND_API_KEY is not configured');
-            return NextResponse.json(
-                { error: 'Email service is not configured. Please contact the administrator.' },
-                { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
-            );
-        }
-
-        // Escape user input to prevent XSS
-        const safeName = escapeHtml(name);
-        const safeEmail = escapeHtml(email);
-        const safeMessage = escapeHtml(message);
-
-        // Send email
-        const response = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${resendApiKey}`,
-            },
-            body: JSON.stringify({
-                from: 'Portfolio Contact <onboarding@resend.dev>',
-                to: [contactEmail],
-                reply_to: email,
-                subject: `New Contact Form Message from ${safeName}`,
-                html: `
+    // Send email
+    const response = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      signal: AbortSignal.timeout(10000),
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${resendApiKey}`,
+        ...(idempotencyKey ? { "Idempotency-Key": `contact/${idempotencyKey}` } : {}),
+      },
+      body: JSON.stringify({
+        from: process.env.CONTACT_FROM || "Portfolio Contact <onboarding@resend.dev>",
+        to: [contactEmail],
+        reply_to: email,
+        subject: `New Contact Form Message from ${safeName}`,
+        html: `
           <!DOCTYPE html>
           <html>
             <head>
@@ -243,37 +222,47 @@ export async function POST(request: NextRequest) {
                   <strong>${siteConfig.url}</strong>
                 </p>
                 <p style="margin: 10px 0 0 0; font-size: 11px; opacity: 0.7;">
-                  Sent at ${new Date().toLocaleString('en-US', {
-                    timeZone: 'Asia/Shanghai',
-                    dateStyle: 'full',
-                    timeStyle: 'long'
-                })}
+                  Sent at ${new Date().toLocaleString("en-US", {
+                    timeZone: "Asia/Shanghai",
+                    dateStyle: "full",
+                    timeStyle: "long",
+                  })}
                 </p>
               </div>
             </body>
           </html>
         `,
-            }),
-        });
+      }),
+    });
 
-        if (!response.ok) {
-            console.error('Resend API error:', response.status);
-            return NextResponse.json(
-                { error: 'Failed to send email. Please try again later.' },
-                { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
-            );
-        }
-
-        return NextResponse.json(
-            { success: true, message: 'Email sent successfully!' },
-            { status: HTTP_STATUS.OK }
-        );
-
-    } catch (error) {
-        console.error('Contact form error:', error);
-        return NextResponse.json(
-            { error: 'An unexpected error occurred. Please try again later.' },
-            { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
-        );
+    if (!response.ok) {
+      console.error("Resend API error:", response.status);
+      return NextResponse.json(
+        { error: "Failed to send email. Please try again later." },
+        { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+      );
     }
+
+    return NextResponse.json(
+      { success: true, message: "Email sent successfully!" },
+      { status: HTTP_STATUS.OK }
+    );
+  } catch (error) {
+    if (
+      error &&
+      typeof error === "object" &&
+      "name" in error &&
+      ["TimeoutError", "AbortError"].includes(String(error.name))
+    ) {
+      return NextResponse.json(
+        { error: "Email service timed out. Please retry the same message." },
+        { status: 504 }
+      );
+    }
+    console.error("Contact form error");
+    return NextResponse.json(
+      { error: "An unexpected error occurred. Please try again later." },
+      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+    );
+  }
 }

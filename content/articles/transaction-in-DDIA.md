@@ -1,133 +1,71 @@
 ---
-title: "Transaction in DDIA"
+title: "Transactions and Isolation: Reading DDIA Through Failure Cases"
 date: "2025-12-31"
-category: "DDIA"
-excerpt: "深入理解事务：从 ACID 到隔离级别，结合 Go 语言实战演示。"
+updatedAt: "2026-09-09"
+category: "Systems"
+excerpt: "Separate atomicity, durability, and isolation, then use concrete concurrent schedules to understand what a transaction does\u2014and what it does not guarantee."
+lang: "en"
+tags: ["transactions", "DDIA", "isolation", "PostgreSQL"]
+featured: false
+draft: false
 ---
 
-![Ryo Yamada Transaction Hero](/images/articles/ryo-yamada-hero.png)
+## Start with the invariant
 
-# 事务 (Transaction)
+Two requests try to reserve the last item in stock. Both read a quantity of one. Both decide that a reservation is allowed. If each writes a new quantity of zero, the stored number can look reasonable while two reservations have been created. The problem is not simply that a write failed; the concurrent schedule violated a business invariant.
 
-## 第一部分 事务 (Transaction)
+This article is a revised reading note inspired by *Designing Data-Intensive Applications*. The explanation and schedules are independently written. It does not reproduce a book chapter, and the SQL discussion below is not a report of a database experiment run during this revision.
 
-在数据系统的浩瀚海洋中，**事务 (Transaction)** 是那一座在狂风巨浪中屹立不倒的灯塔。它简化了应用层的编程模型，让我们在面对不可预测的硬件故障、网络中断和并发冲突时，依然能写出健壮的代码。
+Before choosing an isolation level, state what must remain true. “Stock never goes below zero” is different from “at most one reservation exists for the last unit.” An implementation can satisfy a counter constraint while allowing inconsistent records elsewhere.
 
-## 什么是事务？
+## Atomicity is about a unit of change
 
-简单来说，事务是将**一组读写操作**看作**一个逻辑单元**。这个逻辑单元要么**全部成功 (Commit)**，要么**全部失败 (Abort/Rollback)**。在事务的世界里，不应该存在"做了一半"这种尴尬的状态。
+Atomicity lets a transaction's changes succeed or fail as a unit according to the database's contract. It does not automatically include an email, HTTP request, or message broker outside that transaction. Sending a notification inside a database transaction block does not make the notification rollback-capable.
 
-### 一个简单的 Go 语言示例
+A useful application design keeps irreversible external effects out of an uncertain commit path. Record an intent transactionally and deliver it afterward with a recovery protocol. The resulting delivery may repeat, so the receiver still needs deduplication or idempotent behavior.
 
-想象我们在写一个银行转账程序，Alice 要给 Bob 转账 100 元。如果不用数据库事务，我们用 Go 语言在内存中模拟，可能会写出这样的代码：
+A lost connection during commit can leave the client uncertain about whether the transaction committed. Retrying the whole business operation without an identifier can duplicate it. Atomicity inside the database does not eliminate uncertainty at the client boundary.
 
-```go
-package main
+## Consistency requires the application to say what is valid
 
-import (
-	"fmt"
-	"log"
-	"sync"
-)
+The “C” in ACID is not the same as a distributed consistency model such as linearizability. In the transaction discussion, it concerns preserving valid states and constraints. A database can enforce declared constraints, but it cannot infer every business rule from a table name.
 
-// Account 代表一个简单的银行账户
-type Account struct {
-	Name    string
-	Balance int
-	mu      sync.Mutex // 用于保护并发访问
-}
+Use unique constraints and conditional updates where they encode the invariant directly. A check performed only in application code can race with another request. For relationships across rows, the required protection depends on the query, locking, isolation, and database behavior.
 
-// Global "Database"
-var (
-	Alice = &Account{Name: "Alice", Balance: 1000}
-	Bob   = &Account{Name: "Bob", Balance: 500}
-)
+The best design often combines mechanisms: a unique key identifies a business operation, a conditional update prevents overselling, and a transaction groups the related records. No single acronym substitutes for that concrete design.
 
-// TransferSimple 尝试演示一个朴素的转账逻辑
-// 警告：这段代码在真实分布式环境中极其脆弱
-func TransferSimple(from, to *Account, amount int) {
-	fmt.Printf("开始转账: %s -> %s ($%d)\n", from.Name, to.Name, amount)
+## Isolation is a set of allowed schedules
 
-	// 1. 读取并扣除 from 的余额
-	from.mu.Lock()
-	if from.Balance < amount {
-		from.mu.Unlock()
-		log.Println("余额不足，交易取消")
-		return
-	}
-	from.Balance -= amount
-	// 模拟写入磁盘 A
-	fmt.Printf("✓ %s 余额扣除完成，当前: %d\n", from.Name, from.Balance)
-	from.mu.Unlock()
+Read Committed can provide a fresh committed view for each statement. A later statement may therefore see changes that were not visible to an earlier one. A repeatable snapshot offers a different view, but snapshot stability alone does not rule out every multi-row anomaly.
 
-	// --- 💣 危险区域：如果程序在这里崩溃了怎么办？---
-	// 比如：机器断电、进程被 Kill、网络断开...
+Consider two on-call doctors. Each transaction observes that the other doctor is on call, then marks its own doctor off call. The transactions update different rows. A snapshot-based execution can let both decisions proceed unless additional protection prevents the combined invalid state.
 
-	// 2. 增加 to 的余额
-	to.mu.Lock()
-	to.Balance += amount
-	// 模拟写入磁盘 B
-	fmt.Printf("✓ %s 余额增加完成，当前: %d\n", to.Name, to.Balance)
-	to.mu.Unlock()
+Serializable isolation aims for an outcome equivalent to some serial ordering of committed transactions. That does not mean concurrent execution is physically disabled, and applications must handle transactions that the database aborts to preserve the guarantee. Retrying requires restarting the relevant transaction logic, not just its final statement.
 
-	fmt.Println("转账成功！")
-}
+PostgreSQL's documented behavior is more specific than a generic SQL isolation table: its Repeatable Read prevents phantom reads but can still permit serialization anomalies. Its Read Uncommitted behaves as Read Committed. These are database-specific details, so a cross-database article should not flatten them into one universal implementation.
 
-func main() {
-	TransferSimple(Alice, Bob, 100)
-}
-```
+## Prefer an atomic operation when it expresses the rule
 
-这段代码看起来逻辑清晰，但在"严酷的现实"中，它有几个致命问题：
+For a simple stock counter, an update conditioned on positive stock can combine checking and modification. The caller inspects the affected-row count to distinguish success from no available stock. This avoids a separate application-level read followed by an unconditional write.
 
-1.  **原子性缺失 (Atomicity)**：如果在扣了 Alice 的钱之后，程序崩溃了（比如在代码注释的"危险区域"），Bob 并没有收到钱。100 元凭空消失了。
-2.  **隔离性缺失 (Isolation)**：如果同时有两个线程在对 Alice 进行操作，或者有人在转账过程中查询总账，他们可能会看到中间状态（Alice 的钱扣了，Bob 的还没加，总资产变少了）。
+That still leaves related effects to handle. If the operation also inserts a reservation, both changes need an appropriate transaction boundary. If it calls another service, that call introduces a distributed protocol problem. Start with the smallest invariant and expand the boundary only when required.
 
-事务的存在，就是为了解决这些问题。
+Locks can also protect a decision, but their scope matters. Locking the rows already returned by a query may not protect the absence of another matching row. Predicate-based invariants deserve careful review against the database's concurrency model.
 
-## 第二部分 解构 ACID
+## Durability has an operational context
 
-ACID 是事务的四个金科玉律。但很多时候，我们只是背诵了定义，而没有真正理解其背后的工程意义。DDIA 对此进行了深刻的剖析。
+Durability concerns persistence of committed changes under the database's stated failure assumptions. It does not imply that a replica immediately exposes the change or that a backup exists. Replication lag, recovery settings, storage failures, and acknowledgment policy affect the operational story.
 
-### Atomicity (原子性)
+A recovery exercise should verify both data and application interpretation. Restoring rows is insufficient if external consumers have already acted on a different view or if an application replays an operation without its deduplication records.
 
-**通常的误解**：原子性意味着并发操作是原子的（多线程安全）。
+## How to turn the note into an experiment
 
-**DDIA 的真知灼见**：
-在事务的语境下，原子性**与并发无关**。原子性真正的含义是 **"可终止性" (Abortability)**。
+Use two database sessions and a written sequence of reads, writes, and commits. Establish the initial state, run the schedule at the selected isolation level, and inspect both return values and final rows. Record the database version and every session's transaction settings.
 
-它通过**回滚 (Rollback)** 机制，保证了在发生错误（进程崩溃、网络中断、磁盘已满）时，我们可以安全地丢弃已经做了一半的更改。如果没有原子性，错误处理将会变得异常复杂——你需要知道哪些改了，哪些没改，然后手动修复，这简直是噩梦。
+Add a retry test for serialization failures and a duplicate-operation test for uncertain client outcomes. Confirm that retries do not emit external side effects twice. These experiments require a real database; a mocked repository cannot reproduce its locking or snapshot semantics.
 
-> **原子性给了我们"重试"的勇气。** 如果事务失败了，我们可以放心地重试，而不用担心副作用。
+## References
 
-### Consistency (一致性)
-
-**通常的误解**：一致性是数据库的一个属性。
-
-**DDIA 的真知灼见**：
-一致性其实是 **应用层的一个属性 (Property of the Application)**。
-
-数据库可以提供某些约束（如外键、唯一性约束），但所谓的"数据一致性"（例如：所有账户余额之和应该守恒、借贷必须平衡），是**业务逻辑**定义的**不变量 (Invariants)**。
-
-Atomicity, Isolation, Durability 是数据库提供的属性，而 Consistency 是**我们（开发者）利用数据库提供的 AID 属性，来维护的应用状态**。如果代码写得烂，用了事务也可能导致数据不一致（例如写错了转账逻辑，导致钱凭空增加）。
-
-### Isolation (隔离性)
-
-**核心挑战**：并发 (Concurrency)。
-
-隔离性是为了解决**同时执行**的事务相互干扰的问题。最完美的隔离级别是 **串行化 (Serializability)**：即使事务是并发执行的，最终的结果也必须和它们**串行**执行（一个接一个）的结果完全一致。
-
-但在现实中，为了性能，我们常用弱隔离级别（Weak Isolation Levels）：
-
-*   **Read Committed**: 防止脏读 (Dirty Read) 和脏写 (Dirty Write)。
-*   **Snapshot Isolation (Repeatable Read)**: 防止不可重复读，解决了"由于读取时间不同导致看到的数据不一致"的问题（例如备份和分析查询）。
-
-### Durability (持久性)
-
-持久性承诺：一旦事务提交 (Committed)，数据就不会丢失，即使只有一次。
-
-**实现的代价**：
-*   **WAL (Write-Ahead Log)**: 在修改数据页之前，先顺序写入日志。
-*   **fsync**: 强行刷盘，防止数据停留在 OS Cache 中。
-
-但在分布式系统中，并没有完美的持久性。硬盘可能坏，备份可能丢。持久性是一个概率问题，我们通过复制 (Replication) 和冗余来无限逼近 100% 的可靠性。
+- [Designing Data-Intensive Applications](https://dataintensive.net/), the source of the reading theme.
+- [PostgreSQL transaction isolation](https://www.postgresql.org/docs/current/transaction-iso.html).
+- [Event-driven reliability and outbox boundaries](/articles/event-driven-architecture-kafka).

@@ -15,6 +15,9 @@ const eslintConfig = defineConfig([
     // Build artifacts
     ".open-next/**",
     ".wrangler/**",
+    "coverage/**",
+    "labs/.venv/**",
+    ".omc/**",
   ]),
 ]);
 

@@ -2,6 +2,17 @@
 
 Welcome to the high-end-portfolio documentation! This index will help you find the information you need quickly.
 
+## Current engineering blog
+
+- [Maintenance](rebuild/MAINTENANCE.md)
+- [Editorial style refactor](rebuild/EDITORIAL-REFACTOR.md)
+- [Reading and runtime upgrade](rebuild/READING-UPGRADE.md)
+- [Validation](rebuild/VALIDATION.md)
+- [Sources and scope](rebuild/PROVENANCE.md)
+- [Design system](architecture/DESIGN_SYSTEM.md)
+
+Older implementation notes below describe historical versions; use the current guides and source for present behavior.
+
 ## 📖 Quick Links
 
 - [README](../README.md) - Project overview and getting started

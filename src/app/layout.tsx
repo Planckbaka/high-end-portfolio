@@ -1,23 +1,23 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
-import { SmoothScroll } from "@/lib/smooth-scroll";
+import { SiteFooter } from "@/components/ui/SiteFooter";
 import { cn } from "@/lib/utils";
 import { Navbar } from "@/components/ui/Navbar";
-import { Noise } from "@/components/ui/Noise";
+
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
-import { CustomCursor } from "@/components/ui/CustomCursor";
+
 import { siteConfig } from "@/config/site";
 
 const spaceGrotesk = Space_Grotesk({
-  variable: "--font-sans",
+  variable: "--font-display",
   subsets: ["latin"],
   display: "swap",
 });
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
+  variable: "--font-code",
   subsets: ["latin"],
   display: "swap",
 });
@@ -29,11 +29,20 @@ export const metadata: Metadata = {
     template: `%s | ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  keywords: ["portfolio", "web design", "creative developer", "frontend", "backend", "Go", "React", "Next.js", "Kubernetes", "microservices"],
+  keywords: [
+    "Go",
+    "Python",
+    "LLM",
+    "model inference",
+    "backend engineering",
+    "PyTorch",
+    "concurrency",
+  ],
   authors: [{ name: siteConfig.author.name, url: siteConfig.author.github }],
   creator: siteConfig.author.name,
   alternates: {
     canonical: "/",
+    types: { "application/rss+xml": "/feed.xml" },
   },
   openGraph: {
     type: "website",
@@ -79,9 +88,9 @@ export const metadata: Metadata = {
     googleBot: {
       index: true,
       follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
     },
   },
 };
@@ -90,8 +99,8 @@ export const viewport = {
   // Matches --background in globals.css for each theme, so the browser chrome
   // on mobile blends into the page instead of banding against it.
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f6f5f3" },
-    { media: "(prefers-color-scheme: dark)", color: "#0a0a0a" },
+    { media: "(prefers-color-scheme: light)", color: "#f7f6f2" },
+    { media: "(prefers-color-scheme: dark)", color: "#191b19" },
   ],
 };
 
@@ -107,13 +116,10 @@ export default function RootLayout({
     name: siteConfig.author.name,
     url: siteConfig.url,
     image: `${siteConfig.url}${siteConfig.ogImage}`,
-    sameAs: [
-      siteConfig.author.github,
-      siteConfig.author.linkedin,
-    ],
-    jobTitle: "Creative Developer",
+    sameAs: [siteConfig.author.github, siteConfig.author.linkedin],
+    jobTitle: "Backend Developer",
     description: siteConfig.description,
-    knowsAbout: ["Go", "React", "Next.js", "Kubernetes", "Microservices", "Web Design"],
+    knowsAbout: ["Go", "Python", "Model Inference", "Backend Systems"],
   };
 
   return (
@@ -122,34 +128,28 @@ export default function RootLayout({
         className={cn(
           spaceGrotesk.variable,
           jetbrainsMono.variable,
-          "font-sans bg-background text-foreground overflow-x-hidden"
+          "bg-background text-foreground overflow-x-hidden font-sans"
         )}
       >
         {/* React 19 hoists this into <head>; no manual <head> element needed. */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
         />
         <ThemeProvider
           attribute="data-theme"
-          defaultTheme="dark"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >
           <ErrorBoundary>
             {/* Skip to content link for accessibility */}
-            <a
-              href="#main-content"
-              className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-accent focus:text-accent-foreground focus:rounded"
-            >
+            <a href="#main-content" className="skip-link">
               Skip to main content
             </a>
-            <CustomCursor />
             <Navbar />
-            <Noise />
-            <SmoothScroll>
-              <main id="main-content">{children}</main>
-            </SmoothScroll>
+            <main id="main-content">{children}</main>
+            <SiteFooter />
           </ErrorBoundary>
         </ThemeProvider>
       </body>

@@ -1,93 +1,74 @@
-// Project types
 export interface Project {
-    id?: string;
-    title: string;
-    category: string;
-    year: string;
-    agency: string;
-    grid: string;
-    margins: string;
-    powerLines: string;
-    paddingsSystem: string;
-    image: string;
-    description?: string;
-    tags?: string[];
-    url?: string;
+  id: string;
+  title: string;
+  category: string;
+  description: string;
+  tags: string[];
+  problem: string;
+  contribution: string;
+  tradeoff: string;
+  validation: string;
+  limitations: string;
+  articles: string[];
+  url?: string;
 }
-
-// Article types
 export interface Article {
-    id: string | number;
-    title: string;
-    date: string;
-    category: string;
-    excerpt: string;
-    slug: string;
-    content: string;
-    readingTime?: string;
+  id: string | number;
+  title: string;
+  date: string;
+  updatedAt?: string;
+  category: string;
+  excerpt: string;
+  slug: string;
+  content: string;
+  readingTime?: string;
+  tags?: string[];
+  series?: string;
+  seriesOrder?: number;
+  featured?: boolean;
+  draft?: boolean;
+  lang?: string;
+  labPath?: string;
+  toc?: { id: string; text: string; depth: number }[];
 }
-
-// Technology types
-export interface Technology {
-    id: number;
-    name: string;
-}
-
-// Social Link types
-export interface SocialLink {
-    name: string;
-    url: string;
-}
-
-// Contact Details types
-export interface ContactDetails {
-    email: string;
-    phone: string;
-    location: string;
-}
-
-// Self Intro types
-export interface SelfIntroData {
-    heading: {
-        main: string;
-        sub: string;
-    };
-    description: string;
-    roles: string[];
-    stats: Array<{
-        id: number;
-        value: string;
-        accent?: string;
-        label: string;
-    }>;
-}
-
-// Navigation types
+export type ArticleSummary = Omit<Article, "content" | "toc">;
 export interface NavItem {
-    name: string;
-    path: string;
+  name: string;
+  path: string;
 }
-
-// Animation types
-export interface AnimationConfig {
-    duration?: number;
-    delay?: number;
-    ease?: number[] | string;
+export interface Technology {
+  id: number;
+  name: string;
 }
-
-// Component common props
-export interface BaseComponentProps {
-    className?: string;
-    children?: React.ReactNode;
+export interface SocialLink {
+  name: string;
+  url: string;
 }
-
-// Upcoming Topic types
+export interface ContactDetails {
+  email: string;
+  phone: string;
+  location: string;
+}
+export interface SelfIntroData {
+  heading: { main: string; sub: string };
+  description: string;
+  roles: string[];
+  stats: { id: number; value: string; accent?: string; label: string }[];
+}
 export interface UpcomingTopic {
-    id: string;
-    title: string;
-    category: string;
-    status: 'planning' | 'outline' | 'drafting' | 'reviewing';
-    estimatedDate: string;
-    description: string;
+  id: string;
+  title: string;
+  category: string;
+  status: "planning" | "outline" | "drafting" | "reviewing";
+  estimatedDate: string;
+  description: string;
 }
-
+export interface AnimationConfig {
+  duration?: number;
+  delay?: number;
+  ease?: number[] | string;
+}
+export interface BaseComponentProps {
+  className?: string;
+  children?: React.ReactNode;
+}

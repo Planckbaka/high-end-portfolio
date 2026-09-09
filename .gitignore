@@ -73,3 +73,8 @@ logs/
 
 # Personal Assets
 public/resume.pdf
+
+# Local experiment environments
+labs/.venv/
+__pycache__/
+*.pyc

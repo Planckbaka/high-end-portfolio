@@ -1,0 +1,1 @@
+{'device': 'cpu', 'shape': [2, 4, 8, 16], 'max_absolute_error': 2.384185791015625e-07}

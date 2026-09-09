@@ -1,0 +1,38 @@
+{
+  "measurement_kind": "synthetic timestamp fixture",
+  "requests": 3,
+  "errors": 1,
+  "empty_successes": 0,
+  "success_duration_p50": 0.425,
+  "success_duration_p95": 0.5825,
+  "success_first_event_p95": 0.195,
+  "records": [
+    {
+      "event_count": 3,
+      "first_event_seconds": 0.2,
+      "event_gaps_seconds": [
+        0.09999999999999998,
+        0.2
+      ],
+      "mean_gap_seconds": 0.15,
+      "duration_seconds": 0.6,
+      "error": null
+    },
+    {
+      "event_count": 0,
+      "first_event_seconds": null,
+      "event_gaps_seconds": [],
+      "mean_gap_seconds": null,
+      "duration_seconds": 0.4,
+      "error": "upstream timeout"
+    },
+    {
+      "event_count": 1,
+      "first_event_seconds": 0.1,
+      "event_gaps_seconds": [],
+      "mean_gap_seconds": null,
+      "duration_seconds": 0.25,
+      "error": null
+    }
+  ]
+}
