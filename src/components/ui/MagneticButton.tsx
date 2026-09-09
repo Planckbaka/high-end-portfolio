@@ -2,7 +2,7 @@
 
 import { motion, useMotionTemplate, useMotionValue, useReducedMotion, useSpring } from "framer-motion";
 import { ArrowUpRight, FileText } from "lucide-react";
-import { useRef } from "react";
+import { useCallback, useRef } from "react";
 
 export function MagneticButton({
     children,
@@ -27,7 +27,7 @@ export function MagneticButton({
 
     const transform = useMotionTemplate`translate(${xSpring}px, ${ySpring}px)`;
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const handleMouseMove = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
         // Chasing the cursor is exactly the kind of motion this preference opts out of.
         if (!ref.current || shouldReduceMotion) return;
 
@@ -41,12 +41,12 @@ export function MagneticButton({
         // Magnetic strength
         x.set(distanceX * 0.3);
         y.set(distanceY * 0.3);
-    };
+    }, [x, y, shouldReduceMotion]);
 
-    const handleMouseLeave = () => {
+    const handleMouseLeave = useCallback(() => {
         x.set(0);
         y.set(0);
-    };
+    }, [x, y]);
 
     return (
         <motion.a
