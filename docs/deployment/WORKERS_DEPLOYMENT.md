@@ -28,9 +28,9 @@ binding = "ASSETS"
 ```json
 {
   "scripts": {
-    "build:cf": "opennextjs-cloudflare build",
-    "deploy": "npm run build:cf && wrangler deploy",
-    "deploy:prod": "npm run build:cf && wrangler deploy --env production",
+    "build:cf": "npm run prebuild && opennextjs-cloudflare build",
+    "deploy": "npm run build:cf && wrangler deploy --env= --keep-vars",
+    "deploy:prod": "npm run build:cf && node scripts/check-publication.mjs && wrangler deploy --env= --keep-vars",
     "preview": "wrangler dev"
   }
 }
@@ -69,23 +69,15 @@ npm run deploy
 
 ## 🌐 部署环境
 
-### 开发环境（默认）
+只有一个生产 Worker（默认环境 `high-end-portfolio`）。CI 的 `deploy.yml`（GitHub `environment: production` 门禁）和本地脚本部署的都是它。
 
 ```bash
-npm run deploy
+npm run deploy        # 构建 + 部署
+npm run deploy:prod   # 构建 + 出版校验 + 部署（镜像 CI 门禁，推荐用于正式发布）
 ```
 
 - URL: `https://high-end-portfolio.<subdomain>.workers.dev`
-- 用于测试和开发
-
-### 生产环境
-
-```bash
-npm run deploy:prod
-```
-
-- 需要在 `wrangler.toml` 中配置自定义域名
-- 更稳定的部署环境
+- 曾有的 `[env.production]`（`high-end-portfolio-prod`，workers_dev=false、无路由）从未被使用，已于 2026-10-11 删除。若将来需要独立生产域名，需先配置 routes 或启用 workers.dev 再接回独立环境。
 
 ## 🔧 本地测试
 
@@ -144,7 +136,7 @@ npm run preview
 
 ## 📚 相关文档
 
-- [完整部署指南](./.agent/workflows/deploy-to-workers.md)
+- [完整部署指南](../../.agent/workflows/deploy-to-workers.md)
 - [Cloudflare Workers 文档](https://developers.cloudflare.com/workers/)
 - [OpenNext Cloudflare](https://opennext.js.org/cloudflare)
 
@@ -152,4 +144,4 @@ npm run preview
 
 1. 查看构建日志：`npm run build:cf`
 2. 查看部署日志：`wrangler tail`
-3. 参考 [常见问题](./.agent/workflows/deploy-to-workers.md#常见问题)
+3. 参考 [常见问题](../../.agent/workflows/deploy-to-workers.md#常见问题)

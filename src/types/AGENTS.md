@@ -9,7 +9,7 @@ Shared TypeScript type definitions and interfaces used across the entire applica
 ## Key Files
 | File | Description |
 |------|-------------|
-| `index.ts` | All shared interfaces: `Project`, `Article`, `Technology`, `SocialLink`, `ContactDetails`, `SelfIntroData`, `NavItem`, `AnimationConfig`, `BaseComponentProps` |
+| `index.ts` | All shared interfaces: `Project`, `Article`, `ArticleSummary`, `NavItem`, `SocialLink`, `ContactDetails` |
 
 ## For AI Agents
 
@@ -20,8 +20,8 @@ Shared TypeScript type definitions and interfaces used across the entire applica
 
 ### Common Patterns
 - Import via `import type { ... } from "@/types"` (type-only imports)
-- `Project` includes optional `description`, `tags`, and `url` fields
+- `Project` includes optional `description`, `tags`, `problem/tradeoff/validation` and `url` fields
 - `Article` has both `id: string | number` and `slug` for flexibility
-- `SelfIntroData` uses a nested structure with `heading.main` / `heading.sub`
+- `ArticleSummary` is `Article` minus `content` and `toc`
 
 <!-- MANUAL: Custom project notes can be added below -->

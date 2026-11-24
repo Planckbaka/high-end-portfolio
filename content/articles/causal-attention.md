@@ -6,7 +6,7 @@ category: "LLM"
 excerpt: "Implement causal attention on CPU, trace every tensor dimension, and test outputs and gradients against PyTorch before reasoning about performance."
 lang: "en"
 tags: ["PyTorch", "attention", "causal mask", "tensor shapes"]
-featured: true
+featured: false
 draft: false
 series: "Engineering Reliable Model Systems"
 seriesOrder: 5

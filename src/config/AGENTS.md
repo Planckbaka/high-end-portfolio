@@ -10,10 +10,8 @@ Centralized configuration and static data for the portfolio site. All site metad
 | File | Description |
 |------|-------------|
 | `site.ts` | Site name, URL, author info, social links, OG image |
-| `data.ts` | Static data: `navItems`, `projects`, `technologies`, `articles` (fallback), `socialLinks`, `contactDetails`, `selfIntroData` |
-| `env.ts` | Environment variable validation and access |
-| `seo.ts` | SEO metadata generation helpers |
-| `constants.ts` | Application-wide constants |
+| `data.ts` | Static data: `navItems`, `projects`, `socialLinks`, `contactDetails` |
+| `constants.ts` | Application-wide constants (rate limits, HTTP statuses, error messages) |
 
 ## Subdirectories
 | Directory | Purpose |

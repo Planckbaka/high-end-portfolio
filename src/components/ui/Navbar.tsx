@@ -27,7 +27,9 @@ export function Navbar() {
     <header className="site-header">
       <div className="site-shell header-inner">
         <Link href="/" className="wordmark">
-          <span className="wordmark-icon">a.</span>
+          <span className="wordmark-icon" aria-hidden="true">
+            a.
+          </span>
           akiwayne
           <span className="text-muted-foreground ml-2 hidden text-xs tracking-normal lg:inline">
             / engineering notes
@@ -45,6 +47,12 @@ export function Navbar() {
               if (event.key === "Escape" && menu.current) {
                 menu.current.open = false;
                 menu.current.querySelector("summary")?.focus();
+              }
+            }}
+            onBlur={(event) => {
+              // Collapse once focus travels outside the menu (tab or click away).
+              if (menu.current?.open && !menu.current.contains(event.relatedTarget as Node)) {
+                menu.current.open = false;
               }
             }}
           >

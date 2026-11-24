@@ -1,16 +1,17 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
   reactCompiler: true,
 
-  // Cloudflare Pages 优化配置
+  /*
+   * Images ship byte-identical to public/ (Workers assets have no on-the-fly
+   * optimizer; the `sizes` hints on next/image are therefore inert). Source
+   * art is pre-sized and WebP-compressed instead. Switching this on requires
+   * wiring an OpenNext image loader — a deliberate tradeoff, not an oversight.
+   */
   images: {
-    unoptimized: true, // 使用 Cloudflare 的图片优化服务
+    unoptimized: true,
   },
-
-  // 启用静态导出（推荐用于 Cloudflare Pages）
-  // output: 'export', // Disabled for Cloudflare Adapter (SSR)
 };
 
 export default nextConfig;

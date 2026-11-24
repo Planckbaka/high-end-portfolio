@@ -10,17 +10,30 @@ export default function ContactClient() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState("");
+  const honeypot = useRef("");
   const submitting = useRef(false);
   const attempt = useRef<{ payload: string; key: string } | null>(null);
+  const FIELD_ORDER = ["name", "email", "message"] as const;
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     if (submitting.current) return;
+    /*
+     * Honeypot: the field is visually removed and out of the tab order, so
+     * only a bot fills it. Answer with fake success and drop the payload —
+     * never reveal the trap.
+     */
+    if (honeypot.current) {
+      setStatus("Message sent successfully. Thank you for reaching out.");
+      return;
+    }
     const parsed = contactSchema.safeParse(values);
     if (!parsed.success) {
       const next: Record<string, string> = {};
       for (const issue of parsed.error.issues) next[String(issue.path[0])] ||= issue.message;
       setErrors(next);
       setStatus("Please check the highlighted fields.");
+      const firstInvalid = FIELD_ORDER.find((field) => next[field]);
+      if (firstInvalid) document.getElementById(firstInvalid)?.focus();
       return;
     }
     setErrors({});
@@ -55,16 +68,23 @@ export default function ContactClient() {
     }
   }
   function change(event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) {
-    setValues((previous) => ({ ...previous, [event.target.name]: event.target.value }));
+    const { name, value } = event.target;
+    setValues((previous) => ({ ...previous, [name]: value }));
+    /* Clear a field's stale error as soon as the user edits it again. */
+    setErrors((previous) => {
+      if (!previous[name]) return previous;
+      const next = { ...previous };
+      delete next[name];
+      return next;
+    });
   }
   return (
     <div className="site-shell">
       <header className="page-heading">
-        <p className="eyebrow">Get in touch</p>
         <h1>Let’s talk systems.</h1>
         <p>
           A technical question, a thoughtful correction, or an opportunity to build something
-          useful—I’d like to hear it.
+          useful. I’d like to hear it.
         </p>
       </header>
       <div className="contact-layout">
@@ -82,7 +102,7 @@ export default function ContactClient() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {link.name} ↗
+              {link.name} ↗<span className="sr-only">(opens in a new tab)</span>
             </a>
           ))}
           <p className="text-muted-foreground">
@@ -150,6 +170,17 @@ export default function ContactClient() {
                   {errors.message}
                 </p>
               )}
+            </div>
+            <div className="honeypot-field" aria-hidden="true">
+              <label htmlFor="company-website">Company website</label>
+              <input
+                id="company-website"
+                name="company_website"
+                type="text"
+                tabIndex={-1}
+                autoComplete="off"
+                onChange={(event) => (honeypot.current = event.target.value)}
+              />
             </div>
             <Button type="submit" disabled={pending}>
               {pending ? "Sending…" : "Send message ↗"}

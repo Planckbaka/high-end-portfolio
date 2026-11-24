@@ -1,5 +1,10 @@
 # Code Review - Quick Reference
 
+> **Historical record (May 2026 code review).** The file list below reflects
+> the site as it was then — components like `Loading.tsx` were deleted in the
+> October 2026 cleanup. See `docs/architecture/FOLDER_STRUCTURE.md` for the
+> current tree.
+
 ## 🎯 What Was Done
 
 ### ✅ Critical Fixes (High Priority)

@@ -10,8 +10,7 @@ Article listing page and individual article detail pages. Uses Next.js dynamic r
 | File | Description |
 |------|-------------|
 | `page.tsx` | Server Component — article list page, imports ArticlesClient |
-| `ArticlesClient.tsx` | Client Component — renders article grid with animations |
-| `loading.tsx` | Loading state for article list |
+| `ArticlesClient.tsx` | Client Component — renders article list with URL-driven search, filters, and pagination |
 | `error.tsx` | Error boundary for article list (Client Component) |
 
 ## Subdirectories
@@ -23,7 +22,7 @@ Article listing page and individual article detail pages. Uses Next.js dynamic r
 
 ### Working In This Directory
 - `page.tsx` reads from `src/lib/articles-data.json` (generated at build time)
-- `ArticlesClient.tsx` handles interactive article card hover effects and animations
+- `ArticlesClient.tsx` handles search, topic/series filters, and pagination (state lives in the URL)
 - `error.tsx` must be a Client Component (Next.js requirement)
 - The `[slug]` directory handles individual article rendering with `generateStaticParams`
 
@@ -35,8 +34,7 @@ Article listing page and individual article detail pages. Uses Next.js dynamic r
 
 ### Internal
 - `src/lib/articles-data.json` — pre-rendered article data
-- `src/components/ui/ArticleSkeleton.tsx` — loading skeleton
-- `src/lib/animations.ts` — Framer Motion variants
+- `src/lib/article-search.ts` — `selectArticles` / `ARTICLE_CATEGORIES`
 - `src/lib/utils.ts` — `cn()` utility
 
 <!-- MANUAL: Custom project notes can be added below -->

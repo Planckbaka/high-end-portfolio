@@ -26,7 +26,8 @@ API route for the contact form. Receives form submissions via POST and sends ema
 ## Dependencies
 
 ### Internal
-- `src/config/env.ts` — environment variable access
+- `src/config/site.ts` — site URL and author contact (delivery address fallback)
+- `src/config/constants.ts` — rate-limit windows, HTTP statuses, error messages
 
 ### External
 - `resend` — email delivery SDK

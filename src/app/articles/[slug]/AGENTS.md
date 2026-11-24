@@ -10,7 +10,7 @@ Individual article detail page using Next.js dynamic routing. Renders pre-proces
 | File | Description |
 |------|-------------|
 | `page.tsx` | Server Component — looks up article by slug, renders HTML content |
-| `ArticleClient.tsx` | Client Component — handles article page animations and interactivity |
+| `ArticleClient.tsx` | Client Component — article body, TOC, share links, series navigation |
 
 ## For AI Agents
 
@@ -28,6 +28,6 @@ Individual article detail page using Next.js dynamic routing. Renders pre-proces
 
 ### Internal
 - `src/lib/articles-data.json` — pre-rendered article data
-- `src/lib/animations.ts` — page transition animations
+- `src/lib/markdown.ts` — article data access
 
 <!-- MANUAL: Custom project notes can be added below -->

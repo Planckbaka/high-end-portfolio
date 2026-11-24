@@ -19,10 +19,6 @@ binding = "ASSETS"
 # NEXT_PUBLIC_SITE_URL = "https://your-domain.com"
 # NEXT_PUBLIC_SITE_NAME = "Your Portfolio"
 
-# 生产环境配置
-[env.production]
-name = "high-end-portfolio-prod"
-workers_dev = false
-# routes = [
-#   { pattern = "your-domain.com/*", zone_name = "your-domain.com" }
-# ]
+# 只有一个生产环境：CI 的 production 门禁（deploy.yml）与本地 deploy 脚本
+# 部署的都是这里的默认 Worker。曾经存在的 [env.production] 块从未被任何
+# 脚本或 CI 使用（workers_dev=false 且无路由，部署即失联），已于 2026-10-11 删除。

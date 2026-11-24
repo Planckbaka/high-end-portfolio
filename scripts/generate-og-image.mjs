@@ -5,7 +5,7 @@ import sharp from "sharp";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const output = path.join(root, "public/og/articles");
 const articles = JSON.parse(
-  await fs.readFile(path.join(root, "src/lib/articles-data.json"), "utf8")
+  await fs.readFile(path.join(root, "src/lib/articles-index.json"), "utf8")
 ).filter((article) => !article.draft);
 const escape = (value) =>
   String(value)

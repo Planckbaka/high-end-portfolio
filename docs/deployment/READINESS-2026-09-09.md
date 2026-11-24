@@ -32,3 +32,7 @@ For the existing default target, after these conditions are met, the explicit bu
 - [Wrangler environments](https://developers.cloudflare.com/workers/wrangler/environments/)
 
 Cloudflare now recommends vinext for new projects; this audit retains the existing OpenNext architecture and does not introduce an unrelated framework migration. Local checks establish compatibility, not successful remote deployment or email delivery.
+
+## 2026-10-11 addendum
+
+Condition 2 above is resolved by removing, not wiring: the unused `[env.production]` block was deleted from `wrangler.toml` because no script or CI job ever targeted it (`workers_dev = false`, no routes — deploying it would have produced an unreachable Worker). There is one production Worker: the default `high-end-portfolio`, which both CI's `production`-gated workflow and local deploy scripts target. `npm run deploy:prod` is now the verified production path (`build:cf` + `scripts/check-publication.mjs` + deploy), mirroring CI's gate. Separately, `resume.pdf` was added to `public/.assetsignore` so it is no longer published at `/resume.pdf`.

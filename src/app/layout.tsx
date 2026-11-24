@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { cn } from "@/lib/utils";
@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 import { siteConfig } from "@/config/site";
+import { RouteAnnouncer } from "@/components/RouteAnnouncer";
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-display",
@@ -18,6 +19,12 @@ const spaceGrotesk = Space_Grotesk({
 
 const jetbrainsMono = JetBrains_Mono({
   variable: "--font-code",
+  subsets: ["latin"],
+  display: "swap",
+});
+
+const sourceSerif = Source_Serif_4({
+  variable: "--font-serif",
   subsets: ["latin"],
   display: "swap",
 });
@@ -41,6 +48,8 @@ export const metadata: Metadata = {
   authors: [{ name: siteConfig.author.name, url: siteConfig.author.github }],
   creator: siteConfig.author.name,
   alternates: {
+    // Footgun: this default canonicalizes any future route that forgets its
+    // own metadata to the homepage. Every route must override it.
     canonical: "/",
     types: { "application/rss+xml": "/feed.xml" },
   },
@@ -68,8 +77,7 @@ export const metadata: Metadata = {
     creator: siteConfig.author.twitter,
   },
   /*
-   * Purpose-built favicon set (generated previously and left unused in
-   * public/Favicon Converter/). The old config pointed every icon slot at
+   * Purpose-built favicon set. The old config pointed every icon slot at
    * /avatar.jpeg — a 22 KB photo the browser had to downscale to 16px, with no
    * apple-touch or maskable variant.
    */
@@ -123,12 +131,19 @@ export default function RootLayout({
   };
 
   return (
-    <html lang="en" className="antialiased" suppressHydrationWarning>
+    /*
+     * overflow-x: clip, not hidden. `hidden` makes the element a scroll
+     * container, which strands the sticky header; `clip` trims the same
+     * overflow without one. Applies to html and body together, because a
+     * clip on body alone still lets html scroll sideways.
+     */
+    <html lang="en" className="antialiased overflow-x-clip" suppressHydrationWarning>
       <body
         className={cn(
           spaceGrotesk.variable,
           jetbrainsMono.variable,
-          "bg-background text-foreground overflow-x-hidden font-sans"
+          sourceSerif.variable,
+          "bg-background text-foreground overflow-x-clip font-sans"
         )}
       >
         {/* React 19 hoists this into <head>; no manual <head> element needed. */}
@@ -148,8 +163,13 @@ export default function RootLayout({
               Skip to main content
             </a>
             <Navbar />
-            <main id="main-content">{children}</main>
+            {/* tabIndex makes <main> a programmatic focus target for the skip
+                link across assistive tech, not just modern fragment focus. */}
+            <main id="main-content" tabIndex={-1}>
+              {children}
+            </main>
             <SiteFooter />
+            <RouteAnnouncer />
           </ErrorBoundary>
         </ThemeProvider>
       </body>

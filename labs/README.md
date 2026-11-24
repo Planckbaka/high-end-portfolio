@@ -1,6 +1,6 @@
 # Engineering Labs
 
-Six reproducible experiments accompany **Engineering Reliable Model Systems**.
+Twelve reproducible experiments accompany **Engineering Reliable Model Systems** and **LLM & AI Infrastructure from First Principles**.
 These are teaching implementations, not a deployable model-serving platform.
 
 ## Setup
@@ -12,9 +12,15 @@ python3 -m venv labs/.venv
 labs/.venv/bin/python -m pip install -r labs/requirements.txt
 ```
 
-Python 3.11+ and Go 1.24+ are required. Only the attention and cached-decoder labs require PyTorch. No model downloads or API keys are used. All tensor operations explicitly run on CPU.
+Or with `uv`:
 
-## Test all six labs
+```sh
+uv run --with torch python -m unittest discover -s labs/llm/modern-transformer -p 'test_*.py' -v
+```
+
+Python 3.11+ and Go 1.24+ are required. Only the LLM tensor labs require PyTorch. No model downloads or API keys are used. All tensor operations explicitly run on CPU.
+
+## Test all twelve labs
 
 ```sh
 (cd labs/go && go test -race ./...)
@@ -22,6 +28,12 @@ python3 -m unittest discover -s labs/python/concurrency -p 'test_*.py' -v
 python3 -m unittest discover -s labs/python/streaming -p 'test_*.py' -v
 labs/.venv/bin/python -m unittest discover -s labs/llm/attention -p 'test_*.py' -v
 labs/.venv/bin/python -m unittest discover -s labs/llm/kv-cache -p 'test_*.py' -v
+labs/.venv/bin/python -m unittest discover -s labs/llm/modern-transformer -p 'test_*.py' -v
+labs/.venv/bin/python -m unittest discover -s labs/llm/roofline-flash -p 'test_*.py' -v
+labs/.venv/bin/python -m unittest discover -s labs/llm/deepseek-mla-grpo -p 'test_*.py' -v
+labs/.venv/bin/python -m unittest discover -s labs/llm/flagship-2026 -p 'test_*.py' -v
+labs/.venv/bin/python -m unittest discover -s labs/llm/looped-transformer -p 'test_*.py' -v
+labs/.venv/bin/python -m unittest discover -s labs/llm/block-diffusion -p 'test_*.py' -v
 ```
 
 ## Reproduce the records
@@ -30,6 +42,12 @@ labs/.venv/bin/python -m unittest discover -s labs/llm/kv-cache -p 'test_*.py' -
 python3 labs/python/streaming/measure.py > labs/results/stream-fixture.json
 labs/.venv/bin/python labs/llm/attention/attention.py
 labs/.venv/bin/python labs/llm/kv-cache/benchmark.py --output labs/results/cache-results.json
+labs/.venv/bin/python labs/llm/modern-transformer/modern_blocks.py
+labs/.venv/bin/python labs/llm/roofline-flash/roofline_flash.py
+labs/.venv/bin/python labs/llm/deepseek-mla-grpo/mla_grpo.py
+labs/.venv/bin/python labs/llm/flagship-2026/flagship_blocks.py
+labs/.venv/bin/python labs/llm/looped-transformer/looped_transformer.py
+labs/.venv/bin/python labs/llm/block-diffusion/block_diffusion.py
 ```
 
 The stream report uses prescribed timestamps, not a measured model. Decoder timings are local CPU microbenchmarks over a random-weight, one-block model. Compare correctness first, then timings under the same environment. Do not extrapolate these records to GPU throughput, language quality, or production capacity.

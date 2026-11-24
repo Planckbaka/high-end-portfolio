@@ -1,4 +1,11 @@
-import { getAllArticleSlugs, getArticleBySlug, getAllArticles } from "@/lib/markdown";
+import "katex/dist/katex.min.css";
+import {
+  getAllArticleSlugs,
+  getArticleBySlug,
+  getArticleSummaryBySlug,
+  getAllArticles,
+} from "@/lib/markdown";
+import { getRelatedArticles } from "@/lib/related-articles";
 import ArticleClient from "./ArticleClient";
 import { notFound } from "next/navigation";
 import { siteConfig } from "@/config/site";
@@ -16,7 +23,7 @@ export async function generateStaticParams() {
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
+  const article = getArticleSummaryBySlug(slug);
 
   if (!article) {
     return {
@@ -27,17 +34,32 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   // Per-article share card, pre-rendered at build time by
   // scripts/generate-og-image.mjs into public/og/articles/<slug>.png.
   const ogImage = `/og/articles/${slug}.png`;
+  const canonicalUrl = `${siteConfig.url}/articles/${slug}`;
+  const citationDate = article.date.replaceAll("-", "/");
+
+  const otherMeta: Record<string, string> = {
+    citation_title: article.title,
+    citation_author: siteConfig.author.name,
+    citation_publication_date: citationDate,
+    citation_online_date: (article.updatedAt || article.date).replaceAll("-", "/"),
+    citation_journal_title: article.series || siteConfig.name,
+    citation_language: "en",
+    citation_public_url: canonicalUrl,
+  };
+  if (article.tags && article.tags.length > 0) {
+    otherMeta.citation_keywords = article.tags.join("; ");
+  }
 
   return {
     /*
      * Bare title only. The root layout defines
-     * `title.template = "%s | Akiwayne's Portfolio"`, so appending the site
-     * name here produced "… | Akiwayne's Portfolio | Akiwayne's Portfolio".
+     * `title.template = "%s | ${siteConfig.name}"`, so appending the site
+     * name here would duplicate it.
      */
     title: article.title,
     description: article.excerpt,
     alternates: {
-      canonical: `${siteConfig.url}/articles/${slug}`,
+      canonical: canonicalUrl,
     },
     openGraph: {
       // openGraph titles are not run through the template, so the site
@@ -48,7 +70,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       publishedTime: article.date,
       modifiedTime: article.updatedAt || article.date,
       authors: [siteConfig.author.name],
-      url: `${siteConfig.url}/articles/${slug}`,
+      tags: article.tags,
+      url: canonicalUrl,
       images: [{ url: ogImage, width: 1200, height: 630, alt: article.title }],
     },
     twitter: {
@@ -56,7 +79,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: `${article.title} | ${siteConfig.name}`,
       description: article.excerpt,
       images: [ogImage],
+      // Not inherited: Next shallow-merges page metadata over the layout's.
+      creator: siteConfig.author.twitter,
     },
+    other: otherMeta,
   };
 }
 
@@ -68,12 +94,34 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     notFound();
   }
 
+  const allArticles = getAllArticles();
   const series = article.series
-    ? (await getAllArticles())
+    ? allArticles
         .filter((a) => a.series === article.series)
         .sort((a, b) => (a.seriesOrder || 0) - (b.seriesOrder || 0))
     : [];
   const position = series.findIndex((a) => a.slug === slug);
+  const previous = position > 0 ? series[position - 1] : undefined;
+  const next = position >= 0 ? series[position + 1] : undefined;
+
+  // Layered reading flow: intermediate series chapters stay strictly linear,
+  // while standalone articles and series finales surface 3 related pieces.
+  const related = !next
+    ? getRelatedArticles(article, allArticles, {
+        excludeSlugs: previous ? [previous.slug] : [],
+        limit: 3,
+      })
+    : [];
+
+  const breadcrumbLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
+      { "@type": "ListItem", position: 2, name: "Writing", item: `${siteConfig.url}/articles` },
+      { "@type": "ListItem", position: 3, name: article.title },
+    ],
+  };
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
@@ -82,6 +130,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     datePublished: article.date,
     dateModified: article.updatedAt || article.date,
     inLanguage: "en",
+    image: `${siteConfig.url}/og/articles/${slug}.png`,
+    keywords: article.tags?.join(", "),
+    mainEntityOfPage: `${siteConfig.url}/articles/${slug}`,
     author: {
       "@type": "Person",
       name: siteConfig.author.name,
@@ -100,10 +151,15 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
       />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, "\\u003c") }}
+      />
       <ArticleClient
         article={article}
-        previous={series[position - 1]}
-        next={series[position + 1]}
+        previous={previous}
+        next={next}
+        related={related}
       />
     </>
   );

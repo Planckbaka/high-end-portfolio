@@ -51,6 +51,8 @@ next-env.d.ts
 # Local AI settings and session state
 /.omc/
 /.claude/settings.local.json
+/.claude/skills/
+/skills-lock.json
 
 # Tool caches
 .swc/

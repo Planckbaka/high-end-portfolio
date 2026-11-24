@@ -28,10 +28,8 @@ React components shared across the application. Contains top-level providers and
 
 ### Internal
 - `src/lib/utils.ts` — `cn()` utility for className merging
-- `src/lib/animations.ts` — Framer Motion animation variants
 
 ### External
 - `next-themes` — ThemeProvider
-- `framer-motion` — animation components in `ui/`
 
 <!-- MANUAL: Custom project notes can be added below -->

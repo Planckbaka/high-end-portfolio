@@ -51,12 +51,6 @@ const config = {
       lines: 100,
       statements: 100,
     },
-    "./src/lib/animations.ts": {
-      branches: 100,
-      functions: 100,
-      lines: 100,
-      statements: 100,
-    },
     "./src/config/constants.ts": {
       branches: 100,
       functions: 100,

@@ -4,55 +4,43 @@
 # ui
 
 ## Purpose
-Reusable UI components for the portfolio site. Each component is a self-contained Client Component with its own animations and styling.
+Reusable UI components for the portfolio site. The design language is a quiet editorial system (see `docs/architecture/DESIGN_SYSTEM.md`): native scrolling, no custom cursor, no entrance animations — feedback is limited to hover/focus transitions, which reduced-motion disables.
 
 ## Key Files
 | File | Description |
 |------|-------------|
-| `Navbar.tsx` | Navigation bar — responsive, animated, with theme toggle |
-| `Hero.tsx` | Hero section — main landing area with animations and CTA |
-| `SelfIntro.tsx` | Self introduction section — bio, roles, stats |
-| `ProjectCard.tsx` | Individual project card — image, metadata, hover effects |
-| `ProjectList.tsx` | Project grid — renders ProjectCards with stagger animation |
-| `ArticleSkeleton.tsx` | Loading skeleton for article cards |
-| `CustomCursor.tsx` | Custom cursor effect — follows mouse with magnetic behavior |
-| `MagneticButton.tsx` | Magnetic hover effect button — pulls toward cursor |
-| `GridBackground.tsx` | Animated grid background pattern |
-| `ThemeToggle.tsx` | Dark/light mode toggle button |
-| `Noise.tsx` | Noise texture overlay effect |
-| `Loading.tsx` | Loading spinner/indicator component |
+| `Navbar.tsx` | Sticky header — responsive, `aria-current` nav, details-based mobile menu |
+| `Hero.tsx` | Home hero — editorial composition with framed artwork |
+| `ArticleCard.tsx` | Featured article card + article row for listings |
+| `ProjectList.tsx` | Numbered project rows on the home page |
+| `ArticleTools.tsx` | Table of contents (scroll-spy) and code copy enhancement |
+| `ShareLinks.tsx` | Share-to-X / copy-link controls with live-region feedback |
+| `BackToTop.tsx` | Client scroll-to-top button (footer is a server component) |
+| `ThemeToggle.tsx` | Light/dark switch with `aria-pressed` state |
+| `button.tsx` / `input.tsx` / `textarea.tsx` | Shared primitives (shadcn-style, `data-slot` attributes) |
 
 ## For AI Agents
 
 ### Working In This Directory
-- All components are Client Components (`"use client"`)
+- Server Components by default; add `"use client"` only for interactivity
 - Use `cn()` from `@/lib/utils` for conditional className merging
-- Animation variants are imported from `@/lib/animations`
-- Components use Framer Motion's `motion` wrapper for enter/exit animations
-- TailwindCSS 4 for all styling — no CSS modules or styled-components
-
-### Common Patterns
-- Props interfaces defined inline (not in `types/`) for component-specific props
-- `framer-motion` `variants` prop for declarative animation states
-- `whileHover` / `whileInView` for interactive animations
-- `lucide-react` for icons
+- All styling is TailwindCSS 4 + the semantic tokens in `src/app/globals.css` — no CSS modules
+- Decorative elements get `aria-hidden="true"`; icon-only controls get labels
+- There is no framer-motion in this project anymore — do not reintroduce it without updating `DESIGN_SYSTEM.md` first
 
 ### Testing Requirements
-- Visual testing via `npm run dev` — most components are visual/interactive
-- No unit tests for UI components currently
+- `src/components/ui/__tests__/structure.test.tsx` covers landmarks and affordances
+- Run `npm test` from project root
 
 ## Dependencies
 
 ### Internal
 - `src/lib/utils.ts` — `cn()` utility
-- `src/lib/animations.ts` — Framer Motion variants
-- `src/types/` — shared interfaces (`Project`, `SelfIntroData`)
+- `src/types/` — shared interfaces (`Project`, `ArticleSummary`)
 - `src/config/data.ts` — static data
 
 ### External
-- `framer-motion` — animations
 - `lucide-react` — icons
 - `next-themes` — theme toggle
-- `clsx` + `tailwind-merge` — class merging
 
 <!-- MANUAL: Custom project notes can be added below -->

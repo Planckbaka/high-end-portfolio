@@ -10,7 +10,7 @@ Contact page with an interactive form. Submits data to the `/api/contact` API ro
 | File | Description |
 |------|-------------|
 | `page.tsx` | Server Component — contact page wrapper, imports ContactClient |
-| `ContactClient.tsx` | Client Component — contact form with validation, submission, and animations |
+| `ContactClient.tsx` | Client Component — contact form with validation and submission |
 
 ## For AI Agents
 
@@ -18,7 +18,6 @@ Contact page with an interactive form. Submits data to the `/api/contact` API ro
 - `ContactClient.tsx` handles form state, validation, and POST to `/api/contact`
 - Form fields: `name`, `email`, `message`
 - Shows success/error feedback after submission
-- Uses Framer Motion for form entry animations
 
 ### Testing Requirements
 - Test form submission by running `npm run dev` and using the contact page
@@ -29,7 +28,7 @@ Contact page with an interactive form. Submits data to the `/api/contact` API ro
 ### Internal
 - `src/config/data.ts` — `contactDetails` for displaying contact info
 - `src/app/api/contact/` — form submission endpoint
-- `src/lib/animations.ts` — Framer Motion variants
+- `src/lib/contact-schema.ts` — shared zod schema
 
 ### External
 - `lucide-react` — form icons

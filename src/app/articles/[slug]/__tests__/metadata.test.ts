@@ -32,11 +32,16 @@ describe("article metadata", () => {
         expect(occurrences).toBe(1);
     });
 
-    it("declares a canonical URL and an OG image", async () => {
+    it("declares a canonical URL, OG image, and Zotero citation metadata", async () => {
         const meta = await generateMetadata({ params: params("transaction-in-DDIA") });
         expect(meta.alternates?.canonical).toContain("/articles/transaction-in-DDIA");
         expect(JSON.stringify(meta.openGraph?.images)).toContain("og");
         expect(JSON.stringify(meta.twitter?.images)).toContain("og");
+        expect(meta.other).toMatchObject({
+            citation_author: siteConfig.author.name,
+            citation_language: "en",
+        });
+        expect(String(meta.other?.citation_public_url)).toContain("/articles/transaction-in-DDIA");
     });
 
     it("falls back cleanly for an unknown slug", async () => {

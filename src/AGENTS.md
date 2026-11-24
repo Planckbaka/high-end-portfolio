@@ -15,8 +15,8 @@ _(No standalone files at this level — all code is organized into subdirectorie
 |-----------|---------|
 | `app/` | Next.js App Router pages, layouts, and API routes (see `app/AGENTS.md`) |
 | `components/` | React components including ErrorBoundary and ThemeProvider (see `components/AGENTS.md`) |
-| `config/` | Site configuration, static data, environment, SEO (see `config/AGENTS.md`) |
-| `lib/` | Utilities, animations, markdown processing, articles data (see `lib/AGENTS.md`) |
+| `config/` | Site configuration, static data, shared constants (see `config/AGENTS.md`) |
+| `lib/` | Utilities, markdown processing, articles data, feed (see `lib/AGENTS.md`) |
 | `types/` | Shared TypeScript interfaces (see `types/AGENTS.md`) |
 
 ## For AI Agents
@@ -32,7 +32,7 @@ _(No standalone files at this level — all code is organized into subdirectorie
 
 ### Common Patterns
 - Barrel imports via `@/config/data`, `@/lib/utils`, etc.
-- Framer Motion for animations, Lenis for smooth scrolling
+- CSS-only motion; scrolling is native (`docs/architecture/DESIGN_SYSTEM.md`)
 - `next-themes` for dark/light mode
 
 ## Dependencies
@@ -41,6 +41,6 @@ _(No standalone files at this level — all code is organized into subdirectorie
 - All subdirectories reference `types/` for shared interfaces
 
 ### External
-- React 19, Next.js 16, TailwindCSS 4, Framer Motion, Lenis, next-themes
+- React 19, Next.js 16, TailwindCSS 4, next-themes
 
 <!-- MANUAL: Custom project notes can be added below -->

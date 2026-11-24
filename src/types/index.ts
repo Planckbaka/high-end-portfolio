@@ -12,6 +12,18 @@ export interface Project {
   articles: string[];
   url?: string;
 }
+export interface PaperReference {
+  title: string;
+  arxiv: string;
+  year?: number;
+  tag?: string;
+  firstCiteId?: string;
+}
+export interface TocEntry {
+  id: string;
+  text: string;
+  depth: number;
+}
 export interface Article {
   id: string | number;
   title: string;
@@ -23,22 +35,47 @@ export interface Article {
   content: string;
   readingTime?: string;
   tags?: string[];
+  related?: string[];
   series?: string;
   seriesOrder?: number;
   featured?: boolean;
   draft?: boolean;
   lang?: string;
   labPath?: string;
-  toc?: { id: string; text: string; depth: number }[];
+  papers?: PaperReference[];
+  toc?: TocEntry[];
 }
-export type ArticleSummary = Omit<Article, "content" | "toc">;
+export type ArticleSummary = Omit<Article, "content">;
+export interface LabFile {
+  name: string;
+  relativePath: string;
+  language: string;
+  kind: "impl" | "test" | "result";
+  defaultOpen: boolean;
+  html: string;
+  lineCount: number;
+}
+export interface LabSummary {
+  track: "go" | "python" | "llm";
+  name: string;
+  labPath: string;
+  title: string;
+  summary: string;
+  runCommands: string[];
+  fileCount: number;
+  companionSlugs: string[];
+}
+export interface LabDetail extends LabSummary {
+  readmeHtml: string;
+  files: LabFile[];
+}
+export interface LabsManifest {
+  overviewHtml: string;
+  labs: LabSummary[];
+}
 export interface NavItem {
   name: string;
   path: string;
-}
-export interface Technology {
-  id: number;
-  name: string;
 }
 export interface SocialLink {
   name: string;
@@ -48,27 +85,4 @@ export interface ContactDetails {
   email: string;
   phone: string;
   location: string;
-}
-export interface SelfIntroData {
-  heading: { main: string; sub: string };
-  description: string;
-  roles: string[];
-  stats: { id: number; value: string; accent?: string; label: string }[];
-}
-export interface UpcomingTopic {
-  id: string;
-  title: string;
-  category: string;
-  status: "planning" | "outline" | "drafting" | "reviewing";
-  estimatedDate: string;
-  description: string;
-}
-export interface AnimationConfig {
-  duration?: number;
-  delay?: number;
-  ease?: number[] | string;
-}
-export interface BaseComponentProps {
-  className?: string;
-  children?: React.ReactNode;
 }

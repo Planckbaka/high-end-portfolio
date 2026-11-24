@@ -1,6 +1,11 @@
 /**
  * Error logging utility
- * Centralized error tracking and logging
+ *
+ * Deliberately console-only. This is a statically-rendered portfolio on
+ * Cloudflare Workers: there is no backend to receive error beacons, so a
+ * client-side tracking sink would report nothing while adding code. Server
+ * logs remain inspectable via `wrangler tail`; client errors surface in the
+ * visitor's devtools. Revisit only if an error-tracking backend ever exists.
  */
 
 interface ErrorContext {
@@ -10,45 +15,13 @@ interface ErrorContext {
     [key: string]: unknown;
 }
 
-/**
- * Log errors to console in development, and to external service in production
- */
+/** Structured console error with timestamp and context. */
 export const logError = (error: Error, context?: ErrorContext): void => {
-    const errorDetails = {
+    console.error("Error logged:", {
         message: error.message,
         stack: error.stack,
         name: error.name,
         timestamp: new Date().toISOString(),
         ...context,
-    };
-
-    if (process.env.NODE_ENV === "production") {
-        // In production, you would send to an error tracking service
-        // Example: Sentry, LogRocket, DataDog, etc.
-        console.error("Error logged:", errorDetails);
-
-        // TODO: Integrate with error tracking service
-        // Example:
-        // Sentry.captureException(error, { contexts: { custom: context } });
-    } else {
-        // Development: detailed console logging
-        console.error("Development Error:", errorDetails);
-    }
-};
-
-/**
- * Log warning messages
- */
-export const logWarning = (message: string, context?: Record<string, unknown>): void => {
-    const warningDetails = {
-        message,
-        timestamp: new Date().toISOString(),
-        ...context,
-    };
-
-    if (process.env.NODE_ENV === "production") {
-        console.warn("Warning:", warningDetails);
-    } else {
-        console.warn("Development Warning:", warningDetails);
-    }
+    });
 };

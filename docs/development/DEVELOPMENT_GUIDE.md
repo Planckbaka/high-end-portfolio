@@ -2,8 +2,8 @@
 
 ## Project Structure
 - `src/app`: Next.js App Router pages.
-- `src/components/ui`: Reusable UI components (Hero, ProjectCard, GridBackground).
-- `src/lib`: Utilities (smooth-scroll, utils).
+- `src/components/ui`: Reusable UI components (Hero, ArticleCard, ProjectList, Navbar).
+- `src/lib`: Utilities (utils, article-search, feed, markdown).
 
 ## Adding a New Page
 
@@ -11,53 +11,35 @@
    Create `src/app/your-page/page.tsx`.
 
 2. **Basic Template**:
+   Pages are Server Components by default; export `metadata` via `pageMetadata()` (`src/lib/page-metadata.ts`) and add a Client Component only where interactivity is needed.
    ```tsx
-   import { GridBackground } from "@/components/ui/GridBackground";
+   import { pageMetadata } from "@/lib/page-metadata";
+
+   export const metadata = pageMetadata("Your page", "One-line description.", "/your-page");
 
    export default function YourPage() {
      return (
-       <main className="relative w-full min-h-screen">
-         <GridBackground />
-         <section className="pt-32 px-4 md:px-12 lg:px-24">
-           {/* Your Content */}
-         </section>
-       </main>
+       <div className="site-shell page-bottom">
+         <header className="page-heading">
+           <p className="eyebrow">Section</p>
+           <h1>Your page.</h1>
+         </header>
+         {/* Your content */}
+       </div>
      );
    }
    ```
 
-3. **Smooth Scroll**:
-   The `SmoothScroll` wrapper in `layout.tsx` automatically handles scrolling for all pages. You don't need to add it manually.
+3. **Scrolling**:
+   Native browser scrolling, by design. Do not add a smooth-scroll library without updating `docs/architecture/DESIGN_SYSTEM.md` first; in-page anchors rely on CSS `scroll-behavior: smooth`, which reduced-motion disables.
 
-## Animation Guidelines
+## Motion Guidelines
 
-We use **Framer Motion** for all animations.
-
-### Entrance Animations
-Use the `initial`, `animate`, `transition` pattern.
-```tsx
-<motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  transition={{ duration: 0.6 }}
->
-  Content
-</motion.div>
-```
-
-### Scroll Triggered
-Use `whileInView` for elements that should animate when scrolled into view.
-```tsx
-<motion.div
-  initial={{ opacity: 0 }}
-  whileInView={{ opacity: 1 }}
-  viewport={{ once: true }}
->
-  Content
-</motion.div>
-```
+Motion is CSS-only (transitions in `globals.css`); there is no animation library. Hover/focus feedback uses short color transitions, and the global `prefers-reduced-motion` block disables them. Do not gate content behind entrance animations.
 
 ## Styling
 - Use **Tailwind CSS** for all styling.
+- Semantic theme tokens live in `src/app/globals.css` (`--background`, `--foreground`, `--accent`, `--surface`, `--muted`, `--border`, `--input`); map new ones through `@theme inline`.
+- `--border` is a decorative hairline; interactive control boundaries use `--input` (WCAG 1.4.11).
 - Use `font-heading` for titles and `font-sans` for body text.
 - Use `text-accent` sparingly for impact.

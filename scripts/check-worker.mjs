@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import { spawn } from "node:child_process";
 import { createServer } from "node:net";
 import { setTimeout as delay } from "node:timers/promises";
-import { mkdtemp, rm } from "node:fs/promises";
+import { mkdtemp, readFile, rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 const requestedPort = Number(process.env.WORKER_CHECK_PORT || 0);
@@ -68,10 +68,14 @@ try {
     await delay(1000);
   }
   assert(ready, "Local Worker did not become ready");
+  const expectedArticles = JSON.parse(await readFile("src/lib/articles-index.json", "utf8")).length;
   for (const route of [
     "/",
     "/articles",
+    "/labs",
+    "/labs/llm/deepseek-mla-grpo",
     "/series/reliable-model-systems",
+    "/series/llm-ai-infra",
     "/articles/kv-cache-tiny-decoder",
     "/contact",
     "/labs/engineering-labs.zip",
@@ -83,7 +87,9 @@ try {
   const feed = await fetch(base + "/feed.xml");
   assert.equal(feed.status, 200);
   assert.match(feed.headers.get("content-type") || "", /application\/rss\+xml/);
-  assert.equal(((await feed.text()).match(/<item>/g) || []).length, 18);
+  const feedBody = await feed.text();
+  assert.equal((feedBody.match(/<item>/g) || []).length, expectedArticles);
+  assert.match(feedBody, /<content:encoded>/);
   for (const body of [
     "{",
     "null",
@@ -97,7 +103,7 @@ try {
     assert.equal(r.status, 400, "Invalid contact payload must not reach provider");
   }
   console.log(
-    "Workers runtime: pages, six-part series, 18-item RSS, archive and invalid contact requests pass. No email sent."
+    `Workers runtime: pages, dual series, interactive labs, ${expectedArticles}-item full-text RSS, archive and invalid contact requests pass. No email sent.`
   );
 } finally {
   if (!exited) child.kill("SIGTERM");

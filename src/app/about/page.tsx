@@ -10,11 +10,10 @@ export default function About() {
   return (
     <div className="site-shell page-bottom">
       <header className="page-heading">
-        <p className="eyebrow">About the author</p>
         <h1>Curiosity, made executable.</h1>
         <p>
           I’m Akiwayne. My starting point is Go backend development. My current focus is the
-          engineering around AI systems—and understanding what happens inside them.
+          engineering around AI systems, and understanding what happens inside them.
         </p>
       </header>
       <div className="about-editorial">
@@ -59,6 +58,7 @@ export default function About() {
                 {i > 0 ? " · " : ""}
                 <a href={link.url} target="_blank" rel="noopener noreferrer">
                   {link.name}
+                  <span className="sr-only">(opens in a new tab)</span>
                 </a>
               </span>
             ))}{" "}

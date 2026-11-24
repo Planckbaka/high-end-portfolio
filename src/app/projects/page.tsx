@@ -7,12 +7,11 @@ export const metadata = pageMetadata(
   "Agent engineering and reproducible Go, Python, and CPU model-inference experiments.",
   "/projects"
 );
-export default async function Projects() {
-  const articles = await getAllArticles();
+export default function Projects() {
+  const articles = getAllArticles();
   return (
     <div className="site-shell page-bottom">
       <header className="page-heading">
-        <p className="eyebrow">Selected work</p>
         <h1>
           Built to be
           <br />
@@ -27,7 +26,7 @@ export default async function Projects() {
         {projects.map((project, index) => (
           <a href={`#${project.id}`} key={project.id}>
             <span className="eyebrow">
-              0{index + 1} / {project.category}
+              {String(index + 1).padStart(2, "0")} / {project.category}
             </span>
             <span>
               {project.title}
@@ -40,7 +39,7 @@ export default async function Projects() {
         <article className="project-detail" id={project.id} key={project.id}>
           <div className="project-identity">
             <span className="project-folio" aria-hidden="true">
-              0{index + 1}
+              {String(index + 1).padStart(2, "0")}
             </span>
             <p className="eyebrow">{project.category}</p>
             <h2>{project.title}</h2>
@@ -59,7 +58,7 @@ export default async function Projects() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Upstream reference ↗
+                  Upstream reference ↗<span className="sr-only">(opens in a new tab)</span>
                 </a>
               </div>
             )}
@@ -80,25 +79,50 @@ export default async function Projects() {
             <section aria-label={`${project.title} evidence`}>
               <h3>Inspect the evidence</h3>
               <div className="inline-links">
-                <a
-                  className="text-link"
-                  href={project.id === "pi-go" ? "/labs/go/agent/agent.go" : "/labs/README.md"}
-                >
-                  {project.id === "pi-go" ? "Teaching implementation ↗" : "Reproduction guide ↗"}
-                </a>
-                <a
+                <Link
                   className="text-link"
                   href={
                     project.id === "pi-go"
-                      ? "/labs/go/agent/agent_test.go"
-                      : "/labs/llm/kv-cache/test_decoder.py"
+                      ? "/labs/go/agent"
+                      : project.id === "gemini-research"
+                        ? "/labs/llm/flagship-2026"
+                        : "/labs"
                   }
                 >
-                  {project.id === "pi-go" ? "Lifecycle tests ↗" : "Decoder correctness tests ↗"}
-                </a>
+                  {project.id === "pi-go"
+                    ? "Teaching implementation ↗"
+                    : project.id === "gemini-research"
+                      ? "2026 Flagship & Muon lab ↗"
+                      : "Reproduction guide ↗"}
+                </Link>
+                <Link
+                  className="text-link"
+                  href={
+                    project.id === "pi-go"
+                      ? "/labs/go/gateway"
+                      : project.id === "gemini-research"
+                        ? "/labs/llm/roofline-flash"
+                        : "/labs/llm/kv-cache"
+                  }
+                >
+                  {project.id === "pi-go"
+                    ? "Gateway admission lab ↗"
+                    : project.id === "gemini-research"
+                      ? "Roofline & Online Softmax lab ↗"
+                      : "Decoder & KV cache lab ↗"}
+                </Link>
                 {project.id !== "pi-go" && (
-                  <a className="text-link" href="/labs/results/cache-results.json">
-                    Raw CPU measurements ↗
+                  <a
+                    className="text-link"
+                    href={
+                      project.id === "gemini-research"
+                        ? "/series/llm-ai-infra"
+                        : "/labs/results/cache-results.json"
+                    }
+                  >
+                    {project.id === "gemini-research"
+                      ? "Nine-part research monograph ↗"
+                      : "Raw CPU measurements ↗"}
                   </a>
                 )}
                 <a className="text-link" href="/labs/engineering-labs.zip" download>

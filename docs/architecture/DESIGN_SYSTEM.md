@@ -36,7 +36,7 @@ Use semantic variables for text, surfaces, borders and focus states. Shiki emits
 - Space Grotesk: headings, navigation and identity. JetBrains Mono: code and compact metadata. System sans-serif with Chinese fallbacks: body.
 - Site maximum width 1200px; side gutters 48px desktop, 20px mobile.
 - Article body maximum 720px, 18px desktop / 17px mobile, line-height 1.8. Desktop contents rail 200px; below 768px use native collapsible contents.
-- Home headline 40–76px, mobile 44px. Article headline 36–48px. Normal sentence casing.
+- Home headline 64–100px (art-hero), mobile clamp(58px, 14vw, 88px). Article headline 36–48px. Normal sentence casing.
 - Fine dividers, 4px corners, no heavy shadows. Content spacing, alignment and labels define groups.
 - Code and tables scroll within their container; they must not widen the page. Heading anchors account for the sticky header.
 

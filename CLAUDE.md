@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-A personal portfolio website built with Next.js 16, React 19, and TailwindCSS 4, deployed to Cloudflare Workers. Features a blog/article system with markdown content, smooth scrolling (Lenis), and animations (Framer Motion).
+A personal portfolio website built with Next.js 16, React 19, and TailwindCSS 4, deployed to Cloudflare Workers. Features a blog/article system with markdown content. Motion is intentionally CSS-only and scrolling is native (see docs/architecture/DESIGN_SYSTEM.md) — do not reintroduce Lenis/Framer Motion.
 
 ## Common Commands
 
@@ -16,8 +16,8 @@ npm run generate:articles      # Regenerate articles JSON from markdown files
 # Build & Deploy
 npm run build                  # Build for standard deployment (includes article generation)
 npm run build:cf               # Build for Cloudflare Workers
-npm run deploy                 # Deploy to Cloudflare Workers (dev environment)
-npm run deploy:prod            # Deploy to Cloudflare Workers (production)
+npm run deploy                 # Build and deploy to the site's Worker
+npm run deploy:prod            # Verified production deploy (adds publication checks, mirrors CI)
 
 # Testing
 npm run test                   # Run Jest tests
@@ -34,8 +34,8 @@ npm run lint                   # Run ESLint
 
 - `src/app/` - Next.js App Router pages, layouts, and API routes
 - `src/components/ui/` - Reusable UI components (Navbar, Hero, ProjectCard, etc.)
-- `src/config/` - Site configuration (`site.ts`), static data (`data.ts`), environment (`env.ts`)
-- `src/lib/` - Utilities (`utils.ts`), animations (`animations.ts`), markdown processing (`markdown.ts`)
+- `src/config/` - Site configuration (`site.ts`), static data (`data.ts`), shared constants (`constants.ts`)
+- `src/lib/` - Utilities (`utils.ts`), markdown processing (`markdown.ts`), article search, feed generation
 - `content/articles/` - Markdown articles with frontmatter (title, date, category required)
 - `scripts/` - Build-time scripts for generating article data
 
@@ -68,3 +68,5 @@ Many pages use a Server Component wrapper that imports a Client Component (e.g.,
 - `NEXT_PUBLIC_SITE_URL` - Site URL for SEO
 - `NEXT_PUBLIC_SITE_NAME` - Site name
 - `RESEND_API_KEY` - API key for contact form email (server-only)
+- `CONTACT_EMAIL` - optional override for the delivery address (defaults to the site author's email)
+- `CONTACT_FROM` - optional override for the email sender identity (server-only)

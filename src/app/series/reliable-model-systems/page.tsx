@@ -1,26 +1,26 @@
 import Link from "next/link";
 import { getAllArticles } from "@/lib/markdown";
-import { modelSystemsArticles, MODEL_SYSTEMS_SERIES } from "@/lib/series";
+import { modelSystemsArticles, MODEL_SYSTEMS_SERIES, seriesChapterWord } from "@/lib/series";
 import { pageMetadata } from "@/lib/page-metadata";
 export const metadata = pageMetadata(
   MODEL_SYSTEMS_SERIES.title,
   "A guided sequence of Go, Python and CPU model experiments, from bounded work to cached decoding.",
   MODEL_SYSTEMS_SERIES.path
 );
-export default async function ModelSystemsSeries() {
-  const articles = modelSystemsArticles(await getAllArticles());
+export default function ModelSystemsSeries() {
+  const articles = modelSystemsArticles(getAllArticles());
+  const word = seriesChapterWord(articles.length);
   return (
     <div className="site-shell page-bottom">
       <header className="page-heading">
-        <p className="eyebrow">A guided engineering series</p>
         <h1>
           Systems,
           <br />
           step by step.
         </h1>
         <p>
-          Six explanations, six runnable experiments. Follow the boundaries between requests, tasks
-          and tensors.
+          {seriesChapterWord(articles.length).replace(/^./, (c) => c.toUpperCase())} explanations,{" "}
+          {word} runnable experiments. Follow the boundaries between requests, tasks and tensors.
         </p>
       </header>
       <section className="series-intro" aria-label="How to read this series">
@@ -35,11 +35,11 @@ export default async function ModelSystemsSeries() {
           <p className="eyebrow">Choose your route</p>
           <p>
             Start with Go for lifecycle and cancellation, Python for orchestration and measurement,
-            or read Attention before KV Cache for the numerical path.
+            or read Attention before KV&nbsp;Cache for the numerical path.
           </p>
-          <a className="text-link" href="/labs/README.md">
+          <Link className="text-link" href="/labs">
             Environment and reproduction guide ↗
-          </a>
+          </Link>
         </div>
       </section>
       <ol className="series-chapters">
@@ -56,12 +56,12 @@ export default async function ModelSystemsSeries() {
                 <Link href={`/articles/${a.slug}`}>{a.title}</Link>
               </h2>
               <p>{a.excerpt}</p>
-              {a.labPath && (
-                <a className="text-link" href={`/${a.labPath}/README.md`}>
-                  Companion lab ↗
-                </a>
-              )}
             </div>
+            {a.labPath && (
+              <Link className="text-link series-chapter-lab" href={`/${a.labPath}`}>
+                Companion lab ↗
+              </Link>
+            )}
           </li>
         ))}
       </ol>

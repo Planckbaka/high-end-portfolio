@@ -13,7 +13,7 @@ export const metadata = pageMetadata(
   "/articles"
 );
 
-export default async function ArticlesPage() {
-  const articles = await getAllArticles();
+export default function ArticlesPage() {
+  const articles = getAllArticles({ includeToc: true });
   return <ArticlesClient articles={articles} />;
 }

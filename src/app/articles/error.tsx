@@ -1,9 +1,17 @@
 "use client";
 import Link from "next/link";
-export default function ArticlesError({ reset }: { error: Error; reset: () => void }) {
+import { logError } from "@/lib/error-logger";
+
+export default function ArticlesError({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
+  logError(error, { digest: error.digest });
   return (
     <div className="site-shell page-heading page-bottom">
-      <p className="eyebrow">Something went wrong</p>
       <h1>The writing couldn’t load.</h1>
       <p>Please try again, or return to the homepage.</p>
       <div className="inline-links">

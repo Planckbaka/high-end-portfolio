@@ -1,9 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import { Hero } from "@/components/ui/Hero";
-import { SelfIntro } from "@/components/ui/SelfIntro";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
-import { WritingBacklog } from "@/components/ui/WritingBacklog";
 import ArticlesClient from "@/app/articles/ArticlesClient";
 import ArticleClient from "@/app/articles/[slug]/ArticleClient";
 import ContactClient from "@/app/contact/ContactClient";
@@ -39,9 +37,7 @@ describe("landmark structure", () => {
 describe("no dead affordances", () => {
   it.each([
     ["Hero", <Hero key="h" />],
-    ["SelfIntro", <SelfIntro key="s" />],
     ["SiteFooter", <SiteFooter key="f" />],
-    ["WritingBacklog", <WritingBacklog key="w" />],
     ["ContactClient", <ContactClient key="c" />],
     ["ArticleClient", <ArticleClient key="a" article={article} />],
   ])('%s renders no href="#" links', (_name, element) => {

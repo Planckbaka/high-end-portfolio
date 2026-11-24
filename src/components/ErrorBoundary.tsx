@@ -36,17 +36,25 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="site-shell page-heading page-bottom">
-            <div className="">
-              <h2 className="font-heading mb-4 text-4xl font-bold">Something went wrong</h2>
-              <p className="text-muted-foreground mb-8">
-                The page couldn’t finish loading. Please reload to try again.
-              </p>
-              <button onClick={() => window.location.reload()} className="button primary">
-                Reload Page
-              </button>
-            </div>
-          </div>
+          /*
+           * This replaces the entire tree — including the layout's <main> —
+           * so the fallback must supply its own landmark and heading. The
+           * alert role announces the failure instead of leaving a silent,
+           * unlabeled void for screen readers.
+           */
+          <main className="site-shell page-heading page-bottom">
+            <p className="eyebrow">
+              <span className="eyebrow-dot" />
+              Error
+            </p>
+            <h1 className="font-heading mb-4 text-4xl font-medium">Something went wrong</h1>
+            <p role="alert" className="text-muted-foreground mb-8">
+              The page couldn’t finish loading. Please reload to try again.
+            </p>
+            <button onClick={() => window.location.reload()} className="button primary">
+              Reload Page
+            </button>
+          </main>
         )
       );
     }

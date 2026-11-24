@@ -68,19 +68,19 @@ export async function POST(request: NextRequest) {
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json({ error: "Invalid JSON body" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid JSON body" }, { status: HTTP_STATUS.BAD_REQUEST });
     }
     const parsed = contactSchema.safeParse(body);
     if (!parsed.success) {
       return NextResponse.json(
         { error: "Please check your name, email and message." },
-        { status: 400 }
+        { status: HTTP_STATUS.BAD_REQUEST }
       );
     }
     const { name, email, message } = parsed.data;
     const idempotencyKey = request.headers.get("idempotency-key");
     if (idempotencyKey && !/^[a-zA-Z0-9_-]{16,128}$/.test(idempotencyKey)) {
-      return NextResponse.json({ error: "Invalid submission identifier" }, { status: 400 });
+      return NextResponse.json({ error: "Invalid submission identifier" }, { status: HTTP_STATUS.BAD_REQUEST });
     }
 
     // Get config
@@ -116,81 +116,88 @@ export async function POST(request: NextRequest) {
         subject: `New Contact Form Message from ${safeName}`,
         html: `
           <!DOCTYPE html>
-          <html>
+          <html lang="en">
             <head>
               <meta charset="utf-8">
               <style>
+                /* Matches the site's quiet-editorial palette:
+                   cream paper, ink text, rust accent. */
                 body {
-                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, 'PingFang SC', sans-serif;
                   line-height: 1.6;
-                  color: #333;
+                  color: #232521;
+                  background: #f7f6f2;
                   max-width: 600px;
                   margin: 0 auto;
                   padding: 20px;
                 }
                 .header {
-                  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-                  color: white;
-                  padding: 30px;
-                  border-radius: 10px 10px 0 0;
-                  text-align: center;
+                  border-bottom: 2px solid #232521;
+                  padding: 20px 0 16px;
+                }
+                .header h1 {
+                  margin: 0;
+                  font-size: 20px;
+                  font-weight: 600;
+                  letter-spacing: -0.02em;
+                }
+                .header .kicker {
+                  font-family: 'SF Mono', Menlo, Consolas, monospace;
+                  font-size: 11px;
+                  text-transform: uppercase;
+                  letter-spacing: 0.12em;
+                  color: #a33f2e;
+                  margin-bottom: 6px;
                 }
                 .content {
-                  background: #f9fafb;
-                  padding: 30px;
-                  border: 1px solid #e5e7eb;
-                  border-top: none;
+                  padding: 24px 0;
                 }
                 .field {
                   margin-bottom: 20px;
                 }
                 .label {
-                  font-weight: 600;
-                  color: #6b7280;
-                  font-size: 12px;
+                  font-family: 'SF Mono', Menlo, Consolas, monospace;
+                  font-size: 11px;
                   text-transform: uppercase;
-                  letter-spacing: 0.5px;
-                  margin-bottom: 5px;
+                  letter-spacing: 0.1em;
+                  color: #62665e;
+                  margin-bottom: 4px;
                 }
                 .value {
-                  color: #111827;
                   font-size: 16px;
+                  color: #232521;
                 }
                 .message-box {
-                  background: white;
-                  padding: 20px;
-                  border-radius: 8px;
-                  border-left: 4px solid #667eea;
-                  margin-top: 10px;
+                  background: #fdfcf9;
+                  border: 1px solid #d8d9d0;
+                  border-left: 3px solid #a33f2e;
+                  padding: 16px;
+                  font-size: 15px;
                   white-space: pre-wrap;
                   word-wrap: break-word;
                 }
                 .footer {
-                  background: #f3f4f6;
-                  padding: 20px;
-                  border-radius: 0 0 10px 10px;
-                  text-align: center;
+                  border-top: 1px solid #d8d9d0;
+                  padding: 16px 0 4px;
                   font-size: 12px;
-                  color: #6b7280;
-                  border: 1px solid #e5e7eb;
-                  border-top: none;
+                  color: #62665e;
                 }
                 .button {
                   display: inline-block;
-                  background: #667eea;
-                  color: white;
-                  padding: 12px 24px;
+                  background: #232521;
+                  color: #f7f6f2;
+                  padding: 10px 18px;
                   text-decoration: none;
-                  border-radius: 6px;
-                  margin-top: 15px;
-                  font-weight: 600;
+                  font-size: 14px;
+                  font-weight: 500;
+                  margin-top: 8px;
                 }
               </style>
             </head>
             <body>
               <div class="header">
-                <h1 style="margin: 0; font-size: 24px;">📬 New Contact Form Message</h1>
-                <p style="margin: 10px 0 0 0; opacity: 0.9;">From your portfolio website</p>
+                <div class="kicker">Portfolio / Contact</div>
+                <h1>New message from ${safeName}</h1>
               </div>
 
               <div class="content">
@@ -202,7 +209,7 @@ export async function POST(request: NextRequest) {
                 <div class="field">
                   <div class="label">Email</div>
                   <div class="value">
-                    <a href="mailto:${safeEmail}" style="color: #667eea; text-decoration: none;">${safeEmail}</a>
+                    <a href="mailto:${safeEmail}" style="color: #a33f2e; text-decoration: none;">${safeEmail}</a>
                   </div>
                 </div>
 
@@ -211,18 +218,15 @@ export async function POST(request: NextRequest) {
                   <div class="message-box">${safeMessage}</div>
                 </div>
 
-                <div style="text-align: center;">
-                  <a href="mailto:${safeEmail}" class="button">Reply to ${safeName}</a>
-                </div>
+                <a href="mailto:${safeEmail}" class="button">Reply to ${safeName}</a>
               </div>
 
               <div class="footer">
-                <p style="margin: 0;">
-                  This email was sent from your portfolio contact form<br>
-                  <strong>${siteConfig.url}</strong>
+                <p style="margin: 0 0 8px 0;">
+                  Sent from the contact form at <strong>${siteConfig.url}</strong>
                 </p>
-                <p style="margin: 10px 0 0 0; font-size: 11px; opacity: 0.7;">
-                  Sent at ${new Date().toLocaleString("en-US", {
+                <p style="margin: 0; font-size: 11px;">
+                  ${new Date().toLocaleString("en-US", {
                     timeZone: "Asia/Shanghai",
                     dateStyle: "full",
                     timeStyle: "long",
@@ -249,17 +253,15 @@ export async function POST(request: NextRequest) {
     );
   } catch (error) {
     if (
-      error &&
-      typeof error === "object" &&
-      "name" in error &&
-      ["TimeoutError", "AbortError"].includes(String(error.name))
+      (error instanceof DOMException || error instanceof Error) &&
+      ["TimeoutError", "AbortError"].includes(error.name)
     ) {
       return NextResponse.json(
         { error: "Email service timed out. Please retry the same message." },
-        { status: 504 }
+        { status: HTTP_STATUS.GATEWAY_TIMEOUT }
       );
     }
-    console.error("Contact form error");
+    console.error("Contact form error:", error);
     return NextResponse.json(
       { error: "An unexpected error occurred. Please try again later." },
       { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }

@@ -72,3 +72,9 @@ jobs:
           labs/.venv/bin/python -m unittest discover -s labs/python/streaming -p 'test_*.py' -v
           labs/.venv/bin/python -m unittest discover -s labs/llm/attention -p 'test_*.py' -v
           labs/.venv/bin/python -m unittest discover -s labs/llm/kv-cache -p 'test_*.py' -v
+          labs/.venv/bin/python -m unittest discover -s labs/llm/modern-transformer -p 'test_*.py' -v
+          labs/.venv/bin/python -m unittest discover -s labs/llm/roofline-flash -p 'test_*.py' -v
+          labs/.venv/bin/python -m unittest discover -s labs/llm/deepseek-mla-grpo -p 'test_*.py' -v
+          labs/.venv/bin/python -m unittest discover -s labs/llm/flagship-2026 -p 'test_*.py' -v
+          labs/.venv/bin/python -m unittest discover -s labs/llm/looped-transformer -p 'test_*.py' -v
+          labs/.venv/bin/python -m unittest discover -s labs/llm/block-diffusion -p 'test_*.py' -v

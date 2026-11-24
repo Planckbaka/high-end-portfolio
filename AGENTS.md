@@ -3,7 +3,7 @@
 # high-end-portfolio
 
 ## Purpose
-Personal portfolio website built with Next.js 16, React 19, and TailwindCSS 4. Features a blog/article system with markdown content, smooth scrolling (Lenis), animations (Framer Motion), and deploys to Cloudflare Workers via OpenNext. Showcases projects, articles, and a contact form with Resend email integration.
+Personal portfolio website built with Next.js 16, React 19, and TailwindCSS 4. Features a blog/article system with markdown content, CSS-only motion with native scrolling (see docs/architecture/DESIGN_SYSTEM.md), and deploys to Cloudflare Workers via OpenNext. Showcases projects, articles, and a contact form with Resend email integration.
 
 ## Key Files
 | File | Description |
@@ -51,8 +51,6 @@ Personal portfolio website built with Next.js 16, React 19, and TailwindCSS 4. F
 ### External
 - Next.js 16 + React 19 — framework
 - TailwindCSS 4 — styling
-- Framer Motion — animations
-- Lenis — smooth scrolling
 - Resend — contact form email delivery
 - `@opennextjs/cloudflare` + Wrangler — deployment
 - unified/remark/rehype pipeline — markdown processing
@@ -60,3 +58,13 @@ Personal portfolio website built with Next.js 16, React 19, and TailwindCSS 4. F
 - Jest + Testing Library — tests
 
 <!-- MANUAL: Custom project notes can be added below -->
+
+<!-- BEGIN:nextjs-agent-rules -->
+
+## This is NOT the Next.js you know
+
+This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` (resolved from this file's directory; in monorepos the `next` package may not be visible from the repo root) before writing any code. Heed deprecation notices.
+
+This block is written and re-added by `next dev` — verify at `node_modules/next/dist/server/lib/generate-agent-files.js`. Removing it from a diff only re-creates the uncommitted change; committing it with your work keeps the tree clean.
+
+<!-- END:nextjs-agent-rules -->

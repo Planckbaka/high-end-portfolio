@@ -9,14 +9,14 @@ Next.js App Router directory. Contains pages, layouts, API routes, and error/loa
 ## Key Files
 | File | Description |
 |------|-------------|
-| `layout.tsx` | Root layout — applies theme provider, fonts, global CSS, smooth scroll, navbar |
-| `page.tsx` | Home page — renders Hero, SelfIntro, ProjectList, GridBackground |
-| `loading.tsx` | Global loading state with Loading component |
+| `layout.tsx` | Root layout — fonts, theme provider, error boundary, navbar/footer, JSON-LD |
+| `page.tsx` | Home page — Hero, featured writing, series banner, project list, recent notes |
+| `error.tsx` | Root route error boundary (reset + home link) |
+| `global-error.tsx` | Last-resort boundary that owns `<html>/<body>` |
 | `not-found.tsx` | Custom 404 page |
-| `globals.css` | Global styles and TailwindCSS 4 theme configuration |
-| `favicon.ico` | Site favicon |
-| `robots.ts` | Dynamic robots.txt generation |
-| `sitemap.ts` | Dynamic sitemap.xml generation |
+| `globals.css` | Global styles, theme tokens, TailwindCSS 4 configuration |
+| `manifest.ts` | Web app manifest |
+| `robots.ts` / `sitemap.ts` / `feed.xml/route.ts` | SEO + RSS endpoints |
 
 ## Subdirectories
 | Directory | Purpose |
@@ -34,15 +34,15 @@ Next.js App Router directory. Contains pages, layouts, API routes, and error/loa
 - Metadata is exported from Server Components (layout/page) for SEO
 
 ### Common Patterns
-- `layout.tsx` wraps children with ThemeProvider and Lenis smooth scroll
+- `layout.tsx` wraps children with ThemeProvider and ErrorBoundary (no smooth-scroll wrapper — scrolling is native by design, see `docs/architecture/DESIGN_SYSTEM.md`)
 - Navigation items defined in `src/config/data.ts` (`navItems`)
-- SEO metadata constructed via `src/config/seo.ts`
+- SEO metadata constructed via `src/lib/page-metadata.ts`
 
 ## Dependencies
 
 ### Internal
 - `src/components/` — UI components used by pages
 - `src/config/` — site data and configuration
-- `src/lib/` — utilities and animations
+- `src/lib/` — utilities, markdown processing, feed generation
 
 <!-- MANUAL: Custom project notes can be added below -->

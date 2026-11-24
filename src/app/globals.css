@@ -1,3 +1,12 @@
+/* Hallmark · built: the project · redesign: polish · genre editorial · job: read
+   critique: P4 H5 E4 S5 R4 · weakest: P and E — the concept holds (a technical
+   publication with a real ceramic study as its one image); what read as generated
+   was the reflex set, the eyebrow and the tracked cap, not the idea.
+   hero: Banner (/articles) · Banner (/about) · Banner (/contact) · Banner (/projects) · Banner (/series/llm-ai-infra) · Banner (/series/reliable-model-systems) · Settled (/) · one display per screen, never two
+   waive 38iii · the hero's red "inside out" is the page's single signature, banked in the hero once
+   surface: absolute · the figure mount and the lightbox are a white sheet and a black room, not theme paper
+   answered F19 · four weights across three faces (display 400/500, serif 700, mono 400), no face carries two roles
+*/
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 @custom-variant dark (&:where([data-theme="dark"], [data-theme="dark"] *));
@@ -8,7 +17,12 @@
   --primary-foreground: var(--background);
   --secondary: var(--muted);
   --secondary-foreground: var(--foreground);
-  --input: var(--border);
+  /*
+   * --input is a UI boundary, not a decorative hairline: WCAG 1.4.11 wants
+   * 3:1 against the surfaces a control sits on (surface/bg/muted), which the
+   * hairline --border cannot give. Decorative rules keep using --border.
+   */
+  --input: #7f8377;
   --ring: var(--accent);
   --destructive: #b42318;
   --background: #f7f6f2;
@@ -21,6 +35,23 @@
   --border: #d8d9d0;
   --code-surface: #f0efe9;
   --code-foreground: #232521;
+  /*
+   * Surfaces outside the page's own palette: the sculpture plaque is a light
+   * gallery mount against either wall, and the lightbox is a dark room. Both
+   * are physical constants, not theme values, so they live here as tokens
+   * rather than as literals scattered through the stylesheet.
+   */
+  --plaque: #eeede7;
+  --plaque-ink: #232521;
+  --plaque-rule: #d2d1c9;
+  --mount: #ffffff;
+  --room: rgb(15 17 15 / 0.88);
+  --room-rule: rgb(255 255 255 / 0.28);
+  --room-wash: rgb(255 255 255 / 0.12);
+  --room-ink: #ffffff;
+  --room-caption: #e6e7e2;
+  /* Sticky chrome: the second sticky element offsets by these, never by 0. */
+  --header-height: 89px;
   --body-font:
     -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, "PingFang SC", "Microsoft YaHei",
     sans-serif;
@@ -35,6 +66,7 @@
   --muted: #252824;
   --muted-foreground: #a7aca1;
   --surface: #20231f;
+  --input: #757b6e;
   --border: #3c4138;
   --code-surface: #22251f;
   --code-foreground: #eeeee6;
@@ -67,6 +99,8 @@
 }
 html {
   scroll-padding-top: 100px;
+  /* In-page anchors glide; the reduced-motion block below forces auto. */
+  scroll-behavior: smooth;
 }
 body {
   margin: 0;
@@ -102,9 +136,18 @@ button,
 select {
   cursor: pointer;
 }
-button:disabled {
-  cursor: wait;
-  opacity: 0.6;
+/*
+ * A disabled control reads as disabled on three channels, not on opacity
+ * alone: the fill goes flat, the ink recedes to the muted token and the
+ * cursor withdraws. Opacity by itself also fades the border and the label
+ * together, which is what makes a dimmed button still look pressable.
+ */
+button:disabled,
+button[aria-disabled="true"] {
+  cursor: not-allowed;
+  background: var(--muted);
+  border-color: var(--border);
+  color: var(--muted-foreground);
 }
 a:hover {
   color: var(--accent);
@@ -189,7 +232,7 @@ img {
 .theme-switch {
   display: flex;
   border: 1px solid var(--border);
-  border-radius: 5px;
+  border-radius: 4px;
   padding: 3px;
   gap: 2px;
 }
@@ -197,8 +240,8 @@ img {
   display: grid;
   place-items: center;
   border-radius: 3px;
-  width: 30px;
-  height: 30px;
+  width: 32px;
+  height: 32px;
   color: var(--muted-foreground);
 }
 .theme-switch button[aria-pressed="true"] {
@@ -208,14 +251,18 @@ img {
 .mobile-menu {
   display: none;
 }
+/*
+ * Labels are the mono face at a step smaller, sentence case and untracked.
+ * Mono is this site's metadata material (see DESIGN_SYSTEM.md), so it stays;
+ * the transform and the letterspacing do not. Capitals spread apart are the
+ * tell that a machine set the page, and they read slower than the words.
+ */
 .eyebrow {
   display: flex;
   gap: 10px;
   align-items: center;
   font-family: var(--font-code), monospace;
-  text-transform: uppercase;
   font-size: 11px;
-  letter-spacing: 0.1em;
   line-height: 1.5;
   color: var(--muted-foreground);
 }
@@ -225,31 +272,9 @@ img {
   background: var(--accent);
   border-radius: 50%;
 }
-.hero {
-  padding-block: 90px 76px;
-  border-bottom: 1px solid var(--border);
-  display: grid;
-  grid-template-columns: minmax(0, 1.75fr) minmax(0, 1fr);
-  align-items: center;
-  gap: 64px;
-}
-.hero h1 {
-  font-size: clamp(40px, 5.4vw, 76px);
-  margin: 27px 0;
-  max-width: 790px;
-  line-height: 1.08;
-  letter-spacing: -0.06em;
-}
-.hero h1 em {
-  font-style: normal;
-  color: var(--accent);
-}
-.hero-description {
-  color: var(--muted-foreground);
-  font-size: 18px;
-  line-height: 1.75;
-  max-width: 550px;
-}
+/* Legacy .hero/.hero-aside/.system-row rules deleted 2026-10-12 — the home
+   page has used .art-hero/.hero-composition since the Sept 2026 rebuild;
+   nothing referenced these (grep-verified across src/). */
 .inline-links {
   display: flex;
   flex-wrap: wrap;
@@ -265,46 +290,19 @@ img {
   text-decoration: underline;
   text-underline-offset: 6px;
   text-decoration-color: var(--border);
+  /*
+   * A text link still needs a 44px target. The padding grows the hit box and
+   * the matching negative margin cancels it out of the layout, so inline
+   * runs keep their baseline while a thumb has something to land on.
+   */
+  padding-block: 11px;
+  margin-block: -11px;
 }
-.hero-aside {
-  border: 1px solid var(--border);
-  border-radius: 5px;
-  padding: 25px;
-  background: var(--surface);
+.text-link:hover {
+  text-decoration-color: currentColor;
 }
-.system-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 12px;
-  padding-block: 20px;
-  border-bottom: 1px solid var(--border);
-}
-.system-row:last-of-type {
-  border-bottom: 0;
-}
-.system-row strong {
-  font-family: var(--font-display), sans-serif;
-  font-size: 18px;
-  font-weight: 500;
-}
-.system-row small {
-  color: var(--muted-foreground);
-  display: block;
-  font-size: 12px;
-  margin-top: 4px;
-}
-.system-index {
+.text-link:active {
   color: var(--accent);
-  font:
-    11px var(--font-code),
-    monospace;
-}
-.aside-note {
-  padding-top: 17px;
-  border-top: 1px solid var(--border);
-  color: var(--muted-foreground);
-  font-size: 12px;
 }
 .section {
   padding-block: 58px;
@@ -376,7 +374,12 @@ img {
 }
 .diagram-caption {
   text-align: center;
-  font-size: 10px;
+  font-size: 11px;
+}
+/* Multi-line card titles break more evenly (e.g. no "First / Principles"). */
+.featured-card h3,
+.article-row h2 {
+  text-wrap: balance;
 }
 .featured-card h3 {
   font-size: 22px;
@@ -414,6 +417,9 @@ img {
   border: 1px solid var(--border);
   border-radius: 4px;
   background: var(--surface);
+  /* The hover accent border should ease in, not snap (article is not in the
+     global a/button transition rule). */
+  transition: border-color 0.3s;
 }
 .project-card h3 {
   font-size: 25px;
@@ -431,7 +437,7 @@ img {
 }
 .tag {
   font:
-    10px var(--font-code),
+    11px var(--font-code),
     monospace;
   border: 1px solid var(--border);
   border-radius: 3px;
@@ -503,6 +509,13 @@ img {
   border-color: var(--accent);
   color: var(--accent);
 }
+.button:active {
+  transform: translateY(1px);
+}
+.button.primary:active {
+  background: color-mix(in oklab, var(--foreground) 88%, var(--accent));
+  border-color: color-mix(in oklab, var(--foreground) 88%, var(--accent));
+}
 .button.primary:hover {
   background: var(--accent);
   color: var(--accent-foreground);
@@ -524,6 +537,16 @@ img {
   display: flex;
   gap: 20px;
 }
+.footer-inner nav a {
+  /* Grow the touch target without shifting the visual layout. */
+  padding: 10px 0;
+  margin: -10px 0;
+}
+/* Same trick for the footer's one button: a 20px word is not a target. */
+.footer-inner button {
+  padding: 12px 0;
+  margin: -12px 0;
+}
 .page-heading {
   padding: 64px 0 40px;
   max-width: 760px;
@@ -535,6 +558,7 @@ img {
 .page-heading p {
   font-size: 18px;
   color: var(--muted-foreground);
+  text-wrap: pretty;
 }
 .page-bottom {
   padding-bottom: 72px;
@@ -546,6 +570,8 @@ img {
   flex-wrap: wrap;
   align-items: end;
   gap: 16px;
+  /* Clear the sticky header when pagination or focus jumps here. */
+  scroll-margin-top: 120px;
 }
 .field {
   display: flex;
@@ -563,7 +589,8 @@ img {
   width: 100%;
   min-height: 44px;
   background: var(--surface);
-  border: 1px solid var(--border);
+  /* --input, not --border: control boundaries need the 3:1 contrast. */
+  border: 1px solid var(--input);
   border-radius: 4px;
   padding: 10px 12px;
   color: var(--foreground);
@@ -649,6 +676,14 @@ img {
   padding: 6px 0 6px 12px;
   border-left: 1px solid var(--border);
   line-height: 1.5;
+  /*
+   * A contents rail is scanned, not read: one line per entry. Chapter titles
+   * reach 74 characters and wrapped to four lines in a 220px rail, which made
+   * the list taller than the viewport and hid later sections entirely.
+   */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .toc a[aria-current="location"] {
   color: var(--accent);
@@ -893,11 +928,11 @@ img {
 .skip-link:focus {
   top: 10px;
 }
+/* Focus moves into <main> via the skip link; the target itself stays quiet. */
+main[tabindex="-1"]:focus-visible {
+  outline: none;
+}
 @media (max-width: 1000px) {
-  .hero {
-    gap: 30px;
-    grid-template-columns: 1.5fr 1fr;
-  }
   .article-layout {
     gap: 30px;
     grid-template-columns: 170px minmax(0, 1fr);
@@ -926,7 +961,25 @@ img {
   .mobile-menu summary {
     font-size: 13px;
     cursor: pointer;
-    padding: 10px;
+    padding: 12px 10px;
+    /* Reset the UA disclosure marker — the chevron below replaces it. */
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    user-select: none;
+  }
+  .mobile-menu summary::-webkit-details-marker {
+    display: none;
+  }
+  .mobile-menu summary::after {
+    content: "▾";
+    margin-left: auto;
+    color: var(--muted-foreground);
+    transition: transform 0.2s ease;
+  }
+  .mobile-menu[open] summary::after {
+    transform: rotate(180deg);
   }
   .mobile-menu nav {
     position: absolute;
@@ -943,28 +996,6 @@ img {
   }
   .header-actions {
     gap: 6px;
-  }
-  .hero {
-    grid-template-columns: 1fr;
-    padding: 48px 0 40px;
-    gap: 32px;
-  }
-  .hero h1 {
-    font-size: 44px;
-    letter-spacing: -0.045em;
-    margin: 23px 0;
-  }
-  .hero-description {
-    font-size: 16px;
-  }
-  .hero-aside {
-    padding: 20px;
-  }
-  .system-row {
-    padding: 12px 0;
-  }
-  .hero-aside .aside-note {
-    padding-top: 12px;
   }
   .section {
     padding-block: 38px;
@@ -992,7 +1023,7 @@ img {
     height: 125px;
     padding: 8px;
     margin: 0;
-    font-size: 9px;
+    font-size: 11px;
     overflow: hidden;
   }
   .diagram-row {
@@ -1003,7 +1034,7 @@ img {
     padding: 4px;
   }
   .diagram-caption {
-    font-size: 9px;
+    font-size: 11px;
   }
   .featured-card h3 {
     font-size: 20px;
@@ -1060,8 +1091,7 @@ img {
   .article-layout {
     display: block;
     padding-top: 24px;
-  }
-  .desktop-toc {
+  }  .desktop-toc {
     display: none;
   }
   .mobile-toc {
@@ -1078,6 +1108,10 @@ img {
   }
   .mobile-toc nav a {
     color: var(--muted-foreground);
+    /* Same one-line rule as the desktop rail: a contents entry is a label. */
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .prose {
     font-size: 17px;
@@ -1108,29 +1142,6 @@ img {
 }
 
 @media (min-width: 768px) and (max-width: 1000px) {
-  .hero {
-    grid-template-columns: 1fr;
-    padding-top: 56px;
-  }
-  .hero h1 {
-    font-size: 58px;
-  }
-  .hero-aside {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 20px;
-  }
-  .hero-aside > .eyebrow,
-  .hero-aside > .aside-note {
-    grid-column: 1 / -1;
-  }
-  .system-row {
-    display: block;
-  }
-  .system-row > span {
-    display: block;
-    margin-top: 12px;
-  }
   .featured-grid {
     grid-template-columns: 1fr;
   }
@@ -1141,12 +1152,24 @@ img {
   }
   .article-diagram {
     height: 170px;
-    font-size: 10px;
+    font-size: 11px;
   }
 }
 
 /* Engineering journal: one exhibition grid, two reading densities. */
+/*
+ * The hero is one screen, not a block that happens to sit at the top. It
+ * claims the space under the sticky nav (100dvh minus --header-height) and
+ * distributes it: the composition takes what is left after the two metadata
+ * rails, so the sculpture grows instead of the gap growing under it. Before
+ * this the hero stopped at 681px of an 811px screen and left 208px of nothing
+ * above the next section.
+ */
 .art-hero {
+  min-height: calc(100dvh - var(--header-height));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
   padding: 28px 0 22px;
   border-bottom: 1px solid var(--border);
 }
@@ -1163,6 +1186,7 @@ img {
   gap: 48px;
   align-items: center;
   margin: 32px 0 28px;
+  flex: 1;
 }
 .art-hero h1 {
   font-size: clamp(64px, 7vw, 100px);
@@ -1180,45 +1204,50 @@ img {
   line-height: 1.55;
   max-width: 370px;
 }
-.art-hero-note {
-  color: var(--muted-foreground);
-  font-size: 14px;
-  max-width: 360px;
-  margin-top: 12px;
-}
 .art-hero-copy .inline-links {
   gap: 20px;
   margin-top: 24px;
 }
 .hero-sculpture {
+  /*
+   * Light-theme values are deliberate: the artwork itself is a cream photo,
+   * so its frame stays light in both themes — the "gallery plaque" reads as
+   * one physical exhibit against either wall. Do not tokenize.
+   */
   margin: 0;
-  background: #eeede7;
-  color: #232521;
+  background: var(--plaque);
+  color: var(--plaque-ink);
   position: relative;
   border-radius: 4px;
   overflow: hidden;
+  /* Take the height the composition offers instead of a fixed crop, so the
+     spare room in a taller screen goes to the photograph and not to a gap
+     under it. The caption keeps its own height. */
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
 }
 .hero-sculpture img {
   display: block;
   width: 100%;
   aspect-ratio: 1.15/1;
   object-fit: cover;
+  flex: 1;
+  min-height: 0;
 }
 .hero-sculpture figcaption {
   display: flex;
   justify-content: space-between;
   gap: 12px;
   padding: 18px;
-  border-top: 1px solid #d2d1c9;
+  border-top: 1px solid var(--plaque-rule);
   font:
-    10px var(--font-code),
+    11px var(--font-code),
     monospace;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
 }
 .hero-footnote {
   font:
-    10px var(--font-code),
+    11px var(--font-code),
     monospace;
   color: var(--muted-foreground);
 }
@@ -1320,12 +1349,12 @@ img {
   gap: 6px;
 }
 .diagram-box {
-  font-size: 9px;
+  font-size: 11px;
   padding: 6px;
 }
 .diagram-caption {
   text-align: left;
-  font-size: 9px;
+  font-size: 11px;
 }
 .featured-card:not(:first-child) .diagram-caption {
   display: none;
@@ -1339,11 +1368,21 @@ img {
 .featured-card:first-child h3 {
   font-size: 34px;
 }
-.featured-card h3 a:hover,
-.article-row h2 a:hover {
+/*
+ * Listing-title links read as headings at rest (the editorial choice), but a
+ * faint underline keeps them identifiable as links without any hover —
+ * restoring the affordance the hover-only underline removed.
+ */
+.featured-card h3 a,
+.article-row h2 a {
   text-decoration: underline;
   text-decoration-thickness: 1px;
   text-underline-offset: 5px;
+  text-decoration-color: color-mix(in srgb, var(--muted-foreground) 40%, transparent);
+}
+.featured-card h3 a:hover,
+.article-row h2 a:hover {
+  text-decoration-color: currentColor;
 }
 .series-banner {
   display: grid;
@@ -1358,8 +1397,10 @@ img {
 .series-banner:hover {
   color: var(--accent-foreground);
 }
-.series-banner .eyebrow {
+.series-banner-kind {
   grid-column: 1/-1;
+  font-family: var(--font-code), monospace;
+  font-size: 11px;
   color: inherit;
 }
 .series-banner-title {
@@ -1423,13 +1464,21 @@ img {
 .project-card:hover {
   border-color: var(--accent);
 }
+/*
+ * Banner posture for the interior pages: the heading band takes half the
+ * screen and the page's own content starts inside the first screen, so a
+ * visitor lands on the list, not on a title with 500px of air under it.
+ * The band is capped rather than stretched: on a tall monitor the air goes
+ * below the fold, where the content is.
+ */
 .page-heading {
   max-width: none;
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr);
   gap: 26px 80px;
-  align-items: end;
+  align-items: center;
   padding: 68px 0 52px;
+  min-height: min(46dvh, 420px);
   margin-bottom: 32px;
   border-bottom: 1px solid var(--border);
 }
@@ -1545,6 +1594,10 @@ img {
   gap: 80px;
 }
 .about-note {
+  /* The credo rail rides along while the long right column scrolls. */
+  position: sticky;
+  top: 96px;
+  align-self: start;
   padding-top: 32px;
 }
 .about-note > p {
@@ -1555,7 +1608,19 @@ img {
   margin: 24px 0;
 }
 .about-note .eyebrow {
-  font-size: 10px;
+  font-size: 11px;
+}
+/* One rhythm token for the bio sections. Measure cap in em, not ch: at 18px
+   system font 68ch ≈ 770px — wider than the 747px grid track, so a ch cap
+   never binds (measured 91 chars/line). 34em ≈ 612px ≈ 66–68 avg chars. */
+.about-editorial .prose {
+  max-width: 34em;
+}
+.about-editorial .prose h2 {
+  margin: 44px 0 16px;
+}
+.about-editorial .prose h2:first-child {
+  margin-top: 0;
 }
 .contact-details {
   padding: 28px 0;
@@ -1568,8 +1633,6 @@ img {
 .contact-form .field label {
   font-family: var(--font-code), monospace;
   font-size: 11px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
 }
 .contact-strip {
   padding-block: 72px;
@@ -1644,13 +1707,25 @@ img {
   }
 }
 @media (max-width: 767px) {
+  .art-hero {
+    /* A phone hero is its content's height: the full-screen claim is a
+       desktop posture, and on a phone it only creates scroll to reach the
+       writing. */
+    min-height: 0;
+    display: block;
+  }
+  .art-hero-top {
+    /* Stack the two labels instead of capping the right one's width, which
+       wrapped "GO · PYTHON ·" / "LLM" across two lines. */
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
   .art-hero-top .eyebrow {
-    font-size: 9px;
-    letter-spacing: 0;
+    font-size: 11px;
   }
   .art-hero-top > span {
-    max-width: 90px;
-    text-align: right;
+    text-align: left;
   }
   .hero-composition {
     grid-template-columns: 1fr;
@@ -1669,14 +1744,14 @@ img {
   }
   .hero-sculpture figcaption {
     padding: 14px;
-    font-size: 9px;
+    font-size: 11px;
   }
   .hero-footnote {
     align-items: start;
-    font-size: 9px;
+    font-size: 11px;
   }
   .hero-footnote > span {
-    max-width: 175px;
+    max-width: 190px;
   }
   .section {
     padding-block: 44px;
@@ -1737,12 +1812,14 @@ img {
     font-size: 36px;
   }
   .project-card {
-    grid-template-columns: 32px 1fr;
+    grid-template-columns: 48px 1fr;
     gap: 12px 20px;
   }
   .project-index {
     font-size: 28px;
     grid-row: span 4;
+    /* "02/" must not orphan its slash onto a second line. */
+    white-space: nowrap;
   }
   .project-card h3 {
     font-size: 30px;
@@ -1808,6 +1885,7 @@ img {
     gap: 24px;
   }
   .about-note {
+    position: static;
     padding: 20px;
     background: var(--muted);
   }
@@ -1845,9 +1923,24 @@ img {
 .field [data-slot="textarea"][aria-invalid="true"] {
   border-color: var(--destructive);
 }
+/*
+ * Focus lives on the outline alone. The border stays --input in every state,
+ * so focusing never shifts geometry and never doubles the ring.
+ */
 .field [data-slot="input"]:focus-visible,
 .field [data-slot="textarea"]:focus-visible {
-  border-color: var(--ring);
+  outline: 2px solid var(--ring);
+  outline-offset: 1px;
+}
+
+/* Bot-only bait: present in the DOM, absent from every human channel. */
+.honeypot-field {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
 }
 
 .series-entry {
@@ -1874,10 +1967,15 @@ img {
 }
 .series-chapters li {
   display: grid;
-  grid-template-columns: 100px minmax(0, 720px);
+  grid-template-columns: 100px minmax(0, 720px) auto;
   gap: 40px;
   padding-block: 36px;
   border-bottom: 1px solid var(--border);
+}
+.series-chapter-lab {
+  justify-self: end;
+  align-self: center;
+  white-space: nowrap;
 }
 .chapter-number {
   font-family: var(--font-display), sans-serif;
@@ -1887,6 +1985,7 @@ img {
 }
 .series-chapters h2 {
   font-size: 28px;
+  text-wrap: balance;
   margin: 14px 0;
   font-weight: 400;
   text-wrap: pretty;
@@ -1906,10 +2005,1236 @@ img {
     gap: 18px;
     padding-block: 28px;
   }
+  .series-chapter-lab {
+    grid-column: 2;
+    justify-self: start;
+    align-self: auto;
+  }
   .chapter-number {
     font-size: 28px;
   }
   .series-chapters h2 {
     font-size: 23px;
+  }
+}
+
+/* Academic monograph reader, dual-series showcase, KaTeX, and derivation disclosures */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: scroll()) {
+    @keyframes grow-reading-progress {
+      from {
+        transform: scaleX(0);
+      }
+      to {
+        transform: scaleX(1);
+      }
+    }
+    .reading-progress-bar {
+      position: fixed;
+      inset-inline: 0;
+      inset-block-start: 0;
+      height: 3px;
+      background: var(--accent);
+      z-index: 60;
+      transform-origin: 0 50%;
+      animation: grow-reading-progress auto linear;
+      animation-timeline: scroll(root block);
+    }
+  }
+}
+
+.dual-series-banners {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-top: 64px;
+}
+.dual-series-banners .series-banner {
+  margin-top: 0;
+  grid-template-columns: 1fr;
+  gap: 18px;
+  padding: 36px;
+}
+.series-banner-secondary {
+  background: var(--muted);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+}
+.series-banner-secondary:hover {
+  color: var(--foreground);
+  border-color: var(--accent);
+}
+.series-banner-secondary .series-banner-action {
+  color: var(--accent);
+}
+
+.series-showcase {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+.series-track-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 24px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.series-track-card:hover {
+  border-color: var(--accent);
+}
+.series-track-card strong {
+  font-family: var(--font-display), sans-serif;
+  font-size: 22px;
+  font-weight: 500;
+  letter-spacing: -0.03em;
+  color: var(--foreground);
+}
+.series-track-kind {
+  font-family: var(--font-code), monospace;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.series-track-card > span:last-child {
+  font-size: 13px;
+  color: var(--muted-foreground);
+  line-height: 1.55;
+}
+
+.quick-topic-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+}
+.topic-chip {
+  font:
+    11px var(--font-code),
+    monospace;
+  padding: 5px 10px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--muted-foreground);
+}
+.topic-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.topic-chip[aria-pressed="true"] {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.meta-series-link {
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.meta-paper-badge {
+  color: var(--foreground);
+  background: var(--muted);
+  padding: 2px 6px;
+  border-radius: 3px;
+  border: 1px solid var(--border);
+}
+.article-header-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 18px;
+}
+.paper-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.toc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.toc-step-counter {
+  font:
+    11px var(--font-code),
+    monospace;
+  color: var(--accent);
+}
+
+/* ==========================================================================
+   Jon Barron (softmaxfix) Academic HTML Paper Presentation
+   ========================================================================== */
+.paper-topbar {
+  max-width: 1120px;
+  margin: 26px auto 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.paper-topbar-left,
+.paper-topbar-actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  /* The pills are nowrap, so the row must be allowed to take less than its
+     content width instead of pushing the page 14px past a 375 screen. */
+  min-width: 0;
+  max-width: 100%;
+}
+.btn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  font-family: var(--body-font);
+  font-size: 12.5px;
+  font-weight: 500;
+  color: var(--foreground);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  cursor: pointer;
+  /* A control label is one line at every width: it wraps or it gets shorter,
+     never both. The label is a destination, not a passage to read. */
+  white-space: nowrap;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-bottom: 0;
+  transition:
+    background-color 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+.btn-pill:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  background: var(--muted);
+}
+.btn-pill[data-copied="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+
+.article-heading.paper-header {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 36px 0 34px;
+  text-align: center;
+  border-bottom: 1px solid var(--border);
+}
+/* The one identifier the title does not carry: the category, set as the
+   line above the paper title. Not an eyebrow, because it names a real
+   classification the reader uses to route the piece. */
+.paper-category {
+  font-family: var(--font-code), monospace;
+  font-size: 12px;
+  color: var(--accent);
+  margin: 0 0 10px;
+}
+.article-heading.paper-header h1.paper-title {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: clamp(32px, 4.1vw, 46px);
+  font-weight: 700;
+  line-height: 1.18;
+  letter-spacing: -0.02em;
+  max-width: 880px;
+  margin: 0 auto 20px;
+  text-wrap: balance;
+}
+.authors-row {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 24px;
+  margin-bottom: 12px;
+}
+.author-block {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.author-name {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.author-affil {
+  font-size: 13.5px;
+  color: var(--muted-foreground);
+}
+.paper-meta-row {
+  justify-content: center;
+  font-family: var(--font-code), monospace;
+  font-size: 12px;
+  row-gap: 6px;
+}
+/* The separator is drawn, so the facts stay a list and a wrapped row still
+   reads as separated items instead of trailing punctuation. */
+.paper-meta-item + .paper-meta-item {
+  padding-left: 12px;
+  border-left: 1px solid var(--border);
+}
+.paper-tags {
+  justify-content: center;
+  margin-top: 16px;
+}
+
+/*
+ * Two-column academic paper grid: Sticky TOC + 820px Serif Monograph Column.
+ * Scoped to desktop on purpose. This block sits late in the sheet, so an
+ * unqualified rule here outranks the mobile `display: block` declared above
+ * it and collapses the reading column to the TOC's track width (118px at
+ * 375px wide). Never unscope it.
+ */
+@media (min-width: 768px) {
+  .article-layout {
+    max-width: 1120px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 220px minmax(0, 820px);
+    gap: 54px;
+    justify-content: center;
+    padding: 40px 0 80px;
+  }
+}
+.toc a {
+  transition:
+    color 0.15s ease,
+    border-color 0.15s ease;
+}
+.toc a[aria-current="location"] {
+  color: var(--accent);
+  border-left-width: 2px;
+  border-color: var(--accent);
+  font-weight: 600;
+  margin-left: -1px;
+}
+
+/* Abstract Box (Jon Barron softmaxfix style) */
+.abstract-box {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 24px 32px;
+  margin: 0 0 36px;
+}
+.abstract-title {
+  font-family: var(--body-font);
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted-foreground);
+  text-align: center;
+  margin-bottom: 12px;
+}
+.abstract-box .summary {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: 16.5px;
+  line-height: 1.65;
+  color: var(--foreground);
+  margin: 0;
+  text-align: justify;
+  hyphens: auto;
+}
+.abstract-footer {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 12.5px;
+}
+.abstract-lab-links,
+.abstract-paper-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+.abstract-meta-label {
+  font-family: var(--font-code), monospace;
+  font-size: 11px;
+  color: var(--muted-foreground);
+}
+.paper-source-badge {
+  font-family: var(--font-code), monospace;
+  font-size: 11px;
+  padding: 2px 7px;
+  border-radius: 4px;
+  background: var(--muted);
+  border: 1px solid var(--border);
+  color: var(--foreground);
+}
+.paper-source-badge:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+/* Academic Serif Body Prose */
+.prose {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: 18.5px;
+  line-height: 1.72;
+  max-width: 820px;
+}
+.prose > p {
+  text-align: justify;
+  hyphens: auto;
+  margin: 1.15em 0;
+}
+.prose li {
+  margin: 0.45em 0;
+}
+
+/* Numbered Section & Subsection Headings with Permalink Anchors */
+.prose h2.paper-sec-heading,
+.paper-references h2.paper-sec-heading {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.015em;
+  margin: 2.2em 0 0.85em;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+.prose h3.paper-subsec-heading {
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.35;
+  margin: 1.65em 0 0.65em;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.sec-num {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
+.heading-anchor {
+  margin-left: 6px;
+  font-family: var(--font-code), monospace;
+  font-size: 0.72em;
+  font-weight: 400;
+  color: var(--muted-foreground);
+  text-decoration: none !important;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+.paper-sec-heading:hover .heading-anchor,
+.paper-subsec-heading:hover .heading-anchor,
+.heading-anchor:focus-visible {
+  opacity: 1;
+}
+
+/* Numbered Equations (.equation-row) */
+.prose .equation-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin: 1.35em 0;
+  padding: 12px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  scroll-margin-top: 100px;
+}
+.prose .equation-row:target {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 22%, transparent);
+}
+.prose .equation-row .math-display {
+  flex: 1;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+.prose .equation-row .katex-display {
+  margin: 0;
+  padding: 4px 0;
+  background: transparent;
+  border: 0;
+}
+.prose .eq-num {
+  flex-shrink: 0;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 15px;
+  color: var(--muted-foreground);
+  text-decoration: none !important;
+  font-variant-numeric: tabular-nums;
+}
+.prose .eq-num:hover {
+  color: var(--accent);
+}
+.prose .katex {
+  font-size: 1.02em;
+}
+/*
+ * KaTeX ships two layers: a MathML copy for assistive tech and the shaped HTML
+ * a sighted reader sees. The MathML copy is clipped to 1px and must stay in
+ * the accessibility tree, but its inner boxes still report real geometry, so a
+ * hit test lands on the visible layer and reads it as text painted under a
+ * neighbour. A zero font size keeps the text in the DOM for a screen reader
+ * while leaving no box for a pointer or a layout probe to land on.
+ */
+.katex-mathml {
+  pointer-events: none;
+  font-size: 0;
+}
+
+/* Academic Paper Figures (.paper-figure) & Lightbox */
+.prose figure.academic-figure {
+  margin: 34px 0;
+  padding: 22px 24px 18px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  scroll-margin-top: 90px;
+}
+.prose figure.academic-figure:target {
+  border-color: var(--accent);
+}
+.prose .fig-top-img-wrap {
+  background: var(--mount);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 14px;
+  overflow: hidden;
+}
+.prose figure.academic-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 0;
+  border-radius: 2px;
+  cursor: zoom-in;
+}
+.prose figure.academic-figure figcaption {
+  margin-top: 14px;
+  padding-top: 0;
+  border-top: 0;
+  font-family: var(--font-serif), Georgia, "Times New Roman", serif;
+  font-size: 14.5px;
+  line-height: 1.58;
+  color: var(--muted-foreground);
+  text-align: justify;
+  hyphens: auto;
+}
+.prose figure.academic-figure figcaption .fig-label {
+  font-family: var(--body-font);
+  font-size: 13.5px;
+  font-weight: 700;
+  color: var(--foreground);
+}
+
+.figure-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: var(--room);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  gap: 16px;
+  cursor: zoom-out;
+}
+.figure-lightbox[hidden] {
+  display: none;
+}
+.figure-lightbox-close {
+  align-self: flex-end;
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid var(--room-rule);
+  background: var(--room-wash);
+  color: var(--room-ink);
+  font-family: var(--font-code), monospace;
+  font-size: 12px;
+  cursor: pointer;
+}
+.figure-lightbox-img {
+  max-width: min(1240px, 94vw);
+  max-height: 78vh;
+  width: auto;
+  height: auto;
+  background: var(--mount);
+  padding: 18px;
+  border-radius: 8px;
+  cursor: default;
+}
+.figure-lightbox-caption {
+  max-width: 860px;
+  color: var(--room-caption);
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 15px;
+  line-height: 1.55;
+  text-align: center;
+  margin: 0;
+}
+
+/* Booktabs Academic Tables (.table-card / .booktabs-table) */
+.table-card {
+  margin: 28px 0;
+}
+.table-scroll {
+  container-type: inline-size;
+  max-inline-size: 100%;
+  margin: 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  padding: 6px 12px;
+}
+.prose table.booktabs-table {
+  width: 100%;
+  font-family: var(--body-font);
+  font-size: 14px;
+  border-collapse: collapse;
+  font-variant-numeric: tabular-nums;
+}
+.prose thead {
+  position: sticky;
+  /*
+   * The site header is sticky at top: 0 and 89px tall. A second sticky at 0
+   * parks the table head underneath it (measured: thead top 40px, header
+   * foot 89px, 49px of the row labels hidden). Offset by the header, never 0.
+   */
+  inset-block-start: var(--header-height);
+  z-index: 1;
+  background: var(--surface);
+  border-top: 2px solid var(--foreground);
+  border-bottom: 1.5px solid var(--foreground);
+}
+.prose tbody {
+  border-bottom: 2px solid var(--foreground);
+}
+.prose th {
+  font-family: var(--body-font);
+  font-size: 12.5px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  color: var(--foreground);
+  padding: 10px 12px;
+  border-bottom: 0;
+}
+.prose td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+/* Derivations / Proofs Disclosure */
+.prose details.derivation-box {
+  margin: 26px 0;
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--accent);
+  border-radius: 6px;
+  background: var(--surface);
+  padding: 14px 20px;
+}
+.prose details.derivation-box summary {
+  cursor: pointer;
+  font-family: var(--body-font);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--foreground);
+  list-style: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  user-select: none;
+}
+.prose details.derivation-box summary::-webkit-details-marker {
+  display: none;
+}
+.prose details.derivation-box summary::after {
+  content: "Expand proof ▾";
+  font:
+    11px var(--font-code),
+    monospace;
+  color: var(--accent);
+}
+.prose details.derivation-box[open] summary {
+  padding-bottom: 12px;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+.prose details.derivation-box[open] summary::after {
+  content: "Collapse ▴";
+}
+
+/* Formal Bibliography Section (#references) */
+.paper-references {
+  margin-top: 52px;
+  max-width: 820px;
+  scroll-margin-top: 90px;
+}
+.bib-list {
+  list-style: none;
+  padding: 0;
+  margin: 18px 0 0;
+  display: grid;
+  gap: 14px;
+}
+.bib-item {
+  display: grid;
+  grid-template-columns: 36px minmax(0, 1fr);
+  gap: 10px;
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 15.5px;
+  line-height: 1.55;
+  padding: 10px 14px;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+.bib-index {
+  font-family: var(--font-code), monospace;
+  font-size: 12px;
+  color: var(--muted-foreground);
+  padding-top: 2px;
+}
+.bib-header-line {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px;
+}
+.bib-tag {
+  font-family: var(--font-code), monospace;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.bib-year {
+  font-family: var(--font-code), monospace;
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+}
+.bib-title {
+  font-weight: 600;
+  color: var(--foreground);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-color: color-mix(in srgb, var(--muted-foreground) 45%, transparent);
+}
+.bib-title:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+.bib-links {
+  margin-top: 4px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-code), monospace;
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+}
+.bib-arxiv-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+
+.diagram-systems .diagram-orbit {
+  border-radius: 12px;
+  transform: rotate(15deg);
+}
+.diagram-interface .diagram-orbit {
+  border-radius: 30%;
+  transform: rotate(-18deg);
+}
+
+@media (min-width: 768px) and (max-width: 1080px) {
+  .article-layout {
+    grid-template-columns: 185px minmax(0, 1fr);
+    gap: 32px;
+  }
+}
+@media (max-width: 767px) {
+  .dual-series-banners,
+  .series-showcase {
+    grid-template-columns: 1fr;
+  }
+  .paper-topbar {
+    margin-top: 16px;
+  }
+  .abstract-box {
+    padding: 18px 20px;
+  }
+  .prose > p,
+  .abstract-box .summary,
+  .prose figure.academic-figure figcaption {
+    text-align: left;
+    hyphens: none;
+  }
+  .prose figure.academic-figure {
+    margin-inline: 0;
+    padding: 12px;
+  }
+  .prose .equation-row {
+    padding: 10px 12px;
+  }
+}
+
+/* Inline arXiv Citations & Hover Preview Cards */
+.prose .inline-cite-wrap {
+  position: relative;
+  display: inline-block;
+  scroll-margin-top: 100px;
+}
+.prose .inline-cite-wrap:target .inline-cite {
+  background: color-mix(in srgb, var(--accent) 16%, transparent);
+  border-radius: 3px;
+}
+.prose a.inline-cite {
+  font-family: var(--font-code), monospace;
+  font-size: 0.84em;
+  color: var(--foreground);
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent);
+  text-underline-offset: 3px;
+}
+.prose a.inline-cite:hover {
+  color: var(--accent);
+  text-decoration-color: var(--accent);
+}
+.prose .inline-cite-num {
+  margin-left: 2px;
+  font-size: 0.78em;
+  color: var(--accent);
+  font-weight: 600;
+}
+.prose .inline-cite-card {
+  display: none;
+  position: absolute;
+  left: 0;
+  top: calc(100% + 6px);
+  z-index: 30;
+  width: min(320px, 82vw);
+  padding: 10px 12px;
+  border-radius: 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--foreground) 12%, transparent);
+  font-family: var(--body-font);
+  font-style: normal;
+  font-weight: 400;
+  text-align: left;
+  hyphens: none;
+  line-height: 1.45;
+}
+.prose .inline-cite-card::before {
+  content: "";
+  position: absolute;
+  inset: -8px 0 auto 0;
+  height: 8px;
+}
+.prose .inline-cite-wrap:hover .inline-cite-card,
+.prose .inline-cite-wrap:focus-within .inline-cite-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.prose .inline-cite-card-meta {
+  font-family: var(--font-code), monospace;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--accent);
+}
+.prose .inline-cite-card-title {
+  font-family: var(--font-serif), Georgia, serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.prose a.inline-cite-card-link {
+  margin-top: 2px;
+  font-family: var(--font-code), monospace;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  text-decoration: none;
+}
+.prose a.inline-cite-card-link:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.bib-item:target {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+/* Search Deep-Link Hits & Shortcut Hint */
+.writing-labs-callout {
+  margin-top: 12px;
+  font-size: 14px;
+}
+.search-kbd {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 5px;
+  border: 1px solid var(--border);
+  border-radius: 3px;
+  background: var(--surface);
+  font-family: var(--font-code), monospace;
+  font-size: 10px;
+  line-height: 1.3;
+  color: var(--muted-foreground);
+}
+.search-match-hits {
+  margin-top: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.search-hit-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  padding: 2px 8px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  font-family: var(--font-code), monospace;
+  font-size: 11px;
+  color: var(--muted-foreground);
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.search-hit-chip:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.search-hit-chip.is-paper {
+  color: var(--accent);
+}
+
+/* Layered Related Writing Section */
+.related-writing {
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid var(--border);
+  max-width: 820px;
+}
+.related-writing-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+.related-writing-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 16px;
+}
+.related-writing-card {
+  padding: 16px 18px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.related-writing-card h3 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 17px;
+  font-weight: 600;
+  line-height: 1.32;
+  letter-spacing: -0.015em;
+  margin: 0;
+}
+.related-writing-card h3 a:hover {
+  color: var(--accent);
+}
+.related-writing-card p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--muted-foreground);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Companion Engineering Labs (/labs & /labs/[track]/[name]) */
+.lab-track-subtitle {
+  margin: 6px 0 0;
+  font-size: 14.5px;
+  color: var(--muted-foreground);
+}
+.lab-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 18px;
+}
+.lab-card {
+  padding: 22px 24px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.lab-card-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+.lab-card h3 {
+  font-family: var(--font-display), sans-serif;
+  font-size: 21px;
+  font-weight: 600;
+  line-height: 1.28;
+  letter-spacing: -0.02em;
+  margin: 0;
+}
+.lab-card h3 a:hover {
+  color: var(--accent);
+}
+.lab-card-summary {
+  margin: 0;
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: var(--muted-foreground);
+}
+.lab-companion-links {
+  margin-top: auto;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+}
+.lab-detail-body {
+  max-width: 880px;
+  margin-inline: auto;
+}
+.lab-detail-body .prose,
+.lab-overview-prose {
+  max-width: 880px;
+}
+.lab-companion-list {
+  display: grid;
+  gap: 12px;
+}
+.lab-companion-item p {
+  margin: 4px 0 0;
+  font-size: 14px;
+  color: var(--muted-foreground);
+}
+.lab-files-section {
+  margin-top: 44px;
+}
+.lab-files-header {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.lab-files-header h2 {
+  margin: 0;
+}
+.lab-file-stack {
+  display: grid;
+  gap: 14px;
+}
+.lab-file-panel {
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--surface);
+  overflow: hidden;
+}
+.lab-file-summary {
+  cursor: pointer;
+  list-style: none;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  user-select: none;
+}
+.lab-file-summary::-webkit-details-marker {
+  display: none;
+}
+.lab-file-summary-left,
+.lab-file-summary-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.lab-file-kind {
+  font-family: var(--font-code), monospace;
+  font-size: 10.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  padding: 2px 7px;
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  background: var(--muted);
+  color: var(--muted-foreground);
+}
+.lab-file-kind[data-kind="impl"] {
+  border-color: color-mix(in srgb, var(--accent) 45%, var(--border));
+  color: var(--accent);
+}
+.lab-file-name {
+  font-family: var(--font-code), monospace;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--foreground);
+}
+.lab-file-lines {
+  font-family: var(--font-code), monospace;
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+}
+.lab-file-toggle-hint::after {
+  content: "Expand ▾";
+  font-family: var(--font-code), monospace;
+  font-size: 11px;
+  color: var(--accent);
+}
+.lab-file-panel[open] .lab-file-summary {
+  border-bottom: 1px solid var(--border);
+}
+.lab-file-panel[open] .lab-file-toggle-hint::after {
+  content: "Collapse ▴";
+}
+.lab-file-content {
+  padding: 12px 16px 16px;
+}
+.lab-file-content .code-block {
+  margin: 0;
+}
+.lab-file-subbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-family: var(--font-code), monospace;
+  font-size: 11.5px;
+  color: var(--muted-foreground);
+}
+
+/*
+ * Print: articles are the product, so a printed copy should read like one.
+ * Navigation chrome drops out, tokens flatten to ink-on-white regardless of
+ * the active theme, and external links spell out their destination.
+ */
+@media print {
+  :root,
+  [data-theme="dark"] {
+    color-scheme: light;
+    --background: #ffffff;
+    --foreground: #111111;
+    --muted: #ffffff;
+    --muted-foreground: #444444;
+    --surface: #ffffff;
+    --border: #cccccc;
+    --code-surface: #f4f4f2;
+    --code-foreground: #111111;
+    --accent: #8a3423;
+  }
+  .site-header,
+  .site-footer,
+  .theme-switch,
+  .mobile-menu,
+  .filters,
+  .pagination,
+  .desktop-toc,
+  .mobile-toc,
+  .article-share,
+  .hero-footnote,
+  .back-link,
+  .series-nav,
+  .related-writing,
+  .inline-cite-card {
+    display: none !important;
+  }
+  body {
+    background: var(--background) !important;
+    color: var(--foreground) !important;
+  }
+  .site-shell {
+    max-width: 100%;
+    padding-inline: 0;
+  }
+  .article-layout {
+    /* The hidden TOC would otherwise still reserve its grid track. */
+    display: block;
+  }
+  /* Shiki's dark-theme rule carries !important AND higher specificity
+     ([data-theme="dark"] .shiki); match both so code blocks don't arrive as
+     solid ink rectangles. */
+  [data-theme="dark"] .shiki,
+  [data-theme="dark"] .shiki span,
+  .shiki,
+  .shiki span {
+    color: var(--shiki-light) !important;
+    background-color: transparent !important;
+  }
+  [data-theme="dark"] .prose pre,
+  .prose pre {
+    background: var(--code-surface) !important;
+    color: var(--code-foreground) !important;
+  }
+  .code-toolbar button {
+    display: none !important;
+  }
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+  a[href^="http"]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.85em;
+    word-break: break-all;
+  }
+  h1,
+  h2,
+  h3 {
+    break-after: avoid;
+  }
+  figure,
+  .article-row,
+  .featured-card,
+  .code-block,
+  .table-scroll {
+    break-inside: avoid;
+  }
+  .code-block pre {
+    white-space: pre-wrap;
   }
 }

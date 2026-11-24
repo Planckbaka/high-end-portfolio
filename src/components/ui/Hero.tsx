@@ -20,10 +20,14 @@ export function Hero() {
             <em>inside out.</em>
           </h1>
           <div className="art-hero-copy">
-            <p>Go backends. Python engineering. The mechanics of model inference.</p>
-            <p className="art-hero-note">
-              A personal notebook about how things work—and what happens when they don’t.
-            </p>
+            {/*
+             * One sentence, not two. The second paragraph ("a personal
+             * notebook about how things work") restated what the first and
+             * the headline already said, and made the hero three text blocks
+             * before its actions. Its one fact, that these are notes rather
+             * than a product, is carried by the footnote rail below.
+             */}
+            <p>Go backends, Python, and the mechanics of model inference.</p>
             <div className="inline-links">
               <Link className="button primary" href="/articles">
                 Explore the writing ↗
@@ -50,7 +54,7 @@ export function Hero() {
         </figure>
       </div>
       <div className="hero-footnote">
-        <span>Independent notes / Reproducible experiments</span>
+        <span>Independent notes, reproduced and tested</span>
         <a href="#selected-writing" aria-label="Scroll to explore selected writing">
           Scroll to explore ↓
         </a>

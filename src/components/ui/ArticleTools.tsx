@@ -4,6 +4,7 @@ import { headingIndex } from "@/lib/reading-position";
 import type { Article } from "@/types";
 export function TableOfContents({ toc = [] }: { toc: Article["toc"] }) {
   const [active, setActive] = useState("");
+  const activeIdx = toc.findIndex((item) => item.id === active);
   useEffect(() => {
     const headings = toc
       .map((item) => document.getElementById(item.id))
@@ -39,27 +40,46 @@ export function TableOfContents({ toc = [] }: { toc: Article["toc"] }) {
       window.removeEventListener("resize", measure);
     };
   }, [toc]);
-  const links = toc.map((item) => (
+  const links = toc.map((item, idx) => (
     <a
       href={`#${item.id}`}
-      key={item.id}
+      key={`${item.id}-${idx}`}
       data-depth={item.depth}
       aria-current={active === item.id ? "location" : undefined}
+      /*
+       * Chapter titles run to 74 characters; in a 220px rail they wrap to four
+       * lines and the contents stops being scannable. One line, ellipsised,
+       * with the full title in `title` and the heading itself a click away.
+       */
+      title={item.text}
     >
       {item.text}
     </a>
   ));
   if (!toc.length) return null;
+  const h2Items = toc.filter((t) => t.depth === 2);
+  const currentH2Number =
+    activeIdx >= 0
+      ? toc.slice(0, activeIdx + 1).filter((t) => t.depth === 2).length
+      : 1;
   return (
     <>
       <aside className="desktop-toc">
         <div className="toc">
-          <p className="eyebrow">On this page</p>
+          <div className="toc-header">
+            <p className="eyebrow">Contents</p>
+            {h2Items.length > 0 && (
+              <span className="toc-step-counter" aria-hidden="true">
+                {String(Math.max(1, currentH2Number)).padStart(2, "0")} /{" "}
+                {String(h2Items.length).padStart(2, "0")}
+              </span>
+            )}
+          </div>
           <nav aria-label="Table of contents">{links}</nav>
         </div>
       </aside>
       <details className="mobile-toc">
-        <summary>On this page</summary>
+        <summary>Contents</summary>
         <nav aria-label="Mobile table of contents">{links}</nav>
       </details>
     </>
@@ -104,6 +124,105 @@ export function CodeCopyEnhancement() {
         status.remove();
       });
     });
+
+    // BibTeX & command copy button enhancement (Jon Barron style)
+    document
+      .querySelectorAll<HTMLButtonElement>("button[data-bibtex], button[data-copy-text]")
+      .forEach((btn) => {
+        let timer: ReturnType<typeof setTimeout>;
+        const originalText = btn.textContent || "Copy";
+        const copiedLabel = btn.hasAttribute("data-bibtex")
+          ? "Copied BibTeX!"
+          : btn.getAttribute("data-copied-label") || "Copied!";
+        const onCopyPayload = async () => {
+          const payload =
+            btn.getAttribute("data-bibtex") || btn.getAttribute("data-copy-text") || "";
+          try {
+            await navigator.clipboard.writeText(payload);
+            btn.textContent = copiedLabel;
+            btn.setAttribute("data-copied", "true");
+          } catch {
+            btn.textContent = "Clipboard unavailable";
+          }
+          clearTimeout(timer);
+          timer = setTimeout(() => {
+            btn.textContent = originalText;
+            btn.removeAttribute("data-copied");
+          }, 2200);
+        };
+        btn.addEventListener("click", onCopyPayload);
+        cleanups.push(() => {
+          clearTimeout(timer);
+          btn.removeEventListener("click", onCopyPayload);
+        });
+      });
+
+    // Academic figure click-to-zoom lightbox
+    const zoomableImages = document.querySelectorAll<HTMLImageElement>("img.zoomable");
+    if (zoomableImages.length > 0) {
+      const overlay = document.createElement("div");
+      overlay.className = "figure-lightbox";
+      overlay.setAttribute("role", "dialog");
+      overlay.setAttribute("aria-modal", "true");
+      overlay.setAttribute("aria-label", "Expanded figure view");
+      overlay.hidden = true;
+
+      const closeBtn = document.createElement("button");
+      closeBtn.type = "button";
+      closeBtn.className = "figure-lightbox-close";
+      closeBtn.textContent = "Close (Esc)";
+      closeBtn.setAttribute("aria-label", "Close expanded figure");
+
+      const previewImg = document.createElement("img");
+      previewImg.className = "figure-lightbox-img";
+      previewImg.alt = "";
+
+      const captionBox = document.createElement("p");
+      captionBox.className = "figure-lightbox-caption";
+
+      overlay.append(closeBtn, previewImg, captionBox);
+      document.body.appendChild(overlay);
+
+      const closeLightbox = () => {
+        overlay.hidden = true;
+        document.body.style.overflow = "";
+      };
+
+      const onKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape" && !overlay.hidden) {
+          closeLightbox();
+        }
+      };
+
+      overlay.addEventListener("click", (e) => {
+        if (e.target === overlay || e.target === closeBtn) {
+          closeLightbox();
+        }
+      });
+      window.addEventListener("keydown", onKeyDown);
+
+      zoomableImages.forEach((img) => {
+        const openLightbox = () => {
+          previewImg.src = img.src;
+          previewImg.alt = img.alt;
+          const fig = img.closest("figure");
+          const cap = fig?.querySelector("figcaption");
+          captionBox.textContent = cap?.textContent || img.alt || "";
+          overlay.hidden = false;
+          document.body.style.overflow = "hidden";
+          closeBtn.focus();
+        };
+        img.addEventListener("click", openLightbox);
+        cleanups.push(() => img.removeEventListener("click", openLightbox));
+      });
+
+      cleanups.push(() => {
+        window.removeEventListener("keydown", onKeyDown);
+        document.body.style.overflow = "";
+        overlay.remove();
+      });
+    }
+
     return () => cleanups.forEach((cleanup) => cleanup());
   }, []);
   return null;

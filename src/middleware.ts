@@ -26,8 +26,9 @@ export function middleware(request: NextRequest) {
         "Permissions-Policy",
         "camera=(), microphone=(), geolocation=()"
     );
-    // CSP in Report-Only mode — React Compiler needs unsafe-eval, Framer Motion needs unsafe-inline.
-    // Monitor reports, then tighten and switch to enforcement mode later.
+    // CSP in Report-Only mode — React Compiler needs unsafe-eval, and Next's
+    // inline bootstrap/RSC payload needs unsafe-inline. Monitor reports, then
+    // tighten and switch to enforcement mode later.
     response.headers.set(
         "Content-Security-Policy-Report-Only",
         "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://api.resend.com; frame-ancestors 'none';"
