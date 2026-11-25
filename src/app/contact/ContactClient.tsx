@@ -81,6 +81,10 @@ export default function ContactClient() {
   return (
     <div className="site-shell">
       <header className="page-heading">
+        <p className="eyebrow">
+          <span className="eyebrow-dot" />
+          Correspondence
+        </p>
         <h1>Let’s talk systems.</h1>
         <p>
           A technical question, a thoughtful correction, or an opportunity to build something

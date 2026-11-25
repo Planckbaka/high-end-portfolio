@@ -9,19 +9,25 @@ from pathlib import Path
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from matplotlib.colors import LinearSegmentedColormap
 
-# Editorial palette matching globals.css
+# Anthropic Cotton-Paper & Muted Archival Ink Palette matching globals.css
 BG = "#fdfcf9"
-SURFACE = "#f7f6f2"
-MUTED = "#eeede7"
-BORDER = "#d8d9d0"
-FG = "#232521"
-MUTED_FG = "#62665e"
-ACCENT = "#a33f2e"
-ACCENT_SOFT = "#ee9b84"
-TEAL = "#2d5a52"
-SLATE = "#4a586e"
-GOLD = "#b37b2c"
+SURFACE = "#f0eee6"
+MUTED = "#e8e6dc"
+BORDER = "#cfccc0"
+FG = "#141413"
+MUTED_FG = "#5e5d59"
+ACCENT = "#c6613f"
+ACCENT_SOFT = "#d97757"
+TEAL = "#4a7a6c"
+SLATE = "#4a749c"
+GOLD = "#b07d3b"
+
+PAPER_HEATMAP = LinearSegmentedColormap.from_list(
+    "anthropic_paper",
+    ["#fdfcf9", "#e3dacc", "#d97757", "#141413"],
+)
 
 plt.rcParams.update({
     "font.family": "sans-serif",
@@ -483,7 +489,18 @@ def make_fig7_flagship_2026() -> None:
         )
 
     ax1.axhline(1024, color=MUTED_FG, linestyle="--", linewidth=1.1)
-    ax1.text(0.05, 1180, "1 KB/token Sub-Kilobyte Barrier", fontsize=8.2, color=MUTED_FG, fontweight="bold")
+    ax1.annotate(
+        "1 KB/token\nSub-Kilobyte Barrier",
+        xy=(2.5, 1024),
+        xytext=(2.5, 4200),
+        ha="center",
+        va="bottom",
+        fontsize=8.2,
+        color=MUTED_FG,
+        fontweight="bold",
+        arrowprops=dict(arrowstyle="->", color=MUTED_FG, lw=1.0),
+        bbox=dict(facecolor=BG, edgecolor="none", pad=1.5),
+    )
     ax1.set_yscale("log")
     ax1.set_ylim(300, 35000)
     ax1.set_title("A. Per-Token KV Cache Footprint (Log Scale)", fontsize=11, fontweight="bold", loc="left", pad=10)
@@ -597,7 +614,7 @@ def make_fig9_block_diffusion() -> None:
     # Distinguish causal prefix visibility (0.55) vs bidirectional active block (1.0)
     matrix = np.where(blk_j == blk_i, 1.0, np.where(blk_j < blk_i, 0.45, 0.0))
 
-    ax1.imshow(matrix, cmap="YlOrBr", vmin=0.0, vmax=1.15, aspect="equal")
+    ax1.imshow(matrix, cmap=PAPER_HEATMAP, vmin=0.0, vmax=1.05, aspect="equal")
     for edge in (3.5, 7.5):
         ax1.axhline(edge, color=FG, linewidth=1.3)
         ax1.axvline(edge, color=FG, linewidth=1.3)

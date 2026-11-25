@@ -14,22 +14,26 @@ export default function NotFound() {
   return (
     <div className="site-shell page-bottom">
       <header className="page-heading">
+        <p className="eyebrow">
+          <span className="eyebrow-dot" />
+          Page not found
+        </p>
         <h1>This page isn’t here.</h1>
-        <p>The address may be incorrect. There is still plenty to explore.</p>
-        <div className="inline-links">
-          <Link className="button primary" href="/articles">
-            Browse the writing ↗
-          </Link>
-          <Link className="text-link" href="/">
-            Back home
-          </Link>
+        <div>
+          <p>The address may be incorrect. There is still plenty to explore.</p>
+          <div className="inline-links">
+            <Link className="button primary" href="/articles">
+              Browse the writing ↗
+            </Link>
+            <Link className="text-link" href="/">
+              Back home
+            </Link>
+          </div>
         </div>
       </header>
       <section className="section" aria-labelledby="not-found-notes">
         <div className="section-heading">
-          <h2 id="not-found-notes">
-            <span className="section-number" aria-hidden="true">01</span>Recent notes
-          </h2>
+          <h2 id="not-found-notes">Recent notes</h2>
           <Link className="text-link" href="/articles">
             All articles ↗
           </Link>

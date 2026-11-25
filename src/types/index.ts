@@ -77,6 +77,10 @@ export interface NavItem {
   name: string;
   path: string;
 }
+export interface DirectoryItem extends NavItem {
+  code: string;
+  description: string;
+}
 export interface SocialLink {
   name: string;
   url: string;

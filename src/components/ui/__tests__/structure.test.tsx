@@ -1,5 +1,6 @@
-import { render, screen } from "@testing-library/react";
+import { fireEvent, render, screen } from "@testing-library/react";
 import { Hero } from "@/components/ui/Hero";
+import { Navbar } from "@/components/ui/Navbar";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import ArticlesClient from "@/app/articles/ArticlesClient";
@@ -62,6 +63,34 @@ describe("no dead affordances", () => {
     const cue = container.querySelector('a[href^="#"]');
     expect(cue).not.toBeNull();
     expect(cue!.getAttribute("href")).toBe("#work");
+  });
+
+  it("hero provides a WCAG 2.2.2 pause control for ambient ink motion without aria-pressed", () => {
+    render(<Hero />);
+    const toggle = screen.getByRole("button", { name: /pause motion/i });
+    expect(toggle).not.toHaveAttribute("aria-pressed");
+    fireEvent.click(toggle);
+    expect(screen.getByRole("button", { name: /play motion/i })).toBeInTheDocument();
+  });
+
+  it("navbar exposes inline links and a native dialog mobile index with all six routes", () => {
+    const { container } = render(<Navbar />);
+    const desktopNav = container.querySelector("nav.nav-links");
+    expect(desktopNav).not.toBeNull();
+
+    const dialog = container.querySelector("dialog#site-nav-dialog");
+    expect(dialog).not.toBeNull();
+    expect(dialog).not.toHaveAttribute("role");
+    expect(dialog).not.toHaveAttribute("aria-modal");
+
+    fireEvent.click(screen.getByRole("button", { name: /open navigation index/i }));
+    expect(dialog).toHaveAttribute("open");
+    for (const path of ["/articles", "/series/llm-ai-infra", "/labs", "/projects", "/about", "/contact"]) {
+      expect(desktopNav!.querySelector(`a[href="${path}"]`)).not.toBeNull();
+      expect(dialog!.querySelector(`a[href="${path}"]`)).not.toBeNull();
+    }
+    fireEvent.click(screen.getByRole("button", { name: /close/i }));
+    expect(dialog).not.toHaveAttribute("open");
   });
 });
 

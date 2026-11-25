@@ -1,5 +1,5 @@
-import type { Metadata } from "next";
-import { Space_Grotesk, JetBrains_Mono, Source_Serif_4 } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Newsreader, Inter, Source_Serif_4, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/ui/SiteFooter";
 import { cn } from "@/lib/utils";
@@ -11,20 +11,28 @@ import { ErrorBoundary } from "@/components/ErrorBoundary";
 import { siteConfig } from "@/config/site";
 import { RouteAnnouncer } from "@/components/RouteAnnouncer";
 
-const spaceGrotesk = Space_Grotesk({
+const newsreader = Newsreader({
   variable: "--font-display",
   subsets: ["latin"],
+  style: ["normal", "italic"],
   display: "swap",
 });
 
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-code",
+const inter = Inter({
+  variable: "--font-ui",
   subsets: ["latin"],
   display: "swap",
 });
 
 const sourceSerif = Source_Serif_4({
   variable: "--font-serif",
+  subsets: ["latin"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-code",
   subsets: ["latin"],
   display: "swap",
 });
@@ -48,8 +56,6 @@ export const metadata: Metadata = {
   authors: [{ name: siteConfig.author.name, url: siteConfig.author.github }],
   creator: siteConfig.author.name,
   alternates: {
-    // Footgun: this default canonicalizes any future route that forgets its
-    // own metadata to the homepage. Every route must override it.
     canonical: "/",
     types: { "application/rss+xml": "/feed.xml" },
   },
@@ -76,11 +82,6 @@ export const metadata: Metadata = {
     images: [siteConfig.ogImage],
     creator: siteConfig.author.twitter,
   },
-  /*
-   * Purpose-built favicon set. The old config pointed every icon slot at
-   * /avatar.jpeg — a 22 KB photo the browser had to downscale to 16px, with no
-   * apple-touch or maskable variant.
-   */
   icons: {
     icon: [
       { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
@@ -103,12 +104,11 @@ export const metadata: Metadata = {
   },
 };
 
-export const viewport = {
-  // Matches --background in globals.css for each theme, so the browser chrome
-  // on mobile blends into the page instead of banding against it.
+export const viewport: Viewport = {
+  colorScheme: "light dark",
   themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#f7f6f2" },
-    { media: "(prefers-color-scheme: dark)", color: "#191b19" },
+    { media: "(prefers-color-scheme: light)", color: "#faf9f5" },
+    { media: "(prefers-color-scheme: dark)", color: "#141413" },
   ],
 };
 
@@ -117,7 +117,6 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  // JSON-LD structured data for SEO
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
@@ -125,46 +124,37 @@ export default function RootLayout({
     url: siteConfig.url,
     image: `${siteConfig.url}${siteConfig.ogImage}`,
     sameAs: [siteConfig.author.github, siteConfig.author.linkedin],
-    jobTitle: "Backend Developer",
+    jobTitle: "Backend & AI Systems Researcher",
     description: siteConfig.description,
     knowsAbout: ["Go", "Python", "Model Inference", "Backend Systems"],
   };
 
   return (
-    /*
-     * overflow-x: clip, not hidden. `hidden` makes the element a scroll
-     * container, which strands the sticky header; `clip` trims the same
-     * overflow without one. Applies to html and body together, because a
-     * clip on body alone still lets html scroll sideways.
-     */
     <html lang="en" className="antialiased overflow-x-clip" suppressHydrationWarning>
       <body
         className={cn(
-          spaceGrotesk.variable,
-          jetbrainsMono.variable,
+          newsreader.variable,
+          inter.variable,
           sourceSerif.variable,
+          jetbrainsMono.variable,
           "bg-background text-foreground overflow-x-clip font-sans"
         )}
       >
-        {/* React 19 hoists this into <head>; no manual <head> element needed. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
         />
         <ThemeProvider
           attribute="data-theme"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="light"
+          enableSystem={false}
           disableTransitionOnChange
         >
           <ErrorBoundary>
-            {/* Skip to content link for accessibility */}
             <a href="#main-content" className="skip-link">
               Skip to main content
             </a>
             <Navbar />
-            {/* tabIndex makes <main> a programmatic focus target for the skip
-                link across assistive tech, not just modern fragment focus. */}
             <main id="main-content" tabIndex={-1}>
               {children}
             </main>

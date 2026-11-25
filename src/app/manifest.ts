@@ -18,8 +18,8 @@ export default function manifest(): MetadataRoute.Manifest {
         // Matches --background for the default (light) theme; the browser-level
         // themeColor in layout.tsx handles per-scheme values, which the
         // manifest spec cannot express.
-        background_color: "#f7f6f2",
-        theme_color: "#f7f6f2",
+        background_color: "#faf9f5",
+        theme_color: "#faf9f5",
         icons: [
             { src: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
             { src: "/android-chrome-192x192.png", sizes: "192x192", type: "image/png" },

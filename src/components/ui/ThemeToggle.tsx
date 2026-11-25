@@ -10,13 +10,9 @@ export function ThemeToggle() {
     () => true,
     () => false
   );
-  /*
-   * The static theme-color metas follow the OS preference only; when the user
-   * overrides the theme manually, mirror it into the browser-chrome color.
-   */
   useEffect(() => {
     if (!mounted || !resolvedTheme) return;
-    const color = resolvedTheme === "dark" ? "#191b19" : "#f7f6f2";
+    const color = resolvedTheme === "dark" ? "#141413" : "#faf9f5";
     document
       .querySelectorAll('meta[name="theme-color"]')
       .forEach((meta) => meta.setAttribute("content", color));

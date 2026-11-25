@@ -5,15 +5,15 @@ export function SiteFooter() {
   return (
     <footer className="site-footer">
       <div className="site-shell footer-signature" aria-hidden="true">
-        <span>akiwayne.</span>
+        <span>Akiwayne</span>
         <span>
-          Keep asking{" "}
+          Reading closely,
           <br />
-          how it works.
+          building deliberately.
         </span>
       </div>
       <div className="site-shell footer-inner">
-        <span>© {new Date().getFullYear()} Akiwayne · Built with care, tested with curiosity.</span>
+        <span>© {new Date().getFullYear()} Akiwayne · Notes on systems, models, and engineering.</span>
         <nav aria-label="Social links">
           {socialLinks
             .filter((link) => link.url !== "#")

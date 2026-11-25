@@ -46,59 +46,48 @@ export default function ArticleClient({
     <div className="site-shell paper-shell">
       <div className="reading-progress-bar" aria-hidden="true" />
 
-      <div className="paper-topbar" role="region" aria-label="Paper utilities">
-        <div className="paper-topbar-left">
-          <Link className="btn-pill back-link" href="/articles">
-            ← All Writing
+      <nav className="paper-breadcrumb-bar" aria-label="Article navigation and citation">
+        <div className="paper-breadcrumb-left">
+          <Link className="paper-crumb back-link" href="/articles">
+            ← Writing
           </Link>
           {article.series && (
-            <Link
-              className="btn-pill"
-              href={seriesHref}
-              title={`${article.series}, chapter ${String(article.seriesOrder).padStart(2, "0")}`}
-            >
-              {article.series} #{String(article.seriesOrder).padStart(2, "0")}
-            </Link>
+            <>
+              <span className="paper-crumb-sep" aria-hidden="true">
+                /
+              </span>
+              <Link
+                className="paper-crumb"
+                href={seriesHref}
+                title={`${article.series}, chapter ${String(article.seriesOrder).padStart(2, "0")}`}
+              >
+                {article.series} · Ch. {String(article.seriesOrder).padStart(2, "0")}
+              </Link>
+            </>
           )}
         </div>
-        <div className="paper-topbar-actions">
-          {article.labPath && (
-            <Link className="btn-pill" href={`/${article.labPath}`}>
-              Companion Lab ↗
-            </Link>
-          )}
+        <div className="paper-breadcrumb-actions">
           {hasPapers && (
-            <a className="btn-pill" href="#references">
+            <a className="paper-util-link" href="#references">
               References ({article.papers!.length})
             </a>
           )}
           <button
             type="button"
-            className="btn-pill"
+            className="paper-util-btn"
             data-bibtex={bibtex}
             aria-label="Copy BibTeX citation"
           >
             Copy BibTeX
           </button>
         </div>
-      </div>
+      </nav>
 
       <header className="article-heading paper-header">
-        {/* The category is the only identifier the title does not carry, so it
-            stays and becomes the line above the title. Series and source count
-            move to the meta row below, where the date already lives. */}
         <p className="paper-category">{article.category}</p>
         <h1 className="paper-title">{article.title}</h1>
-        <div className="authors-row">
-          <div className="author-block">
-            <span className="author-name">{siteConfig.author.name}</span>
-            <span className="author-affil">Independent Systems &amp; AI Infrastructure Research</span>
-          </div>
-        </div>
-        {/* Facts only, separated by a drawn hairline. The series is named once,
-            in the topbar pill above; repeating it here was an echo and it
-            pushed the row onto two lines at 1440. */}
         <div className="article-meta paper-meta-row">
+          <span className="author-name">{siteConfig.author.name}</span>
           <time className="paper-meta-item" dateTime={article.date}>
             {formatDate(article.date)}
           </time>
@@ -111,11 +100,6 @@ export default function ArticleClient({
               {article.papers!.length} primary arXiv{" "}
               {article.papers!.length === 1 ? "source" : "sources"}
             </span>
-          )}
-          {article.labPath && (
-            <Link className="text-link paper-meta-item" href={`/${article.labPath}`}>
-              Reproducible CPU Lab
-            </Link>
           )}
         </div>
         {article.tags && article.tags.length > 0 && (

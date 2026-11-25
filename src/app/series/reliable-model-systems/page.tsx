@@ -2,17 +2,24 @@ import Link from "next/link";
 import { getAllArticles } from "@/lib/markdown";
 import { modelSystemsArticles, MODEL_SYSTEMS_SERIES, seriesChapterWord } from "@/lib/series";
 import { pageMetadata } from "@/lib/page-metadata";
+
 export const metadata = pageMetadata(
   MODEL_SYSTEMS_SERIES.title,
   "A guided sequence of Go, Python and CPU model experiments, from bounded work to cached decoding.",
   MODEL_SYSTEMS_SERIES.path
 );
+
 export default function ModelSystemsSeries() {
   const articles = modelSystemsArticles(getAllArticles());
   const word = seriesChapterWord(articles.length);
+
   return (
     <div className="site-shell page-bottom">
       <header className="page-heading">
+        <p className="eyebrow">
+          <span className="eyebrow-dot" />
+          Guided engineering series · {articles.length} chapters
+        </p>
         <h1>
           Systems,
           <br />
@@ -44,28 +51,36 @@ export default function ModelSystemsSeries() {
       </section>
       <ol className="series-chapters">
         {articles.map((a) => (
-          <li key={a.slug}>
+          <li key={a.slug} className="series-chapter-card is-compact-series">
             <span className="chapter-number" aria-hidden="true">
               {String(a.seriesOrder).padStart(2, "0")}
             </span>
-            <div>
+            <div className="series-chapter-main">
               <p className="eyebrow">
                 {a.category} · {a.readingTime}
               </p>
-              <h2>
+              <h3>
                 <Link href={`/articles/${a.slug}`}>{a.title}</Link>
-              </h2>
+              </h3>
               <p>{a.excerpt}</p>
+              <div className="series-chapter-actions">
+                <Link className="text-link" href={`/articles/${a.slug}`}>
+                  Read chapter →
+                </Link>
+                {a.labPath && (
+                  <Link className="text-link" href={`/${a.labPath}`}>
+                    Companion lab ↗
+                  </Link>
+                )}
+              </div>
             </div>
-            {a.labPath && (
-              <Link className="text-link series-chapter-lab" href={`/${a.labPath}`}>
-                Companion lab ↗
-              </Link>
-            )}
           </li>
         ))}
       </ol>
       <div className="inline-links">
+        <Link className="text-link" href="/series/llm-ai-infra">
+          Research monograph: LLM &amp; AI Infrastructure ↗
+        </Link>
         <Link className="text-link" href="/articles">
           All writing ↗
         </Link>

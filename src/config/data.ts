@@ -1,10 +1,50 @@
-import type { NavItem, Project, SocialLink, ContactDetails } from "@/types";
+import type { NavItem, DirectoryItem, Project, SocialLink, ContactDetails } from "@/types";
 import { siteConfig } from "@/config/site";
 export const navItems: NavItem[] = [
   { name: "Writing", path: "/articles" },
+  { name: "Research", path: "/series/llm-ai-infra" },
+  { name: "Labs", path: "/labs" },
   { name: "Projects", path: "/projects" },
   { name: "About", path: "/about" },
   { name: "Contact", path: "/contact" },
+];
+export const directoryItems: DirectoryItem[] = [
+  {
+    code: "01",
+    name: "Writing",
+    path: "/articles",
+    description: "Essays, notes, and archive search",
+  },
+  {
+    code: "02",
+    name: "Research",
+    path: "/series/llm-ai-infra",
+    description: "Nine-part monograph on model infrastructure",
+  },
+  {
+    code: "03",
+    name: "Labs",
+    path: "/labs",
+    description: "Small reproducible experiments in Go & Python",
+  },
+  {
+    code: "04",
+    name: "Projects",
+    path: "/projects",
+    description: "Selected systems and validation notes",
+  },
+  {
+    code: "05",
+    name: "About",
+    path: "/about",
+    description: "Approach, scope, and background",
+  },
+  {
+    code: "06",
+    name: "Contact",
+    path: "/contact",
+    description: "Correspondence and inquiries",
+  },
 ];
 export const projects: Project[] = [
   {

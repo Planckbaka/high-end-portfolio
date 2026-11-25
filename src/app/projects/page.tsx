@@ -12,6 +12,10 @@ export default function Projects() {
   return (
     <div className="site-shell page-bottom">
       <header className="page-heading">
+        <p className="eyebrow">
+          <span className="eyebrow-dot" />
+          Selected systems &amp; validation
+        </p>
         <h1>
           Built to be
           <br />
@@ -26,7 +30,7 @@ export default function Projects() {
         {projects.map((project, index) => (
           <a href={`#${project.id}`} key={project.id}>
             <span className="eyebrow">
-              {String(index + 1).padStart(2, "0")} / {project.category}
+              {String(index + 1).padStart(2, "0")} · {project.category}
             </span>
             <span>
               {project.title}

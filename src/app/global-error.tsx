@@ -31,9 +31,9 @@ export default function GlobalError({
         }}
       >
         <style>{`:root {
-          --background: #f7f6f2;
-          --foreground: #232521;
-          --muted-foreground: #62665e;
+          --background: #faf9f5;
+          --foreground: #141413;
+          --muted-foreground: #5e5d59;
         }`}</style>
         <main style={{ maxWidth: "34rem", padding: "2rem", textAlign: "center" }}>
           <h1 style={{ fontSize: "1.75rem", fontWeight: 500, letterSpacing: "-0.03em" }}>

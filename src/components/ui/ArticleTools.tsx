@@ -4,7 +4,21 @@ import { headingIndex } from "@/lib/reading-position";
 import type { Article } from "@/types";
 export function TableOfContents({ toc = [] }: { toc: Article["toc"] }) {
   const [active, setActive] = useState("");
+  const [collapsed, setCollapsed] = useState(false);
   const activeIdx = toc.findIndex((item) => item.id === active);
+
+  useEffect(() => {
+    const layout = document.querySelector(".article-layout");
+    if (!layout) return;
+    if (collapsed) {
+      layout.setAttribute("data-toc-collapsed", "true");
+    } else {
+      layout.removeAttribute("data-toc-collapsed");
+    }
+    return () => {
+      layout.removeAttribute("data-toc-collapsed");
+    };
+  }, [collapsed]);
   useEffect(() => {
     const headings = toc
       .map((item) => document.getElementById(item.id))
@@ -65,18 +79,42 @@ export function TableOfContents({ toc = [] }: { toc: Article["toc"] }) {
   return (
     <>
       <aside className="desktop-toc">
-        <div className="toc">
-          <div className="toc-header">
-            <p className="eyebrow">Contents</p>
-            {h2Items.length > 0 && (
-              <span className="toc-step-counter" aria-hidden="true">
-                {String(Math.max(1, currentH2Number)).padStart(2, "0")} /{" "}
-                {String(h2Items.length).padStart(2, "0")}
-              </span>
-            )}
+        {collapsed ? (
+          <div className="toc toc-collapsed-rail">
+            <button
+              type="button"
+              className="toc-focus-btn"
+              onClick={() => setCollapsed(false)}
+              aria-label="Show table of contents"
+            >
+              Contents ▸
+            </button>
           </div>
-          <nav aria-label="Table of contents">{links}</nav>
-        </div>
+        ) : (
+          <div className="toc">
+            <div className="toc-header">
+              <p className="eyebrow">Contents</p>
+              <div className="toc-header-actions">
+                {h2Items.length > 0 && (
+                  <span className="toc-step-counter" aria-hidden="true">
+                    {String(Math.max(1, currentH2Number)).padStart(2, "0")}/
+                    {String(h2Items.length).padStart(2, "0")}
+                  </span>
+                )}
+                <button
+                  type="button"
+                  className="toc-focus-btn"
+                  onClick={() => setCollapsed(true)}
+                  aria-label="Hide table of contents for focus reading"
+                  title="Focus reading mode"
+                >
+                  Focus
+                </button>
+              </div>
+            </div>
+            <nav aria-label="Table of contents">{links}</nav>
+          </div>
+        )}
       </aside>
       <details className="mobile-toc">
         <summary>Contents</summary>

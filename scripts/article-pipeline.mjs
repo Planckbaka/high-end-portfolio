@@ -416,6 +416,9 @@ export async function renderArticle(content, options = {}) {
             };
             const altText = String(img.properties.alt || "");
             const strippedCaption = altText.replace(/^Figure\s+\d+\s*:\s*/i, "");
+            if (strippedCaption) {
+              img.properties.alt = `Figure ${figCount}: ${strippedCaption}`;
+            }
             return {
               type: "element",
               tagName: "figure",

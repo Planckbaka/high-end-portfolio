@@ -1,4 +1,5 @@
 import { pageMetadata } from "@/lib/page-metadata";
+import Image from "next/image";
 import Link from "next/link";
 import { socialLinks } from "@/config/data";
 export const metadata = pageMetadata(
@@ -10,6 +11,10 @@ export default function About() {
   return (
     <div className="site-shell page-bottom">
       <header className="page-heading">
+        <p className="eyebrow">
+          <span className="eyebrow-dot" />
+          Background &amp; methodology
+        </p>
         <h1>Curiosity, made executable.</h1>
         <p>
           I’m Akiwayne. My starting point is Go backend development. My current focus is the
@@ -18,6 +23,16 @@ export default function About() {
       </header>
       <div className="about-editorial">
         <aside className="about-note">
+          <div className="about-plate-frame" aria-hidden="true">
+            <Image
+              src="/images/editorial/about-atelier-plate.webp"
+              alt=""
+              width={760}
+              height={567}
+              loading="lazy"
+              className="about-plate-img"
+            />
+          </div>
           <span className="eyebrow">A working principle</span>
           <p>
             Make the question concrete.

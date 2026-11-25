@@ -1,6 +1,7 @@
 import { pageMetadata } from "@/lib/page-metadata";
 import ArticlesClient from "./ArticlesClient";
 import { getAllArticles } from "@/lib/markdown";
+import { getLabsManifest } from "@/lib/labs";
 
 // Force this page to be statically generated at build time
 // This is required for Cloudflare Workers deployment
@@ -15,5 +16,6 @@ export const metadata = pageMetadata(
 
 export default function ArticlesPage() {
   const articles = getAllArticles({ includeToc: true });
-  return <ArticlesClient articles={articles} />;
+  const labCount = getLabsManifest().labs.length;
+  return <ArticlesClient articles={articles} labCount={labCount} />;
 }

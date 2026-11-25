@@ -7,9 +7,11 @@ import { CodeCopyEnhancement } from "@/components/ui/ArticleTools";
 export const dynamic = "force-static";
 export const revalidate = false;
 
+const LAB_COUNT = getLabsManifest().labs.length;
+
 export const metadata = pageMetadata(
   "Engineering Labs",
-  "Nine reproducible CPU experiments in Go, Python, and PyTorch accompanying the systems and LLM infrastructure monographs.",
+  `${LAB_COUNT} reproducible CPU experiments in Go, Python, and PyTorch accompanying the systems and LLM infrastructure monographs.`,
   "/labs"
 );
 
@@ -35,29 +37,33 @@ export default function LabsIndexPage() {
 
   return (
     <div className="site-shell page-bottom">
-      <div className="paper-topbar" role="region" aria-label="Lab archive utilities">
-        <div className="paper-topbar-left">
-          <Link className="btn-pill back-link" href="/articles">
+      <nav className="paper-breadcrumb-bar" aria-label="Lab archive utilities">
+        <div className="paper-breadcrumb-left">
+          <Link className="paper-crumb back-link" href="/articles">
             ← All Writing
           </Link>
         </div>
-        <div className="paper-topbar-actions">
-          <a className="btn-pill" href="/labs/engineering-labs.zip" download>
+        <div className="paper-breadcrumb-actions">
+          <a className="paper-util-link" href="/labs/engineering-labs.zip" download>
             Download All Labs (.zip) ↓
           </a>
         </div>
-      </div>
+      </nav>
 
       <header className="page-heading">
+        <p className="eyebrow">
+          <span className="eyebrow-dot" />
+          Companion implementations · {manifest.labs.length} reproducible CPU labs
+        </p>
         <h1>
           Engineering
           <br />
           labs.
         </h1>
         <p>
-          Nine self-contained CPU implementations and test suites paired with the writing. Every
-          mechanism—from bounded Go admission gates to DeepSeek MLA matrix absorption—runs locally
-          without GPUs or external API keys.
+          {manifest.labs.length} self-contained CPU implementations and test suites paired with the
+          writing. Every mechanism—from bounded Go admission gates to DeepSeek MLA matrix
+          absorption—runs locally without GPUs or external API keys.
         </p>
       </header>
 

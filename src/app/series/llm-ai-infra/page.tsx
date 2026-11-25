@@ -9,6 +9,45 @@ export const metadata = pageMetadata(
   LLM_INFRA_SERIES.path
 );
 
+const CHAPTER_FIGURES: Record<number, string> = {
+  1: "/images/articles/llm-infra/fig1-modern-transformer-evolution.svg",
+  2: "/images/articles/llm-infra/fig2-roofline-flashattention.svg",
+  3: "/images/articles/llm-infra/fig3-zero-chinchilla-scaling.svg",
+  4: "/images/articles/llm-infra/fig4-rlhf-dpo-grpo-architecture.svg",
+  5: "/images/articles/llm-infra/fig5-mla-and-distserve.svg",
+  6: "/images/articles/llm-infra/fig6-long-context-vla.svg",
+  7: "/images/articles/llm-infra/fig7-flagship-2026-codesign.svg",
+  8: "/images/articles/llm-infra/fig8-looped-transformer-topology.svg",
+  9: "/images/articles/llm-infra/fig9-block-diffusion-llm.svg",
+};
+
+const MONOGRAPH_PARTS = [
+  {
+    id: "part-1",
+    roman: "Part I",
+    title: "Foundations & Hardware Ledger",
+    thesis:
+      "Positional geometry, SRAM-tiled attention, and distributed memory-bandwidth bounds that govern transformer pretraining and serving.",
+    orders: [1, 2, 3],
+  },
+  {
+    id: "part-2",
+    roman: "Part II",
+    title: "Alignment & Frontier Co-Design",
+    thesis:
+      "Critic-free RL reasoning, low-rank latent KV compression, long-context agentic loops, and 2026 sub-kilobyte CED/AttnRes/Muon co-design.",
+    orders: [4, 5, 6, 7],
+  },
+  {
+    id: "part-3",
+    roman: "Part III",
+    title: "Latent Recurrence & Diffusion Paradigms",
+    thesis:
+      "Moving beyond fixed-depth autoregressive decoding via looped shared-weight recurrence and block-causal discrete diffusion.",
+    orders: [8, 9],
+  },
+] as const;
+
 export default function LlmAiInfraSeries() {
   const articles = llmInfraArticles(getAllArticles());
   const word = seriesChapterWord(articles.length);
@@ -17,6 +56,10 @@ export default function LlmAiInfraSeries() {
   return (
     <div className="site-shell page-bottom">
       <header className="page-heading">
+        <p className="eyebrow">
+          <span className="eyebrow-dot" />
+          Research monograph · {articles.length} chapters · {totalPapers} arXiv papers
+        </p>
         <h1>
           Models,
           <br />
@@ -28,6 +71,7 @@ export default function LlmAiInfraSeries() {
           verifications. {totalPapers} arXiv papers synthesized.
         </p>
       </header>
+
       <section className="series-intro" aria-label="How to read this series">
         <div>
           <p className="eyebrow">First-principles methodology</p>
@@ -49,45 +93,112 @@ export default function LlmAiInfraSeries() {
           </Link>
         </div>
       </section>
-      <ol className="series-chapters">
-        {articles.map((a) => (
-          <li key={a.slug}>
-            <span className="chapter-number" aria-hidden="true">
-              {String(a.seriesOrder).padStart(2, "0")}
-            </span>
-            <div>
-              <p className="eyebrow">
-                {a.category} · {a.readingTime}
-                {a.papers && a.papers.length > 0 && ` · ${a.papers.length} papers`}
-              </p>
-              <h2>
-                <Link href={`/articles/${a.slug}`}>{a.title}</Link>
-              </h2>
-              <p>{a.excerpt}</p>
-              {a.papers && a.papers.length > 0 && (
-                <div className="tags">
-                  {a.papers.map((p) => (
-                    <a
-                      key={p.arxiv}
-                      className="tag paper-chip"
-                      href={`https://arxiv.org/abs/${p.arxiv}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {p.tag || p.title} ({p.year}) ↗
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-            {a.labPath && (
-              <Link className="text-link series-chapter-lab" href={`/${a.labPath}`}>
-                Companion lab ↗
-              </Link>
-            )}
-          </li>
+
+      <nav className="monograph-part-nav" aria-label="Monograph parts">
+        {MONOGRAPH_PARTS.map((part) => (
+          <a key={part.id} className="monograph-part-pill" href={`#${part.id}`}>
+            <span className="monograph-part-roman">{part.roman}</span>
+            <span>{part.title}</span>
+          </a>
         ))}
-      </ol>
+      </nav>
+
+      <div className="monograph-parts">
+        {MONOGRAPH_PARTS.map((part) => {
+          const partChapters = articles.filter((a) =>
+            part.orders.includes((a.seriesOrder ?? 0) as never)
+          );
+          if (partChapters.length === 0) return null;
+          return (
+            <section
+              key={part.id}
+              id={part.id}
+              className="monograph-part"
+              aria-labelledby={`${part.id}-heading`}
+            >
+              <header className="monograph-part-header">
+                <p className="monograph-part-kicker">{part.roman}</p>
+                <div className="monograph-part-title-group">
+                  <h2 id={`${part.id}-heading`}>{part.title}</h2>
+                  <p>{part.thesis}</p>
+                </div>
+              </header>
+
+              <ol className="series-chapters">
+                {partChapters.map((a) => {
+                  const order = a.seriesOrder ?? 0;
+                  const figSrc = CHAPTER_FIGURES[order];
+                  const papers = a.papers ?? [];
+                  const shownPapers = papers.slice(0, 3);
+                  const hiddenCount = Math.max(0, papers.length - shownPapers.length);
+                  return (
+                    <li key={a.slug} className="series-chapter-card">
+                      <span className="chapter-number" aria-hidden="true">
+                        {String(order).padStart(2, "0")}
+                      </span>
+                      <div className="series-chapter-main">
+                        <p className="eyebrow">
+                          {a.category} · {a.readingTime}
+                          {papers.length > 0 && ` · ${papers.length} primary arXiv papers`}
+                        </p>
+                        <h3>
+                          <Link href={`/articles/${a.slug}`}>{a.title}</Link>
+                        </h3>
+                        <p>{a.excerpt}</p>
+                        {papers.length > 0 && (
+                          <div className="tags series-paper-row">
+                            {shownPapers.map((p) => (
+                              <a
+                                key={p.arxiv}
+                                className="tag paper-chip"
+                                href={`https://arxiv.org/abs/${p.arxiv}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                              >
+                                {p.tag || p.title} ({p.year}) ↗
+                              </a>
+                            ))}
+                            {hiddenCount > 0 && (
+                              <Link
+                                className="tag paper-chip is-more"
+                                href={`/articles/${a.slug}#references`}
+                              >
+                                +{hiddenCount} more in chapter
+                              </Link>
+                            )}
+                          </div>
+                        )}
+                        <div className="series-chapter-actions">
+                          <Link className="text-link" href={`/articles/${a.slug}`}>
+                            Read chapter →
+                          </Link>
+                          {a.labPath && (
+                            <Link className="text-link" href={`/${a.labPath}`}>
+                              Companion lab ↗
+                            </Link>
+                          )}
+                        </div>
+                      </div>
+                      {figSrc && (
+                        <Link
+                          href={`/articles/${a.slug}#fig-1`}
+                          className="series-fig-thumb"
+                          aria-hidden="true"
+                          tabIndex={-1}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={figSrc} alt="" loading="lazy" />
+                        </Link>
+                      )}
+                    </li>
+                  );
+                })}
+              </ol>
+            </section>
+          );
+        })}
+      </div>
+
       <div className="inline-links">
         <Link className="text-link" href="/series/reliable-model-systems">
           Companion series: Engineering Reliable Model Systems ↗

@@ -16,7 +16,13 @@ import {
 
 const QUICK_TOPICS = ["RoPE", "FlashAttention", "MLA", "GRPO", "ZeRO", "KV cache", "Go", "asyncio"];
 
-export default function ArticlesClient({ articles }: { articles: ArticleSummary[] }) {
+export default function ArticlesClient({
+  articles,
+  labCount = 12,
+}: {
+  articles: ArticleSummary[];
+  labCount?: number;
+}) {
   const [search, setSearch] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -57,7 +63,9 @@ export default function ArticlesClient({ articles }: { articles: ArticleSummary[
     ),
   ];
   const chapters = modelSystemsArticles(articles).length;
-  const infraChapters = llmInfraArticles(articles).length;
+  const infraList = llmInfraArticles(articles);
+  const infraChapters = infraList.length;
+  const infraPapers = infraList.reduce((sum, a) => sum + (a.papers?.length ?? 0), 0);
 
   /*
    * Filters stay controlled instead of remounting with `key={search}`: a
@@ -124,6 +132,10 @@ export default function ArticlesClient({ articles }: { articles: ArticleSummary[
   return (
     <div className="site-shell page-bottom">
       <header className="page-heading">
+        <p className="eyebrow">
+          <span className="eyebrow-dot" />
+          Archive · {articles.length} essays and research notes
+        </p>
         <h1>Writing.</h1>
         <div>
           <p>
@@ -132,7 +144,7 @@ export default function ArticlesClient({ articles }: { articles: ArticleSummary[
           </p>
           <p className="writing-labs-callout">
             <Link className="text-link" href="/labs">
-              Browse all 9 Companion CPU Labs ↗
+              Browse all {labCount} Companion CPU Labs ↗
             </Link>
           </p>
         </div>
@@ -140,17 +152,18 @@ export default function ArticlesClient({ articles }: { articles: ArticleSummary[
       <div className="series-showcase" aria-label="Guided reading tracks">
         <Link className="series-track-card" href={LLM_INFRA_SERIES.path}>
           <span className="series-track-kind">
-            Research monograph, {seriesChapterWord(infraChapters)} parts
+            Research monograph · {seriesChapterWord(infraChapters)} chapters
           </span>
           <strong>{LLM_INFRA_SERIES.title}</strong>
           <span>
-            30 foundational arXiv papers synthesized with LaTeX proofs, Roofline ledgers, and
-            PyTorch CPU verifications ↗
+            {infraPapers > 0
+              ? `${infraPapers} foundational and frontier arXiv papers synthesized with LaTeX proofs, Roofline ledgers, and PyTorch CPU verifications ↗`
+              : "Foundational and frontier arXiv papers synthesized with LaTeX proofs, Roofline ledgers, and PyTorch CPU verifications ↗"}
           </span>
         </Link>
         <Link className="series-track-card" href={MODEL_SYSTEMS_SERIES.path}>
           <span className="series-track-kind">
-            Engineering track, {seriesChapterWord(chapters)} parts
+            Engineering series · {seriesChapterWord(chapters)} chapters
           </span>
           <strong>{MODEL_SYSTEMS_SERIES.title}</strong>
           <span>

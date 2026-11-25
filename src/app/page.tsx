@@ -1,11 +1,13 @@
 import Link from "next/link";
 import { Hero } from "@/components/ui/Hero";
-import { ProjectList } from "@/components/ui/ProjectList";
 import { FeaturedArticle, ArticleRow } from "@/components/ui/ArticleCard";
+import { MonographRoom } from "@/components/home/MonographRoom";
 import { projects } from "@/config/data";
 import { siteConfig } from "@/config/site";
 import { getAllArticles } from "@/lib/markdown";
 import { modelSystemsArticles, llmInfraArticles, LLM_INFRA_SERIES } from "@/lib/series";
+import { getLabsManifest } from "@/lib/labs";
+
 export default function Home() {
   const articles = getAllArticles();
   const featured = articles.filter((article) => article.featured).slice(0, 3);
@@ -13,11 +15,13 @@ export default function Home() {
   const infraArticlesList = llmInfraArticles(articles);
   const infraChapterCount = infraArticlesList.length;
   const infraPaperCount = infraArticlesList.reduce((sum, a) => sum + (a.papers?.length ?? 0), 0);
-  /*
-   * Recent notes skips the featured trio above it: the homepage otherwise
-   * repeated the same titles and excerpts verbatim in two sections.
-   */
-  const recent = articles.filter((article) => !article.featured).slice(0, 5);
+  const labsManifest = getLabsManifest();
+  const recent = articles.filter((article) => !article.featured).slice(0, 6);
+
+  const flagshipProject = projects.find((p) => p.id === "gemini-research") ?? projects[0];
+  const piGoProject = projects.find((p) => p.id === "pi-go") ?? projects[1];
+  const labsProject = projects.find((p) => p.id === "engineering-labs") ?? projects[2];
+
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
@@ -35,92 +39,145 @@ export default function Home() {
       "query-input": "required name=search_term_string",
     },
   };
+
   return (
-    <div className="site-shell">
+    <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd).replace(/</g, "\\u003c") }}
       />
-      <Hero />
-      <section className="section" aria-labelledby="selected-writing">
-        <div className="section-heading">
-          <h2 id="selected-writing">
-            <span className="section-number" aria-hidden="true">01</span>Selected writing
-          </h2>
-          <Link className="text-link" href="/articles">
-            All articles ↗
+
+      {/* Room 1: Cotton-Paper Editorial Hero */}
+      <Hero
+        stats={{
+          chapters: infraChapterCount,
+          papers: infraPaperCount,
+          labs: labsManifest.labs.length,
+          articles: articles.length,
+        }}
+      />
+
+      <div className="site-shell">
+        {/* Room 2: Selected Reading (Tactile Oat Islands) */}
+        <section className="section" aria-labelledby="selected-writing">
+          <div className="section-heading">
+            <div>
+              <span className="section-kicker">Curated essays</span>
+              <h2 id="selected-writing">Selected reading</h2>
+            </div>
+            <Link className="text-link" href="/articles">
+              All {articles.length} articles →
+            </Link>
+          </div>
+          <div className="featured-grid">
+            {featured.map((article) => (
+              <FeaturedArticle key={article.slug} article={article} />
+            ))}
+          </div>
+        </section>
+
+        {/* Room 3: Warm Carbon Monograph Dark Ink Room */}
+        <MonographRoom
+          chapters={infraArticlesList.map((ch) => ({
+            slug: ch.slug,
+            title: ch.title,
+            excerpt: ch.excerpt,
+            readingTime: ch.readingTime ?? "",
+            seriesOrder: ch.seriesOrder ?? 0,
+            paperCount: ch.papers?.length ?? 0,
+            labPath: ch.labPath,
+          }))}
+          totalPapers={infraPaperCount}
+          companionChapterCount={chapterCount}
+        />
+
+        {/* Room 4: Chronological Reading Ledger */}
+        <section className="section" aria-labelledby="latest-writing">
+          <div className="section-heading">
+            <div>
+              <span className="section-kicker">Chronological archive</span>
+              <h2 id="latest-writing">Recent writing</h2>
+            </div>
+            <Link className="text-link" href="/articles">
+              Full archive →
+            </Link>
+          </div>
+          <div>
+            {recent.map((article) => (
+              <ArticleRow key={article.slug} article={article} compact />
+            ))}
+          </div>
+        </section>
+
+        {/* Room 5: Companion Labs & Selected Projects Shelf */}
+        <section className="section" id="work" aria-labelledby="selected-projects">
+          <div className="section-heading">
+            <div>
+              <span className="section-kicker">Executable companions</span>
+              <h2 id="selected-projects">Labs &amp; selected projects</h2>
+            </div>
+            <Link className="text-link" href="/projects">
+              All projects →
+            </Link>
+          </div>
+
+          <div className="companion-shelf">
+            <article className="companion-card">
+              <div>
+                <p className="eyebrow">{flagshipProject.category}</p>
+                <h3>
+                  <Link href={LLM_INFRA_SERIES.path}>{flagshipProject.title}</Link>
+                </h3>
+                <p>{flagshipProject.description}</p>
+              </div>
+              <Link className="text-link" href={`/projects#${flagshipProject.id}`}>
+                Validation dossier →
+              </Link>
+            </article>
+
+            <article className="companion-card">
+              <div>
+                <p className="eyebrow">{piGoProject.category}</p>
+                <h3>
+                  <Link href={`/projects#${piGoProject.id}`}>{piGoProject.title}</Link>
+                </h3>
+                <p>{piGoProject.description}</p>
+              </div>
+              <Link className="text-link" href="/labs/go/agent">
+                Agent loop study →
+              </Link>
+            </article>
+
+            <article className="companion-card">
+              <div>
+                <p className="eyebrow">{labsProject.category}</p>
+                <h3>
+                  <Link href="/labs">{labsManifest.labs.length} Companion CPU Labs</Link>
+                </h3>
+                <p>{labsProject.description}</p>
+              </div>
+              <Link className="text-link" href="/labs">
+                Browse all {labsManifest.labs.length} labs →
+              </Link>
+            </article>
+          </div>
+        </section>
+
+        {/* Quiet Correspondence Strip */}
+        <section className="contact-strip">
+          <div>
+            <p className="eyebrow" style={{ marginBottom: 10 }}>
+              <span className="eyebrow-dot" />
+              Correspondence
+            </p>
+            <h2>Thoughtful questions and careful corrections are always welcome.</h2>
+            <p>Working on backend reliability, model inference, or systems research?</p>
+          </div>
+          <Link className="button primary" href="/contact">
+            Write a note →
           </Link>
-        </div>
-        <div className="featured-grid">
-          {featured.map((article) => (
-            <FeaturedArticle key={article.slug} article={article} />
-          ))}
-        </div>
-      </section>
-      <div className="dual-series-banners">
-        <Link className="series-banner" href={LLM_INFRA_SERIES.path}>
-          <span className="series-banner-kind">
-            Research monograph, {String(infraChapterCount).padStart(2, "0")} chapters,{" "}
-            {infraPaperCount} arXiv papers
-          </span>
-          <span className="series-banner-title">
-            LLM &amp; AI Infra.
-            <br />
-            First principles.
-          </span>
-          <span className="series-banner-copy">
-            From RoPE, FlashAttention-2, and DeepSeek MLA to V4.1 CED, AttnRes, Muon, Looped
-            Transformers, and Block Diffusion LLMs. Derive the math, audit the Roofline ledger, and
-            run the PyTorch tests.
-            <span className="series-banner-action">Read the monograph ↗</span>
-          </span>
-        </Link>
-        <Link className="series-banner series-banner-secondary" href="/series/reliable-model-systems">
-          <span className="series-banner-kind">
-            The guided series, {String(chapterCount).padStart(2, "0")} chapters, runnable CPU labs
-          </span>
-          <span className="series-banner-title">
-            Reliable models.
-            <br />
-            Deliberate systems.
-          </span>
-          <span className="series-banner-copy">
-            From bounded Go workers to a tiny cached decoder. Read the explanations, then test the
-            mechanisms.<span className="series-banner-action">Begin the series ↗</span>
-          </span>
-        </Link>
+        </section>
       </div>
-      <section className="section" id="work" aria-labelledby="selected-projects">
-        <div className="section-heading">
-          <h2 id="selected-projects">
-            <span className="section-number" aria-hidden="true">02</span>From the workbench
-          </h2>
-          <Link className="text-link" href="/projects">
-            Projects ↗
-          </Link>
-        </div>
-        <ProjectList projects={projects} />
-      </section>
-      <section className="section" aria-labelledby="latest-writing">
-        <div className="section-heading">
-          <h2 id="latest-writing">
-            <span className="section-number" aria-hidden="true">03</span>Recent notes
-          </h2>
-          <span className="eyebrow">Always a work in progress</span>
-        </div>
-        {recent.map((article) => (
-          <ArticleRow key={article.slug} article={article} compact />
-        ))}
-      </section>
-      <section className="contact-strip">
-        <div>
-          <h2>Good systems start with a conversation.</h2>
-          <p>Working on backend reliability or model-serving infrastructure?</p>
-        </div>
-        <Link className="button" href="/contact">
-          Get in touch ↗
-        </Link>
-      </section>
-    </div>
+    </>
   );
 }

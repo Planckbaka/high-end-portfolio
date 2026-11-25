@@ -108,6 +108,33 @@ const EXT_TO_LANG = {
   ".yaml": "yaml",
 };
 
+const LAB_SUMMARIES = {
+  "labs/llm/attention":
+    "Numerical verification of scaled dot-product causal attention, shape invariants, and zero-leakage future masking on CPU.",
+  "labs/llm/block-diffusion":
+    "Block-causal masking, confidence-thresholded parallel unmasking, and KV-cached prefix reuse for discrete diffusion LLMs.",
+  "labs/llm/deepseek-mla-grpo":
+    "Low-rank KV latent compression, RoPE key decoupling, weight-matrix absorption, and critic-free GRPO advantage normalization.",
+  "labs/llm/flagship-2026":
+    "Asymmetric compressed-encoder decoding (CED), depth-wise attention residuals (AttnRes), and 5-step Newton-Schulz Muon orthogonalization.",
+  "labs/llm/kv-cache":
+    "Incremental key-value state caching vs. full recomputation, verifying exact floating-point logit parity across decode steps.",
+  "labs/llm/looped-transformer":
+    "Recurrent shared-weight depth iteration, terminal-loop constant KV cache, and adaptive compute halting criteria.",
+  "labs/llm/modern-transformer":
+    "Complex-plane RoPE rotation invariance, SwiGLU gating dynamics, and RMSNorm gradient stability checks in pure PyTorch.",
+  "labs/llm/roofline-flash":
+    "Online Softmax blockwise tiling and HBM/SRAM arithmetic-intensity roofline verification against naive quadratic attention.",
+  "labs/go/agent":
+    "Deterministic tool-use state machine with bounded step budgets, structured error recovery, and context-driven cancellation.",
+  "labs/go/gateway":
+    "Semaphore-bounded admission control, per-request timeout propagation, and graceful server draining tested under Go's race detector.",
+  "labs/python/concurrency":
+    "Structured asyncio.TaskGroup fan-out, semaphore backpressure, and fail-fast cancellation across heterogeneous tool calls.",
+  "labs/python/streaming":
+    "Time-to-first-token (TTFT) and inter-token latency (ITL) quantile telemetry over asynchronous server-sent event streams.",
+};
+
 function parseReadmeHeader(markdown, fallbackName) {
   const lines = markdown.split("\n");
   let title = fallbackName;
@@ -122,12 +149,20 @@ function parseReadmeHeader(markdown, fallbackName) {
   }
   const bodyMd = titleLineIdx >= 0 ? lines.slice(titleLineIdx + 1).join("\n").trim() : markdown;
 
-  // Extract first prose paragraph as summary
+  // Extract first conceptual prose paragraph as summary (skipping CLI setup lines or trailing colons)
   const paragraphs = bodyMd
     .replace(/```[\s\S]*?```/g, "")
     .split(/\n\s*\n/)
     .map((p) => p.trim())
-    .filter((p) => p && !p.startsWith("#") && !p.startsWith("1.") && !p.startsWith("- "));
+    .filter(
+      (p) =>
+        p &&
+        !p.startsWith("#") &&
+        !p.startsWith("1.") &&
+        !p.startsWith("- ") &&
+        !/^Run\s+(from|via|with|this)/i.test(p) &&
+        !p.endsWith(":")
+    );
   const rawSummary = (paragraphs[0] || "")
     .replace(/\*\*([^*]+)\*\*/g, "$1")
     .replace(/`([^`]+)`/g, "$1")
@@ -230,12 +265,13 @@ for (const track of TRACK_ORDER) {
     }
 
     const companionSlugs = companionMap.get(labPath) || [];
+    const curatedSummary = LAB_SUMMARIES[labPath] || summary;
     const summaryRecord = {
       track,
       name,
       labPath,
       title,
-      summary,
+      summary: curatedSummary,
       runCommands,
       fileCount: labFiles.length,
       companionSlugs,
