@@ -22,6 +22,7 @@ export default function ModelSystemsSeries() {
         </p>
         <h1>
           Systems,
+          {" "}
           <br />
           step by step.
         </h1>
@@ -59,9 +60,9 @@ export default function ModelSystemsSeries() {
               <p className="eyebrow">
                 {a.category} · {a.readingTime}
               </p>
-              <h3>
+              <h2>
                 <Link href={`/articles/${a.slug}`}>{a.title}</Link>
-              </h3>
+              </h2>
               <p>{a.excerpt}</p>
               <div className="series-chapter-actions">
                 <Link className="text-link" href={`/articles/${a.slug}`}>

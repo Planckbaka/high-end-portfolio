@@ -29,13 +29,14 @@ export default function About() {
               alt=""
               width={760}
               height={567}
-              loading="lazy"
+              priority
               className="about-plate-img"
             />
           </div>
           <span className="eyebrow">A working principle</span>
           <p>
             Make the question concrete.
+            {" "}
             <br />
             Make the answer testable.
           </p>

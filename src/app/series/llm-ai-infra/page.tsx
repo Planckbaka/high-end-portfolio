@@ -62,6 +62,7 @@ export default function LlmAiInfraSeries() {
         </p>
         <h1>
           Models,
+          {" "}
           <br />
           hardware, &amp; proofs.
         </h1>

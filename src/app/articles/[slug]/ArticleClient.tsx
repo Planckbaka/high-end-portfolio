@@ -21,6 +21,11 @@ function formatBibtex(article: Article): string {
 }`;
 }
 
+/** "FlashAttention-2" must never break after the hyphen; use U+2011 NON-BREAKING HYPHEN. */
+function keepHyphenated(title: string): string {
+  return title.replace(/([A-Za-z])-(\d)/g, "$1\u2011$2");
+}
+
 // Kept under its historical filename; the article body is a Server Component.
 export default function ArticleClient({
   article,
@@ -85,7 +90,7 @@ export default function ArticleClient({
 
       <header className="article-heading paper-header">
         <p className="paper-category">{article.category}</p>
-        <h1 className="paper-title">{article.title}</h1>
+        <h1 className="paper-title">{keepHyphenated(article.title)}</h1>
         <div className="article-meta paper-meta-row">
           <span className="author-name">{siteConfig.author.name}</span>
           <time className="paper-meta-item" dateTime={article.date}>

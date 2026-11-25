@@ -81,9 +81,9 @@ export function Navbar() {
       >
         <div className="nav-dialog-shell">
           <div className="nav-dialog-topbar">
-            <h1 id="nav-dialog-heading" className="nav-dialog-title">
+            <h2 id="nav-dialog-heading" className="nav-dialog-title">
               Index
-            </h1>
+            </h2>
             <button type="button" className="nav-dialog-close" onClick={closeMenu} autoFocus>
               Close
             </button>

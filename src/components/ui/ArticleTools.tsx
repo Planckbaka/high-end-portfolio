@@ -126,6 +126,14 @@ export function TableOfContents({ toc = [] }: { toc: Article["toc"] }) {
 export function CodeCopyEnhancement() {
   useEffect(() => {
     const cleanups: (() => void)[] = [];
+    // Horizontally scrollable equations must be reachable by keyboard.
+    document.querySelectorAll<HTMLElement>(".math-display").forEach((node, i) => {
+      if (node.scrollWidth > node.clientWidth) {
+        node.tabIndex = 0;
+        node.setAttribute("role", "region");
+        node.setAttribute("aria-label", `Equation ${i + 1}, scrollable`);
+      }
+    });
     document.querySelectorAll<HTMLElement>(".code-block").forEach((block) => {
       const toolbar = block.querySelector(".code-toolbar");
       const code = block.querySelector("pre code");

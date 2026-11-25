@@ -1,6 +1,5 @@
 "use client";
 import { useRef, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { contactSchema } from "@/lib/contact-schema";
@@ -186,9 +185,9 @@ export default function ContactClient() {
                 onChange={(event) => (honeypot.current = event.target.value)}
               />
             </div>
-            <Button type="submit" disabled={pending}>
+            <button type="submit" className="button primary" disabled={pending}>
               {pending ? "Sending…" : "Send message ↗"}
-            </Button>
+            </button>
           </form>
           <p className="status-message" role="status" aria-live="polite">
             {status}

@@ -18,6 +18,7 @@ export default function Projects() {
         </p>
         <h1>
           Built to be
+          {" "}
           <br />
           understood.
         </h1>

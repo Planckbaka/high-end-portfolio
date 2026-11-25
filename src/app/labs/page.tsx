@@ -57,6 +57,7 @@ export default function LabsIndexPage() {
         </p>
         <h1>
           Engineering
+          {" "}
           <br />
           labs.
         </h1>

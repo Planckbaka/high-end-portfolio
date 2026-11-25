@@ -18,6 +18,7 @@ const eslintConfig = defineConfig([
     "coverage/**",
     "labs/.venv/**",
     ".omc/**",
+    ".claude/**",
   ]),
 ]);
 
