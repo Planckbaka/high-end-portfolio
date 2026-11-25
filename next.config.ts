@@ -2,6 +2,9 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
+  experimental: {
+    agentUpgrade: "security",
+  },
 
   /*
    * Images ship byte-identical to public/ (Workers assets have no on-the-fly
