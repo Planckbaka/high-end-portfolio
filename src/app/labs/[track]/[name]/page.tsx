@@ -4,7 +4,9 @@ import { getAllLabs, getLabDetail, getLabSummary } from "@/lib/labs";
 import { getAllArticles } from "@/lib/markdown";
 import { pageMetadata } from "@/lib/page-metadata";
 import { CodeCopyEnhancement } from "@/components/ui/ArticleTools";
-import type { LabFile } from "@/types";
+import { siteConfig } from "@/config/site";
+import { breadcrumbJsonLd, personEntity, serializeJsonLd } from "@/lib/seo";
+import { LabFileStack } from "./LabFileStack";
 
 export const dynamic = "force-static";
 export const revalidate = false;
@@ -24,7 +26,11 @@ export async function generateMetadata({
   const { track, name } = await params;
   const lab = getLabSummary(track, name);
   if (!lab) {
-    return { title: "Lab Not Found" };
+    return {
+      title: "Lab Not Found",
+      alternates: {},
+      robots: { index: false, follow: false },
+    };
   }
   return pageMetadata(
     `${lab.title} — Lab`,
@@ -32,12 +38,6 @@ export async function generateMetadata({
     `/${lab.labPath}`
   );
 }
-
-const KIND_BADGE: Record<LabFile["kind"], string> = {
-  impl: "Implementation",
-  test: "Verification Suite",
-  result: "Recorded Output",
-};
 
 export default async function LabDetailPage({
   params,
@@ -55,25 +55,63 @@ export default async function LabDetailPage({
     .map((slug) => articlesBySlug.get(slug))
     .filter((a): a is NonNullable<typeof a> => Boolean(a));
   const runSnippet = lab.runCommands.join("\n");
+  const labUrl = `${siteConfig.url}/${lab.labPath}`;
+  const softwareLd = {
+    "@context": "https://schema.org",
+    "@type": "SoftwareSourceCode",
+    name: lab.title,
+    description: lab.summary || `Reproducible ${track.toUpperCase()} implementation and verification suite.`,
+    url: labUrl,
+    programmingLanguage: track === "go" ? "Go" : "Python",
+    codeRepository: siteConfig.author.github,
+    author: personEntity(),
+    ...(companions.length > 0
+      ? {
+          isPartOf: companions.map((a) => ({
+            "@type": "BlogPosting",
+            headline: a.title,
+            url: `${siteConfig.url}/articles/${a.slug}`,
+          })),
+        }
+      : {}),
+  };
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: "Home", url: siteConfig.url },
+    { name: "Engineering Labs", url: `${siteConfig.url}/labs` },
+    { name: lab.title, url: labUrl },
+  ]);
 
   return (
     <div className="site-shell paper-shell page-bottom">
-      <div className="paper-topbar" role="region" aria-label="Lab utilities">
-        <div className="paper-topbar-left">
-          <Link className="btn-pill back-link" href="/labs">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(softwareLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }}
+      />
+      <nav className="paper-breadcrumb-bar" aria-label="Lab navigation and utilities">
+        <div className="paper-breadcrumb-left">
+          <Link className="paper-crumb back-link" href="/labs">
             ← All Labs
           </Link>
           {companions[0] && (
-            <Link className="btn-pill" href={`/articles/${companions[0].slug}`}>
-              Companion Article ↗
-            </Link>
+            <>
+              <span className="paper-crumb-sep" aria-hidden="true">
+                /
+              </span>
+              <Link className="paper-crumb" href={`/articles/${companions[0].slug}`}>
+                Companion Article →
+              </Link>
+            </>
           )}
         </div>
-        <div className="paper-topbar-actions">
+        <div className="paper-breadcrumb-actions">
           {runSnippet && (
             <button
               type="button"
-              className="btn-pill"
+              className="paper-util-btn"
               data-copy-text={runSnippet}
               data-copied-label="Copied command!"
               aria-label="Copy lab run commands"
@@ -81,11 +119,11 @@ export default async function LabDetailPage({
               Copy Run Command
             </button>
           )}
-          <a className="btn-pill" href="/labs/engineering-labs.zip" download>
+          <a className="paper-util-link" href="/labs/engineering-labs.zip" download>
             Download All (.zip) ↓
           </a>
         </div>
-      </div>
+      </nav>
 
       <header className="article-heading paper-header">
         <p className="paper-category">
@@ -109,7 +147,7 @@ export default async function LabDetailPage({
               {companions.map((article) => (
                 <div key={article.slug} className="lab-companion-item">
                   <Link className="text-link" href={`/articles/${article.slug}`}>
-                    {article.title} ↗
+                    {article.title} →
                   </Link>
                   <p>{article.excerpt}</p>
                 </div>
@@ -120,48 +158,7 @@ export default async function LabDetailPage({
 
         <div className="prose lab-readme-prose" dangerouslySetInnerHTML={{ __html: lab.readmeHtml }} />
 
-        <section className="lab-files-section" aria-labelledby="lab-source-files">
-          <div className="lab-files-header">
-            <h2 id="lab-source-files" className="paper-sec-heading">
-              Source &amp; Verification Files
-            </h2>
-            <span className="eyebrow">
-              Primary implementation expanded · Click any file header to toggle
-            </span>
-          </div>
-
-          <div className="lab-file-stack">
-            {lab.files.map((file) => (
-              <details
-                key={file.relativePath}
-                className="lab-file-panel"
-                open={file.defaultOpen ? true : undefined}
-              >
-                <summary className="lab-file-summary">
-                  <div className="lab-file-summary-left">
-                    <span className="lab-file-kind" data-kind={file.kind}>
-                      {KIND_BADGE[file.kind]}
-                    </span>
-                    <code className="lab-file-name">{file.name}</code>
-                  </div>
-                  <div className="lab-file-summary-right">
-                    <span className="lab-file-lines">{file.lineCount} lines</span>
-                    <span className="lab-file-toggle-hint" aria-hidden="true" />
-                  </div>
-                </summary>
-                <div className="lab-file-content">
-                  <div className="lab-file-subbar">
-                    <span>/{file.relativePath}</span>
-                    <a className="text-link" href={`/${file.relativePath}`} download={file.name}>
-                      Raw file ↓
-                    </a>
-                  </div>
-                  <div dangerouslySetInnerHTML={{ __html: file.html }} />
-                </div>
-              </details>
-            ))}
-          </div>
-        </section>
+        <LabFileStack files={lab.files} />
       </div>
 
       <CodeCopyEnhancement key={lab.labPath} />

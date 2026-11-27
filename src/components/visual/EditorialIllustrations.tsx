@@ -1,20 +1,20 @@
 import Image from "next/image";
 
-export function HeroTopologyPlate({ paused = false }: { paused?: boolean }) {
-  const ticks = Array.from({ length: 36 }, (_, idx) => {
-    const angle = (idx * 10 * Math.PI) / 180;
-    const isMajor = idx % 3 === 0;
-    const r1 = isMajor ? 182 : 186;
-    const r2 = 192;
-    return {
-      x1: (210 + r1 * Math.cos(angle)).toFixed(1),
-      y1: (190 + r1 * Math.sin(angle)).toFixed(1),
-      x2: (210 + r2 * Math.cos(angle)).toFixed(1),
-      y2: (190 + r2 * Math.sin(angle)).toFixed(1),
-      isMajor,
-    };
-  });
+const HERO_TICKS = Array.from({ length: 36 }, (_, idx) => {
+  const angle = (idx * 10 * Math.PI) / 180;
+  const isMajor = idx % 3 === 0;
+  const r1 = isMajor ? 182 : 186;
+  const r2 = 192;
+  return {
+    x1: (210 + r1 * Math.cos(angle)).toFixed(1),
+    y1: (190 + r1 * Math.sin(angle)).toFixed(1),
+    x2: (210 + r2 * Math.cos(angle)).toFixed(1),
+    y2: (190 + r2 * Math.sin(angle)).toFixed(1),
+    isMajor,
+  };
+});
 
+export function HeroTopologyPlate({ paused = false }: { paused?: boolean }) {
   return (
     <div className="salon-art-stage">
       <Image
@@ -42,7 +42,7 @@ export function HeroTopologyPlate({ paused = false }: { paused?: boolean }) {
             strokeDasharray="2 5"
             opacity="0.45"
           />
-          {ticks.map((t, i) => (
+          {HERO_TICKS.map((t, i) => (
             <line
               key={i}
               x1={t.x1}

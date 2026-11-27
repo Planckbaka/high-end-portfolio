@@ -31,7 +31,7 @@ export function middleware(request: NextRequest) {
     // tighten and switch to enforcement mode later.
     response.headers.set(
         "Content-Security-Policy-Report-Only",
-        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self' https://api.resend.com; frame-ancestors 'none';"
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self'; connect-src 'self'; frame-ancestors 'none';"
     );
 
     return response;

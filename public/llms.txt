@@ -1,0 +1,38 @@
+# Akiwayne | Backend & AI Engineering
+
+> Notes on Go backends, Python engineering, and model inference. Implementations, reproducible experiments, and the decisions behind them.
+
+## Core Pages
+- [Home](https://high-end-portfolio.1229773363.workers.dev/): Overview, selected writing, and research monographs
+- [Writing Archive](https://high-end-portfolio.1229773363.workers.dev/articles): All 27 technical essays and notes
+- [Engineering Labs](https://high-end-portfolio.1229773363.workers.dev/labs): 12 reproducible CPU labs in Go, Python, and PyTorch
+- [Projects](https://high-end-portfolio.1229773363.workers.dev/projects): Selected systems and validation dossiers
+- [About](https://high-end-portfolio.1229773363.workers.dev/about): Background and engineering methodology
+- [RSS Feed](https://high-end-portfolio.1229773363.workers.dev/feed.xml): Full-text RSS with MathML
+- [Sitemap](https://high-end-portfolio.1229773363.workers.dev/sitemap.xml): XML sitemap
+
+## Monograph: LLM & AI Infrastructure
+- [Series Index](https://high-end-portfolio.1229773363.workers.dev/series/llm-ai-infra)
+
+## Series: Engineering Reliable Model Systems
+- [Series Index](https://high-end-portfolio.1229773363.workers.dev/series/reliable-model-systems)
+- [Bounded Concurrency in Go: Admission Control, Cancellation, and Shutdown](https://high-end-portfolio.1229773363.workers.dev/articles/go-bounded-concurrency): A small admission gate makes overload and shutdown explicit. Follow the lifecycle from acquiring a slot to proving that every worker has finished.
+- [Inside a Go Agent Loop: Tool Calls, State Transitions, and Failure Recovery](https://high-end-portfolio.1229773363.workers.dev/articles/go-agent-loop): An agent is a state machine around unreliable boundaries. Build a deterministic loop that makes tool identity, errors, cancellation, and termination inspectable.
+- [Structured Concurrency for Model Workloads in Python](https://high-end-portfolio.1229773363.workers.dev/articles/python-structured-concurrency): Bound the queue and the number of tasks, preserve result identity, and make failures cancel the work they own. A standard-library asyncio lab.
+- [Measuring Streaming Systems Without Fooling Yourself](https://high-end-portfolio.1229773363.workers.dev/articles/python-streaming-measurement): Separate first-event latency, inter-event gaps, completion time, and failures. Build a small measurement tool whose arithmetic can be checked against known timelines.
+- [Causal Attention from First Principles: Shapes, Masks, and Numerical Checks](https://high-end-portfolio.1229773363.workers.dev/articles/causal-attention): Implement causal attention on CPU, trace every tensor dimension, and test outputs and gradients against PyTorch before reasoning about performance.
+- [KV Cache Explained Through a Tiny Decoder](https://high-end-portfolio.1229773363.workers.dev/articles/kv-cache-tiny-decoder): Compare full-prefix and incremental decoding in the same CPU model. Verify positions, logits, cache growth, and measurement boundaries before claiming a speedup.
+
+## Standalone Essays
+- [Dependency Injection in Go: Reading Wire and Owning Initialization](https://high-end-portfolio.1229773363.workers.dev/articles/go-wire-for-dev): Wire can explain an existing initialization graph, but its archived status changes the decision for new projects. Start with constructors, cleanup, and explicit ownership.
+- [Transactions and Isolation: Reading DDIA Through Failure Cases](https://high-end-portfolio.1229773363.workers.dev/articles/transaction-in-DDIA): Separate atomicity, durability, and isolation, then use concrete concurrent schedules to understand what a transaction does—and what it does not guarantee.
+- [Ten Go Design Patterns, Judged by Their Tradeoffs](https://high-end-portfolio.1229773363.workers.dev/articles/10-design-patterns-in-go): Constructors, small interfaces, options, adapters, and other patterns are useful when they clarify ownership and failure—not when they make a service look more sophisticated.
+- [Gin Request Lifecycles: Middleware, Cancellation, and Boundaries](https://high-end-portfolio.1229773363.workers.dev/articles/the-go-webframe-work): Trace a request through Gin before optimizing the router. Middleware order, abort behavior, validation, and downstream context propagation determine correctness.
+- [Kafka Internals: Logs, Replication, and the Boundary of Durability](https://high-end-portfolio.1229773363.workers.dev/articles/the-understand-of-kafka): Understand partitions, offsets, replication, and acknowledgments before treating a Kafka cluster as an unlimited durable queue.
+- [Interfaces for Uncertain Work: Progress, Evidence, and Recovery](https://high-end-portfolio.1229773363.workers.dev/articles/future-of-digital-interfaces): AI interfaces need to distinguish activity from success. Make provisional output, cancellation, failures, and supporting evidence understandable to the person using the system.
+- [Motion for Technical Interfaces: Animate State, Preserve Reading](https://high-end-portfolio.1229773363.workers.dev/articles/mastering-framer-motion): Use animation to explain an interface transition while keeping content readable, keyboard behavior predictable, and reduced-motion preferences respected.
+- [Microservice Boundaries: Optimize for Change and Failure](https://high-end-portfolio.1229773363.workers.dev/articles/art-of-microservices): A service boundary adds a network and an ownership contract. Use it where independent change earns the cost of partial failure, observability, and recovery.
+- [Redis Beyond Caching: Streams, Idempotency, and Atomic Decisions](https://high-end-portfolio.1229773363.workers.dev/articles/redis-beyond-caching): Redis offers useful coordination primitives, but message acknowledgment, atomic commands, and persistence each solve a different part of the application problem.
+- [Kubernetes for Backend Developers: Readiness, Resources, and Shutdown](https://high-end-portfolio.1229773363.workers.dev/articles/kubernetes-for-developers): A Deployment can restart a process without making its service correct. Connect probes, resource settings, and termination to the application lifecycle.
+- [Event-Driven Architecture with Kafka: Make Recovery Part of the Protocol](https://high-end-portfolio.1229773363.workers.dev/articles/event-driven-architecture-kafka): An event bus does not make a workflow reliable by itself. Trace the database write, event publication, consumer side effect, and offset commit as separate boundaries.
+- [Linux System Programming in Go: Own the Process Lifecycle](https://high-end-portfolio.1229773363.workers.dev/articles/linux-system-programming-go): File descriptors, subprocesses, signals, and cancellation cross the boundary between Go and the operating system. Trace their ownership before building a supervisor.

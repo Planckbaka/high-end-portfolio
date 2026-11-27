@@ -68,20 +68,23 @@ export function ArticleRow({
   article,
   compact = false,
   match,
+  headingLevel = "h2",
 }: {
   article: ArticleSummary;
   compact?: boolean;
   match?: ArticleSearchMatch;
+  headingLevel?: "h2" | "h3";
 }) {
+  const Heading = headingLevel;
   return (
     <article className={`article-row${compact ? " is-compact" : ""}`}>
       <time className="row-date" dateTime={article.date}>
         {formatDate(article.date)}
       </time>
       <div>
-        <h2>
+        <Heading>
           <Link href={`/articles/${article.slug}`}>{article.title}</Link>
-        </h2>
+        </Heading>
         {!compact && <p>{article.excerpt}</p>}
         <ArticleMeta article={article} shortSeries={compact} />
         {match && (match.matchedSections.length > 0 || match.matchedPapers.length > 0) && (

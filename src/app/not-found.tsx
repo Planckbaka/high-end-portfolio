@@ -2,7 +2,9 @@ import Link from "next/link";
 import { ArticleRow } from "@/components/ui/ArticleCard";
 import { getAllArticles } from "@/lib/markdown";
 export const metadata = {
+  title: "Page Not Found",
   // The root layout's canonical "/" would otherwise leak onto every 404.
+  alternates: {},
   robots: { index: false, follow: false },
 };
 export default function NotFound() {
@@ -23,7 +25,7 @@ export default function NotFound() {
           <p>The address may be incorrect. There is still plenty to explore.</p>
           <div className="inline-links">
             <Link className="button primary" href="/articles">
-              Browse the writing ↗
+              Browse the writing →
             </Link>
             <Link className="text-link" href="/">
               Back home
@@ -35,7 +37,7 @@ export default function NotFound() {
         <div className="section-heading">
           <h2 id="not-found-notes">Recent notes</h2>
           <Link className="text-link" href="/articles">
-            All articles ↗
+            All articles →
           </Link>
         </div>
         {recent.map((article) => (

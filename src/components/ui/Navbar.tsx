@@ -2,19 +2,17 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef } from "react";
 import { ThemeToggle } from "./ThemeToggle";
 import { directoryItems, socialLinks } from "@/config/data";
 
 export function Navbar() {
   const pathname = usePathname() || "/";
   const dialogRef = useRef<HTMLDialogElement>(null);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   const openMenu = () => {
     const dialog = dialogRef.current;
     if (!dialog) return;
-    setMenuOpen(true);
     if (typeof dialog.showModal === "function") {
       if (!dialog.open) dialog.showModal();
     } else {
@@ -29,7 +27,6 @@ export function Navbar() {
       dialog.close();
     } else {
       dialog.removeAttribute("open");
-      setMenuOpen(false);
     }
   };
 
@@ -62,8 +59,6 @@ export function Navbar() {
             type="button"
             className="mobile-index-trigger"
             onClick={openMenu}
-            aria-haspopup="dialog"
-            aria-expanded={menuOpen}
             aria-controls="site-nav-dialog"
             aria-label="Open navigation index"
           >
@@ -77,13 +72,16 @@ export function Navbar() {
         ref={dialogRef}
         className="nav-dialog"
         aria-labelledby="nav-dialog-heading"
-        onClose={() => setMenuOpen(false)}
+        {...({ closedby: "any" } as Record<string, string>)}
+        onClick={(e) => {
+          if (e.target === dialogRef.current) closeMenu();
+        }}
       >
         <div className="nav-dialog-shell">
           <div className="nav-dialog-topbar">
-            <h2 id="nav-dialog-heading" className="nav-dialog-title">
+            <h1 id="nav-dialog-heading" className="nav-dialog-title">
               Index
-            </h2>
+            </h1>
             <button type="button" className="nav-dialog-close" onClick={closeMenu} autoFocus>
               Close
             </button>
@@ -106,7 +104,7 @@ export function Navbar() {
 
           <div className="nav-dialog-footer">
             <span>Notes on systems, models, and engineering.</span>
-            <div style={{ display: "flex", gap: 18 }}>
+            <div className="nav-dialog-social">
               {socialLinks
                 .filter((link) => link.url !== "#")
                 .map((link) => (
@@ -116,10 +114,10 @@ export function Navbar() {
                     target="_blank"
                     rel="noopener noreferrer"
                   >
-                    {link.name} ↗
+                    {link.name} ↗<span className="sr-only"> (opens in a new tab)</span>
                   </a>
                 ))}
-              <a href="/feed.xml">RSS ↗</a>
+              <a href="/feed.xml">RSS →</a>
             </div>
           </div>
         </div>

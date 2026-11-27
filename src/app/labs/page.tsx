@@ -3,6 +3,8 @@ import { getLabsManifest } from "@/lib/labs";
 import { getAllArticles } from "@/lib/markdown";
 import { pageMetadata } from "@/lib/page-metadata";
 import { CodeCopyEnhancement } from "@/components/ui/ArticleTools";
+import { siteConfig } from "@/config/site";
+import { breadcrumbJsonLd, collectionPageJsonLd, serializeJsonLd } from "@/lib/seo";
 
 export const dynamic = "force-static";
 export const revalidate = false;
@@ -34,9 +36,31 @@ export default function LabsIndexPage() {
   const manifest = getLabsManifest();
   const articlesBySlug = new Map(getAllArticles().map((a) => [a.slug, a]));
   const tracks: Array<"llm" | "go" | "python"> = ["llm", "go", "python"];
+  const collectionLd = collectionPageJsonLd({
+    name: "Engineering Labs",
+    description: `${manifest.labs.length} reproducible CPU experiments in Go, Python, and PyTorch accompanying the systems and LLM infrastructure monographs.`,
+    path: "/labs",
+    items: manifest.labs.map((lab) => ({
+      name: lab.title,
+      url: `${siteConfig.url}/${lab.labPath}`,
+      description: lab.summary,
+    })),
+  });
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: "Home", url: siteConfig.url },
+    { name: "Engineering Labs", url: `${siteConfig.url}/labs` },
+  ]);
 
   return (
     <div className="site-shell page-bottom">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(collectionLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }}
+      />
       <nav className="paper-breadcrumb-bar" aria-label="Lab archive utilities">
         <div className="paper-breadcrumb-left">
           <Link className="paper-crumb back-link" href="/articles">
@@ -68,6 +92,19 @@ export default function LabsIndexPage() {
         </p>
       </header>
 
+      <nav className="monograph-part-nav" aria-label="Lab tracks">
+        {tracks.map((track) => (
+          <a key={track} className="monograph-part-pill" href={`#track-${track}`}>
+            <span className="monograph-part-roman">{track.toUpperCase()}</span>
+            <span>{TRACK_LABELS[track].title}</span>
+          </a>
+        ))}
+        <a className="monograph-part-pill" href="#reproduction-guide">
+          <span className="monograph-part-roman">ENV</span>
+          <span>Reproduction guide</span>
+        </a>
+      </nav>
+
       {tracks.map((track) => {
         const items = manifest.labs.filter((lab) => lab.track === track);
         const info = TRACK_LABELS[track];
@@ -82,7 +119,7 @@ export default function LabsIndexPage() {
             </div>
             <div className="lab-grid">
               {items.map((lab) => (
-                <article key={lab.labPath} className="lab-card">
+                <article key={lab.labPath} className="lab-card flex flex-col">
                   <div className="lab-card-meta">
                     <span className="eyebrow">/{lab.labPath}</span>
                     <span className="eyebrow">{lab.fileCount} files</span>
@@ -91,19 +128,24 @@ export default function LabsIndexPage() {
                     <Link href={`/${lab.labPath}`}>{lab.title}</Link>
                   </h3>
                   {lab.summary && <p className="lab-card-summary">{lab.summary}</p>}
-                  {lab.companionSlugs.length > 0 && (
-                    <div className="lab-companion-links">
-                      <span className="eyebrow">Companion writing:</span>
-                      {lab.companionSlugs.map((slug) => {
-                        const companion = articlesBySlug.get(slug);
-                        return companion ? (
-                          <Link key={slug} className="text-link" href={`/articles/${slug}`}>
-                            {companion.title} ↗
-                          </Link>
-                        ) : null;
-                      })}
-                    </div>
-                  )}
+                  <div className="lab-companion-links mt-auto pt-3">
+                    <Link className="text-link" href={`/${lab.labPath}`}>
+                      Inspect code &amp; tests →
+                    </Link>
+                    {lab.companionSlugs.length > 0 && (
+                      <>
+                        <span className="eyebrow">Companion writing:</span>
+                        {lab.companionSlugs.map((slug) => {
+                          const companion = articlesBySlug.get(slug);
+                          return companion ? (
+                            <Link key={slug} className="text-link" href={`/articles/${slug}`}>
+                              {companion.title} →
+                            </Link>
+                          ) : null;
+                        })}
+                      </>
+                    )}
+                  </div>
                 </article>
               ))}
             </div>

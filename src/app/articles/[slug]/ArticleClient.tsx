@@ -64,9 +64,16 @@ export default function ArticleClient({
               <Link
                 className="paper-crumb"
                 href={seriesHref}
-                title={`${article.series}, chapter ${String(article.seriesOrder).padStart(2, "0")}`}
+                title={
+                  article.seriesOrder != null
+                    ? `${article.series}, chapter ${String(article.seriesOrder).padStart(2, "0")}`
+                    : article.series
+                }
               >
-                {article.series} · Ch. {String(article.seriesOrder).padStart(2, "0")}
+                {article.series}
+                {article.seriesOrder != null
+                  ? ` · Ch. ${String(article.seriesOrder).padStart(2, "0")}`
+                  : ""}
               </Link>
             </>
           )}
@@ -130,7 +137,7 @@ export default function ArticleClient({
                   <div className="abstract-lab-links">
                     <span className="abstract-meta-label">Artifact:</span>
                     <Link className="text-link" href={`/${article.labPath}`}>
-                      Open Companion Lab (/{article.labPath}) ↗
+                      Open Companion Lab →
                     </Link>
                     <span aria-hidden="true">·</span>
                     <a className="text-link" href="/labs/engineering-labs.zip" download>
@@ -151,7 +158,8 @@ export default function ArticleClient({
                         title={paper.title}
                       >
                         [{paper.tag || `arXiv:${paper.arxiv}`}
-                        {paper.year ? `, ${paper.year}` : ""}] ↗
+                        {paper.year ? `, ${paper.year}` : ""}] ↗{" "}
+                        <span className="sr-only">(opens in a new tab)</span>
                       </a>
                     ))}
                   </div>
@@ -181,7 +189,7 @@ export default function ArticleClient({
                           rel="noopener noreferrer"
                           className="bib-title"
                         >
-                          {paper.title}
+                          {paper.title} <span className="sr-only">(opens in a new tab)</span>
                         </a>
                       </div>
                       <div className="bib-links">
@@ -191,7 +199,8 @@ export default function ArticleClient({
                           rel="noopener noreferrer"
                           className="bib-arxiv-link"
                         >
-                          arXiv:{paper.arxiv} [abs] ↗
+                          arXiv:{paper.arxiv} [abs] ↗{" "}
+                          <span className="sr-only">(opens in a new tab)</span>
                         </a>
                         <span aria-hidden="true">·</span>
                         <a
@@ -200,7 +209,7 @@ export default function ArticleClient({
                           rel="noopener noreferrer"
                           className="bib-arxiv-link"
                         >
-                          PDF ↗
+                          PDF ↗ <span className="sr-only">(opens in a new tab)</span>
                         </a>
                         {paper.firstCiteId && (
                           <>
@@ -237,7 +246,7 @@ export default function ArticleClient({
               <div>
                 {next && (
                   <Link href={`/articles/${next.slug}`}>
-                    <small>Next in the series</small>
+                    <small>Next in the series →</small>
                     {next.title}
                   </Link>
                 )}
@@ -252,7 +261,7 @@ export default function ArticleClient({
                   Related writing
                 </p>
                 <Link className="text-link" href="/articles">
-                  Full archive ↗
+                  Full archive →
                 </Link>
               </div>
               <div className="related-writing-grid">

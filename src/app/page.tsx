@@ -7,6 +7,7 @@ import { siteConfig } from "@/config/site";
 import { getAllArticles } from "@/lib/markdown";
 import { modelSystemsArticles, llmInfraArticles, LLM_INFRA_SERIES } from "@/lib/series";
 import { getLabsManifest } from "@/lib/labs";
+import { PERSON_ID, WEBSITE_ID, serializeJsonLd } from "@/lib/seo";
 
 export default function Home() {
   const articles = getAllArticles();
@@ -25,11 +26,12 @@ export default function Home() {
   const websiteJsonLd = {
     "@context": "https://schema.org",
     "@type": "WebSite",
+    "@id": WEBSITE_ID,
     name: siteConfig.name,
     url: siteConfig.url,
     description: siteConfig.description,
     inLanguage: "en",
-    publisher: { "@type": "Person", name: siteConfig.author.name },
+    publisher: { "@id": PERSON_ID },
     potentialAction: {
       "@type": "SearchAction",
       target: {
@@ -44,7 +46,7 @@ export default function Home() {
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteJsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(websiteJsonLd) }}
       />
 
       {/* Room 1: Cotton-Paper Editorial Hero */}
@@ -104,7 +106,7 @@ export default function Home() {
           </div>
           <div>
             {recent.map((article) => (
-              <ArticleRow key={article.slug} article={article} compact />
+              <ArticleRow key={article.slug} article={article} compact headingLevel="h3" />
             ))}
           </div>
         </section>
@@ -166,7 +168,7 @@ export default function Home() {
         {/* Quiet Correspondence Strip */}
         <section className="contact-strip">
           <div>
-            <p className="eyebrow" style={{ marginBottom: 10 }}>
+            <p className="eyebrow contact-strip-eyebrow">
               <span className="eyebrow-dot" />
               Correspondence
             </p>

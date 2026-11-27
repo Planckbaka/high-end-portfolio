@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getAllArticles } from "@/lib/markdown";
 import { llmInfraArticles, LLM_INFRA_SERIES, seriesChapterWord } from "@/lib/series";
 import { pageMetadata } from "@/lib/page-metadata";
+import { siteConfig } from "@/config/site";
+import { breadcrumbJsonLd, collectionPageJsonLd, serializeJsonLd } from "@/lib/seo";
 
 export const metadata = pageMetadata(
   LLM_INFRA_SERIES.title,
@@ -52,9 +54,49 @@ export default function LlmAiInfraSeries() {
   const articles = llmInfraArticles(getAllArticles());
   const word = seriesChapterWord(articles.length);
   const totalPapers = articles.reduce((sum, a) => sum + (a.papers?.length ?? 0), 0);
+  const collectionLd = collectionPageJsonLd({
+    name: LLM_INFRA_SERIES.title,
+    description:
+      "A nine-part research monograph synthesizing foundational and frontier papers across modern Transformer architectures, Roofline & FlashAttention systems, distributed training, RL reasoning, 2026 flagship CED/Muon co-design, Looped Transformers, and Diffusion LLMs.",
+    path: LLM_INFRA_SERIES.path,
+    items: articles.map((a) => ({
+      name: a.title,
+      url: `${siteConfig.url}/articles/${a.slug}`,
+      description: a.excerpt,
+    })),
+  });
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: "Home", url: siteConfig.url },
+    { name: "Writing", url: `${siteConfig.url}/articles` },
+    { name: LLM_INFRA_SERIES.title, url: `${siteConfig.url}${LLM_INFRA_SERIES.path}` },
+  ]);
 
   return (
     <div className="site-shell page-bottom">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(collectionLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }}
+      />
+      <nav className="paper-breadcrumb-bar" aria-label="Monograph navigation">
+        <div className="paper-breadcrumb-left">
+          <Link className="paper-crumb back-link" href="/articles">
+            ← Writing
+          </Link>
+          <span className="paper-crumb-sep" aria-hidden="true">
+            /
+          </span>
+          <span className="paper-crumb">Research Monograph</span>
+        </div>
+        <div className="paper-breadcrumb-actions">
+          <Link className="paper-util-link" href="/labs">
+            Companion Labs →
+          </Link>
+        </div>
+      </nav>
       <header className="page-heading">
         <p className="eyebrow">
           <span className="eyebrow-dot" />
@@ -90,7 +132,7 @@ export default function LlmAiInfraSeries() {
             RoPE invariance, Online Softmax blockwise tiling, and MLA matrix absorption locally.
           </p>
           <Link className="text-link" href="/labs">
-            Environment and reproduction guide ↗
+            Environment and reproduction guide →
           </Link>
         </div>
       </section>
@@ -107,7 +149,7 @@ export default function LlmAiInfraSeries() {
       <div className="monograph-parts">
         {MONOGRAPH_PARTS.map((part) => {
           const partChapters = articles.filter((a) =>
-            part.orders.includes((a.seriesOrder ?? 0) as never)
+            (part.orders as readonly number[]).includes(a.seriesOrder ?? 0)
           );
           if (partChapters.length === 0) return null;
           return (
@@ -156,7 +198,8 @@ export default function LlmAiInfraSeries() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                               >
-                                {p.tag || p.title} ({p.year}) ↗
+                                {p.tag || p.title} ({p.year}) ↗{" "}
+                                <span className="sr-only">(opens in a new tab)</span>
                               </a>
                             ))}
                             {hiddenCount > 0 && (
@@ -175,7 +218,7 @@ export default function LlmAiInfraSeries() {
                           </Link>
                           {a.labPath && (
                             <Link className="text-link" href={`/${a.labPath}`}>
-                              Companion lab ↗
+                              Companion lab →
                             </Link>
                           )}
                         </div>
@@ -188,7 +231,7 @@ export default function LlmAiInfraSeries() {
                           tabIndex={-1}
                         >
                           {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={figSrc} alt="" loading="lazy" />
+                          <img src={figSrc} alt="" width={320} height={200} loading="lazy" />
                         </Link>
                       )}
                     </li>
@@ -202,13 +245,13 @@ export default function LlmAiInfraSeries() {
 
       <div className="inline-links">
         <Link className="text-link" href="/series/reliable-model-systems">
-          Companion series: Engineering Reliable Model Systems ↗
+          Companion series: Engineering Reliable Model Systems →
         </Link>
         <Link className="text-link" href="/articles">
-          All writing ↗
+          All writing →
         </Link>
         <a className="text-link" href="/feed.xml">
-          Subscribe via RSS ↗
+          Subscribe via RSS →
         </a>
       </div>
     </div>

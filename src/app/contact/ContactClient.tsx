@@ -9,10 +9,26 @@ export default function ContactClient() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [pending, setPending] = useState(false);
   const [status, setStatus] = useState("");
+  const [statusKind, setStatusKind] = useState<"idle" | "error" | "success">("idle");
   const honeypot = useRef("");
   const submitting = useRef(false);
   const attempt = useRef<{ payload: string; key: string } | null>(null);
   const FIELD_ORDER = ["name", "email", "message"] as const;
+  type FieldName = (typeof FIELD_ORDER)[number];
+
+  function validateField(name: FieldName, value: string) {
+    const result = contactSchema.shape[name].safeParse(value);
+    setErrors((previous) => {
+      if (result.success) {
+        if (!previous[name]) return previous;
+        const next = { ...previous };
+        delete next[name];
+        return next;
+      }
+      return { ...previous, [name]: result.error.issues[0]?.message || "Invalid value." };
+    });
+  }
+
   async function submit(event: React.FormEvent) {
     event.preventDefault();
     if (submitting.current) return;
@@ -22,6 +38,7 @@ export default function ContactClient() {
      * never reveal the trap.
      */
     if (honeypot.current) {
+      setStatusKind("success");
       setStatus("Message sent successfully. Thank you for reaching out.");
       return;
     }
@@ -30,6 +47,7 @@ export default function ContactClient() {
       const next: Record<string, string> = {};
       for (const issue of parsed.error.issues) next[String(issue.path[0])] ||= issue.message;
       setErrors(next);
+      setStatusKind("error");
       setStatus("Please check the highlighted fields.");
       const firstInvalid = FIELD_ORDER.find((field) => next[field]);
       if (firstInvalid) document.getElementById(firstInvalid)?.focus();
@@ -38,6 +56,7 @@ export default function ContactClient() {
     setErrors({});
     submitting.current = true;
     setPending(true);
+    setStatusKind("idle");
     setStatus("");
     try {
       const payload = JSON.stringify(parsed.data);
@@ -56,10 +75,12 @@ export default function ContactClient() {
             ? data.error
             : "Your message could not be sent. Please try again."
         );
+      setStatusKind("success");
       setStatus("Message sent successfully. Thank you for reaching out.");
       attempt.current = null;
       setValues({ name: "", email: "", message: "" });
     } catch (error) {
+      setStatusKind("error");
       setStatus(error instanceof Error ? error.message : "Connection failed. Please try again.");
     } finally {
       submitting.current = false;
@@ -97,7 +118,7 @@ export default function ContactClient() {
             {contactDetails.email} ↗
           </a>
           <p>{contactDetails.location}</p>
-          {socialLinks.map((link) => (
+            {socialLinks.map((link) => (
             <a
               className="text-link"
               key={link.name}
@@ -105,7 +126,7 @@ export default function ContactClient() {
               target="_blank"
               rel="noopener noreferrer"
             >
-              {link.name} ↗<span className="sr-only">(opens in a new tab)</span>
+              {link.name} ↗ <span className="sr-only">(opens in a new tab)</span>
             </a>
           ))}
           <p className="text-muted-foreground">
@@ -115,7 +136,8 @@ export default function ContactClient() {
           </p>
         </div>
         <div className="contact-form">
-          <form onSubmit={submit} aria-label="Contact form" aria-busy={pending}>
+          <form onSubmit={submit} noValidate aria-label="Contact form" aria-busy={pending}>
+            <p className="text-xs text-[var(--muted-foreground)]">All fields are required.</p>
             <div className="field">
               <label htmlFor="name">Name</label>
               <Input
@@ -124,10 +146,15 @@ export default function ContactClient() {
                 id="name"
                 name="name"
                 autoComplete="name"
+                enterKeyHint="next"
                 value={values.name}
                 onChange={change}
+                onBlur={(event) => {
+                  if (event.target.value.trim()) validateField("name", event.target.value);
+                }}
                 maxLength={100}
                 required
+                className="border-[var(--border-strong)] dark:border-[#3e3d38]"
               />
               {errors.name && (
                 <p id="name-error" className="text-destructive text-sm">
@@ -143,11 +170,20 @@ export default function ContactClient() {
                 id="email"
                 name="email"
                 type="email"
+                inputMode="email"
                 autoComplete="email"
+                autoCorrect="off"
+                autoCapitalize="none"
+                spellCheck={false}
+                enterKeyHint="next"
                 value={values.email}
                 onChange={change}
+                onBlur={(event) => {
+                  if (event.target.value.trim()) validateField("email", event.target.value);
+                }}
                 maxLength={254}
                 required
+                className="border-[var(--border-strong)] dark:border-[#3e3d38]"
               />
               {errors.email && (
                 <p id="email-error" className="text-destructive text-sm">
@@ -164,9 +200,13 @@ export default function ContactClient() {
                 name="message"
                 value={values.message}
                 onChange={change}
+                onBlur={(event) => {
+                  if (event.target.value.trim()) validateField("message", event.target.value);
+                }}
                 maxLength={5000}
                 required
                 placeholder="What are you working on?"
+                className="border-[var(--border-strong)] dark:border-[#3e3d38]"
               />
               {errors.message && (
                 <p id="message-error" className="text-destructive text-sm">
@@ -186,10 +226,21 @@ export default function ContactClient() {
               />
             </div>
             <button type="submit" className="button primary" disabled={pending}>
-              {pending ? "Sending…" : "Send message ↗"}
+              {pending ? "Sending…" : "Send message →"}
             </button>
           </form>
-          <p className="status-message" role="status" aria-live="polite">
+          <p
+            className={`status-message ${
+              statusKind === "error"
+                ? "text-destructive"
+                : statusKind === "success"
+                  ? "text-[var(--accent)]"
+                  : ""
+            }`}
+            data-state={statusKind}
+            role="status"
+            aria-live="polite"
+          >
             {status}
           </p>
         </div>

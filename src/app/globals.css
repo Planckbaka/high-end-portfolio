@@ -90,15 +90,15 @@
   --code-surface: #1c1b19;
   --code-foreground: #f2f0e8;
 
-  --ink-room-bg: #1c1b18;
-  --ink-room-surface: #252420;
-  --ink-room-hover: #2e2d28;
-  --ink-room-border: #383631;
-  --ink-room-fg: #faf9f5;
-  --ink-room-muted: #b5b3aa;
-  --ink-room-accent: #e0886b;
+  --ink-room-bg: #ece9df;
+  --ink-room-surface: #f6f4ec;
+  --ink-room-hover: #e2ded0;
+  --ink-room-border: #d3cfc1;
+  --ink-room-fg: #141413;
+  --ink-room-muted: #55544f;
+  --ink-room-accent: #b2502f;
 
-  --mount: #f6f4ec;
+  --mount: #e4e0d3;
   --glass-header: #141413;
   --grain-opacity: 0.022;
 }
@@ -142,7 +142,7 @@ body {
   background-color: var(--background);
   color: var(--foreground);
   font-family: var(--font-ui), var(--body-font);
-  font-size: 16.5px;
+  font-size: 1.03125rem;
   line-height: 1.65;
   -webkit-font-smoothing: antialiased;
 }
@@ -206,6 +206,20 @@ a:hover {
 :focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 4px;
+}
+
+.monograph-room :focus-visible {
+  outline-color: var(--ink-room-accent);
+}
+
+.button.primary:focus-visible,
+.button.clay:focus-visible {
+  outline-color: var(--foreground);
+  outline-offset: 3px;
+}
+
+.monograph-room .button.clay:focus-visible {
+  outline-color: var(--ink-room-fg);
 }
 
 h1,
@@ -437,8 +451,8 @@ dialog.nav-dialog::backdrop {
   min-height: 100%;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: 28px;
+  justify-content: flex-start;
+  gap: 20px;
 }
 
 .nav-dialog-topbar {
@@ -452,7 +466,7 @@ dialog.nav-dialog::backdrop {
 .nav-dialog-title {
   margin: 0;
   font-family: var(--font-display), Georgia, serif;
-  font-size: 22px;
+  font-size: 1.375rem;
   font-weight: 400;
 }
 
@@ -468,7 +482,6 @@ dialog.nav-dialog::backdrop {
 
 .nav-dialog-links {
   display: grid;
-  border-top: 1px solid var(--border);
 }
 
 .nav-dialog-link {
@@ -482,7 +495,7 @@ dialog.nav-dialog::backdrop {
 
 .nav-dialog-name {
   font-family: var(--font-display), Georgia, serif;
-  font-size: 28px;
+  font-size: 1.75rem;
   color: var(--foreground);
 }
 
@@ -496,6 +509,7 @@ dialog.nav-dialog::backdrop {
 }
 
 .nav-dialog-footer {
+  margin-top: auto;
   display: flex;
   flex-wrap: wrap;
   justify-content: space-between;
@@ -504,6 +518,11 @@ dialog.nav-dialog::backdrop {
   border-top: 1px solid var(--border);
   font-size: 13px;
   color: var(--muted-foreground);
+}
+
+.nav-dialog-social {
+  display: flex;
+  gap: 18px;
 }
 
 /* ==========================================================================
@@ -638,7 +657,7 @@ dialog.nav-dialog::backdrop {
 .salon-hero-copy h1 {
   margin: 18px 0 24px;
   font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(42px, 5.1vw, 68px);
+  font-size: clamp(2.5rem, 1.5rem + 3.5vw, 4.25rem);
   font-weight: 400;
   line-height: 1.07;
   letter-spacing: -0.028em;
@@ -653,7 +672,7 @@ dialog.nav-dialog::backdrop {
 
 .salon-hero-lead {
   max-width: 510px;
-  font-size: 18.5px;
+  font-size: 1.15625rem;
   line-height: 1.65;
   color: var(--muted-foreground);
   text-wrap: pretty;
@@ -693,7 +712,7 @@ dialog.nav-dialog::backdrop {
   width: 100%;
   aspect-ratio: 1.04 / 1;
   border-radius: 16px;
-  background: var(--mount);
+  background: #f5f3ec;
   border: 1px solid var(--border);
   display: grid;
   place-items: center;
@@ -791,7 +810,7 @@ dialog.nav-dialog::backdrop {
 
 .section-heading h2 {
   margin: 0;
-  font-size: clamp(28px, 3.2vw, 40px);
+  font-size: clamp(1.75rem, 1.2rem + 2vw, 2.5rem);
   font-weight: 400;
 }
 
@@ -846,17 +865,14 @@ dialog.nav-dialog::backdrop {
   aspect-ratio: 4 / 3;
   align-self: start;
   border-radius: 14px;
-  background: var(--mount);
+  background: #f5f3ec;
   border: 1px solid var(--border);
   padding: 10px;
   display: grid;
+  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
   place-items: center;
   overflow: hidden;
   color: var(--foreground);
-}
-
-.article-diagram {
-  grid-template: minmax(0, 1fr) / minmax(0, 1fr);
 }
 
 .discipline-plate-img {
@@ -868,8 +884,19 @@ dialog.nav-dialog::backdrop {
   mix-blend-mode: multiply;
 }
 
+[data-theme="dark"] :is(.salon-art-canvas, .article-diagram, .about-plate-frame) {
+  background: var(--surface-pure);
+}
+
 [data-theme="dark"] :is(.salon-art-canvas, .article-diagram, .about-plate-frame) img {
-  filter: brightness(0.95) sepia(0.03);
+  filter: invert(0.91) hue-rotate(180deg) contrast(0.95);
+  mix-blend-mode: screen;
+}
+
+[data-theme="dark"] .salon-art-overlay-svg {
+  color: var(--foreground);
+  mix-blend-mode: screen;
+  opacity: 0.25;
 }
 
 .featured-card:first-child .article-diagram {
@@ -985,7 +1012,7 @@ dialog.nav-dialog::backdrop {
 
 .monograph-room h2 {
   font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(32px, 3.8vw, 48px);
+  font-size: clamp(2rem, 1.3rem + 2.5vw, 3rem);
   font-weight: 400;
   line-height: 1.1;
   color: var(--ink-room-fg);
@@ -1244,8 +1271,12 @@ dialog.nav-dialog::backdrop {
   padding-block: 76px;
 }
 
+.contact-strip-eyebrow {
+  margin-bottom: 10px;
+}
+
 .contact-strip h2 {
-  font-size: clamp(28px, 3.4vw, 42px);
+  font-size: clamp(1.75rem, 1.2rem + 2.2vw, 2.625rem);
   margin: 0 0 10px;
   max-width: 640px;
 }
@@ -1275,7 +1306,7 @@ dialog.nav-dialog::backdrop {
 
 .footer-signature > span:first-child {
   font-family: var(--font-display), Georgia, serif;
-  font-size: clamp(42px, 6vw, 76px);
+  font-size: clamp(2.5rem, 1.5rem + 4vw, 4.75rem);
   font-weight: 400;
   letter-spacing: -0.035em;
   line-height: 1;
@@ -1337,7 +1368,7 @@ dialog.nav-dialog::backdrop {
 }
 
 .page-heading h1 {
-  font-size: clamp(42px, 5.4vw, 68px);
+  font-size: clamp(2.5rem, 1.5rem + 3.8vw, 4.25rem);
   font-weight: 400;
   line-height: 1.04;
   letter-spacing: -0.028em;
@@ -1909,7 +1940,7 @@ dialog.nav-dialog::backdrop {
   margin-bottom: 22px;
   padding: 10px;
   border-radius: 14px;
-  background: var(--mount);
+  background: #f5f3ec;
   border: 1px solid var(--border);
   overflow: hidden;
 }
@@ -2020,6 +2051,7 @@ dialog.nav-dialog::backdrop {
       height: 2px;
       background: var(--clay);
       z-index: 70;
+      pointer-events: none;
       transform-origin: 0 50%;
       animation: grow-reading-progress auto linear;
       animation-timeline: scroll(root block);
@@ -2109,7 +2141,7 @@ dialog.nav-dialog::backdrop {
 .btn-pill[data-copied="true"] {
   border-color: var(--clay);
   background: var(--clay);
-  color: #faf9f5;
+  color: #141413;
 }
 
 .back-link {
@@ -2136,7 +2168,7 @@ dialog.nav-dialog::backdrop {
 
 .article-heading.paper-header h1.paper-title {
   font-family: var(--font-display), Georgia, "Times New Roman", serif;
-  font-size: clamp(34px, 4.3vw, 52px);
+  font-size: clamp(2.125rem, 1.4rem + 2.5vw, 3.25rem);
   font-weight: 400;
   line-height: 1.12;
   letter-spacing: -0.025em;
@@ -2356,7 +2388,7 @@ dialog.nav-dialog::backdrop {
 
 .prose {
   font-family: var(--font-serif), Georgia, "Times New Roman", serif;
-  font-size: 19px;
+  font-size: 1.1875rem;
   line-height: 1.8;
   max-width: 760px;
   --tw-prose-body: var(--foreground);
@@ -2649,27 +2681,44 @@ dialog.nav-dialog::backdrop {
   color: var(--foreground);
 }
 
-.figure-lightbox {
-  position: fixed;
-  inset: 0;
-  z-index: 120;
-  background: var(--room);
-  backdrop-filter: blur(10px);
+.prose figure.academic-figure img:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+
+dialog.figure-lightbox {
+  margin: auto;
+  padding: 24px;
+  border: 0;
+  background: transparent;
+  color: var(--room-ink);
+  max-width: min(1280px, 96vw);
+  max-height: 94dvh;
+  overflow: visible;
+}
+
+dialog.figure-lightbox[open] {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 32px;
   gap: 16px;
-  cursor: zoom-out;
 }
 
-.figure-lightbox[hidden] {
-  display: none;
+dialog.figure-lightbox:modal {
+  overscroll-behavior: contain;
+}
+
+dialog.figure-lightbox::backdrop {
+  background: var(--room);
+  backdrop-filter: blur(10px);
+  overflow: hidden;
+  overscroll-behavior: contain;
 }
 
 .figure-lightbox-close {
   align-self: flex-end;
+  min-height: 36px;
   padding: 6px 16px;
   border-radius: 999px;
   border: 1px solid var(--room-rule);
@@ -2679,8 +2728,8 @@ dialog.nav-dialog::backdrop {
 }
 
 .figure-lightbox-img {
-  max-width: min(1240px, 94vw);
-  max-height: 78vh;
+  max-width: min(1240px, 92vw);
+  max-height: 76vh;
   width: auto;
   height: auto;
   background: var(--mount);
@@ -2725,9 +2774,6 @@ dialog.nav-dialog::backdrop {
 }
 
 .prose thead {
-  position: sticky;
-  inset-block-start: var(--header-height);
-  z-index: 1;
   background: var(--surface);
   border-top: 1.5px solid var(--foreground);
   border-bottom: 1px solid var(--foreground);
@@ -3253,16 +3299,34 @@ dialog.nav-dialog::backdrop {
   }
 
   .salon-hero {
-    padding-block: 40px 56px;
+    padding-block: 24px 40px;
   }
 
   .salon-hero-grid {
-    gap: 36px;
+    gap: 24px;
+  }
+
+  .salon-hero-copy h1 {
+    margin: 12px 0 14px;
+    font-size: clamp(2rem, 1.5rem + 2.5vw, 2.5rem);
+  }
+
+  .salon-hero-notes {
+    margin-top: 18px;
+    padding-top: 16px;
   }
 
   .salon-art-frame {
-    padding: 18px 18px 14px;
+    padding: 16px 16px 12px;
     border-radius: 18px;
+  }
+
+  .salon-art-canvas {
+    aspect-ratio: 16 / 10;
+  }
+
+  .monograph-preview-stage {
+    min-height: 0;
   }
 
   .section,
@@ -3398,7 +3462,7 @@ dialog.nav-dialog::backdrop {
   }
 
   .prose {
-    font-size: 17.5px;
+    font-size: 1.09375rem;
   }
 
   .prose figure.academic-figure {
@@ -3426,19 +3490,7 @@ dialog.nav-dialog::backdrop {
 /* ==========================================================================
    Award-polish layer: dark-mode craft, hit targets, mobile breadcrumb, motion
    ========================================================================== */
-[data-theme="dark"] {
-  --mount: #e4e0d3;
-  /* The one contrasting room inverts to warm paper so the rhythm survives in dark mode. */
-  --ink-room-bg: #ece9df;
-  --ink-room-surface: #f6f4ec;
-  --ink-room-hover: #e2ded0;
-  --ink-room-border: #d3cfc1;
-  --ink-room-fg: #141413;
-  --ink-room-muted: #55544f;
-  --ink-room-accent: #b2502f;
-}
-
-[data-theme="dark"] :is(.salon-art-canvas, .article-diagram, .about-plate-frame, .series-fig-thumb) img {
+[data-theme="dark"] .series-fig-thumb img {
   filter: brightness(0.93) contrast(0.97);
 }
 
@@ -3579,10 +3631,6 @@ dialog.nav-dialog::backdrop {
     align-items: center;
     min-block-size: 32px;
   }
-
-  .paper-meta-item + .paper-meta-item::before {
-    margin-right: 10px;
-  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -3628,7 +3676,7 @@ dialog.nav-dialog::backdrop {
   }
 
   .salon-art-frame {
-    animation: rise-in 0.9s 0.16s cubic-bezier(0.22, 1, 0.36, 1) both;
+    animation: rise-in-soft 0.9s 0.16s cubic-bezier(0.22, 1, 0.36, 1) both;
   }
 
   /* Draw-on underline for text links: animates background-size, never width. */
@@ -3697,6 +3745,40 @@ dialog.nav-dialog::backdrop {
   }
 }
 
+@media (pointer: coarse) {
+  .theme-switch button {
+    width: 44px;
+    height: 44px;
+  }
+
+  .heading-anchor,
+  .motion-quiet-btn,
+  .toc-focus-btn {
+    min-block-size: 44px;
+    min-inline-size: 44px;
+  }
+}
+
+@media (forced-colors: active) {
+  :focus-visible {
+    outline: 2px solid Highlight;
+  }
+
+  .theme-switch button[aria-pressed="true"],
+  .topic-chip[aria-pressed="true"],
+  .pagination a[aria-current="page"] {
+    forced-color-adjust: none;
+    background: Highlight;
+    color: HighlightText;
+    border-color: Highlight;
+  }
+
+  .toc a[aria-current="location"],
+  .monograph-chapter-item a[data-active="true"] {
+    outline: 2px solid Highlight;
+  }
+}
+
 /* ==========================================================================
    Print: Ink-on-White Archival Edition
    ========================================================================== */
@@ -3732,7 +3814,11 @@ dialog.nav-dialog::backdrop {
   .series-nav,
   .related-writing,
   .inline-cite-card,
-  .reading-progress-bar {
+  .reading-progress-bar,
+  .motion-quiet-btn,
+  .toc-focus-btn,
+  .heading-anchor,
+  .figure-lightbox {
     display: none !important;
   }
 

@@ -117,8 +117,8 @@ test("real PostCSS output contains page and theme rules", async () => {
   const result = await postcss([tailwind()]).process(await fs.readFile(file, "utf8"), {
     from: file,
   });
-  assert.match(result.css, /\.art-hero h1/);
-  assert.match(result.css, /--background: #f7f6f2/);
+  assert.match(result.css, /\.salon-hero-copy h1/);
+  assert.match(result.css, /--background: #faf9f5/);
   assert.match(result.css, /\.site-shell/);
   assert.ok(!result.css.includes("@theme inline"));
 });

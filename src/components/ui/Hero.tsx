@@ -1,8 +1,22 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { HeroTopologyPlate } from "@/components/visual/EditorialIllustrations";
+
+const subscribeReducedMotion = (cb: () => void) => {
+  if (typeof window === "undefined" || typeof window.matchMedia !== "function") {
+    return () => {};
+  }
+  const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  mq.addEventListener("change", cb);
+  return () => mq.removeEventListener("change", cb);
+};
+
+const getReducedMotionSnapshot = () =>
+  typeof window !== "undefined" &&
+  typeof window.matchMedia === "function" &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 export interface HeroStats {
   chapters: number;
@@ -20,6 +34,12 @@ const DEFAULT_HERO_STATS: HeroStats = {
 
 export function Hero({ stats = DEFAULT_HERO_STATS }: { stats?: HeroStats }) {
   const [motionPaused, setMotionPaused] = useState(false);
+  const osReducedMotion = useSyncExternalStore(
+    subscribeReducedMotion,
+    getReducedMotionSnapshot,
+    () => false
+  );
+  const effectivePaused = motionPaused || osReducedMotion;
 
   return (
     <section className="salon-hero" aria-labelledby="hero-title">
@@ -64,17 +84,19 @@ export function Hero({ stats = DEFAULT_HERO_STATS }: { stats?: HeroStats }) {
 
         <figure className="salon-art-frame">
           <div className="salon-art-canvas">
-            <HeroTopologyPlate paused={motionPaused} />
+            <HeroTopologyPlate paused={effectivePaused} />
           </div>
           <figcaption className="salon-art-caption">
             <span>Fig. I — Structure, invariants, and bounded flow</span>
-            <button
-              type="button"
-              className="motion-quiet-btn"
-              onClick={() => setMotionPaused((prev) => !prev)}
-            >
-              {motionPaused ? "Play motion" : "Pause motion"}
-            </button>
+            {!osReducedMotion && (
+              <button
+                type="button"
+                className="motion-quiet-btn"
+                onClick={() => setMotionPaused((prev) => !prev)}
+              >
+                {motionPaused ? "Play motion" : "Pause motion"}
+              </button>
+            )}
           </figcaption>
         </figure>
       </div>

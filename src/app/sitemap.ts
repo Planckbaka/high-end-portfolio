@@ -26,6 +26,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: builtAt,
       changeFrequency: "monthly" as const,
       priority: 1,
+      images: [`${baseUrl}/og-image.png`],
     },
     {
       url: `${baseUrl}/articles`,
@@ -48,6 +49,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: new Date(article.updatedAt || article.date),
     changeFrequency: "weekly" as const,
     priority: 0.8,
+    images: [`${baseUrl}/og/articles/${article.slug}.png`],
   }));
 
   const labPages = getAllLabs().map((lab) => ({

@@ -91,6 +91,11 @@ export function MonographRoom({
         <div
           className="monograph-index-sheet"
           onMouseLeave={() => setActiveSlug(null)}
+          onBlur={(e) => {
+            if (!e.currentTarget.contains(e.relatedTarget)) {
+              setActiveSlug(null);
+            }
+          }}
         >
           <div className="monograph-frontispiece" aria-hidden="true">
             <Image

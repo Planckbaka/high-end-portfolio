@@ -35,6 +35,10 @@ describe("article metadata", () => {
     it("declares a canonical URL, OG image, and Zotero citation metadata", async () => {
         const meta = await generateMetadata({ params: params("transaction-in-DDIA") });
         expect(meta.alternates?.canonical).toContain("/articles/transaction-in-DDIA");
+        expect(meta.alternates?.types?.["application/rss+xml"]).toBe("/feed.xml");
+        expect(meta.openGraph?.siteName).toBe(siteConfig.name);
+        expect(meta.openGraph?.locale).toBe("en_US");
+        expect(Array.isArray(meta.keywords)).toBe(true);
         expect(JSON.stringify(meta.openGraph?.images)).toContain("og");
         expect(JSON.stringify(meta.twitter?.images)).toContain("og");
         expect(meta.other).toMatchObject({
@@ -44,8 +48,9 @@ describe("article metadata", () => {
         expect(String(meta.other?.citation_public_url)).toContain("/articles/transaction-in-DDIA");
     });
 
-    it("falls back cleanly for an unknown slug", async () => {
+    it("falls back cleanly with noindex for an unknown slug", async () => {
         const meta = await generateMetadata({ params: params("does-not-exist") });
         expect(meta.title).toBe("Article Not Found");
+        expect(meta.robots).toMatchObject({ index: false, follow: false });
     });
 });

@@ -9,6 +9,8 @@ import { getRelatedArticles } from "@/lib/related-articles";
 import ArticleClient from "./ArticleClient";
 import { notFound } from "next/navigation";
 import { siteConfig } from "@/config/site";
+import { seriesPathForTitle } from "@/lib/series";
+import { breadcrumbJsonLd, personEntity, serializeJsonLd, WEBSITE_ID } from "@/lib/seo";
 
 // Force static generation for Cloudflare Workers compatibility
 export const dynamic = "force-static";
@@ -28,6 +30,8 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!article) {
     return {
       title: "Article Not Found",
+      alternates: {},
+      robots: { index: false, follow: false },
     };
   }
 
@@ -58,8 +62,10 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
      */
     title: article.title,
     description: article.excerpt,
+    keywords: article.tags,
     alternates: {
       canonical: canonicalUrl,
+      types: { "application/rss+xml": "/feed.xml" },
     },
     openGraph: {
       // openGraph titles are not run through the template, so the site
@@ -67,9 +73,12 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       title: `${article.title} | ${siteConfig.name}`,
       description: article.excerpt,
       type: "article",
+      siteName: siteConfig.name,
+      locale: "en_US",
       publishedTime: article.date,
       modifiedTime: article.updatedAt || article.date,
       authors: [siteConfig.author.name],
+      section: article.category,
       tags: article.tags,
       url: canonicalUrl,
       images: [{ url: ogImage, width: 1200, height: 630, alt: article.title }],
@@ -113,47 +122,75 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       })
     : [];
 
-  const breadcrumbLd = {
-    "@context": "https://schema.org",
-    "@type": "BreadcrumbList",
-    itemListElement: [
-      { "@type": "ListItem", position: 1, name: "Home", item: siteConfig.url },
-      { "@type": "ListItem", position: 2, name: "Writing", item: `${siteConfig.url}/articles` },
-      { "@type": "ListItem", position: 3, name: article.title },
-    ],
-  };
+  const canonicalUrl = `${siteConfig.url}/articles/${slug}`;
+  const wordCount = article.content
+    .replace(/<[^>]+>/g, " ")
+    .trim()
+    .split(/\s+/)
+    .filter(Boolean).length;
+
+  const breadcrumbItems: Array<{ name: string; url?: string }> = [
+    { name: "Home", url: siteConfig.url },
+    { name: "Writing", url: `${siteConfig.url}/articles` },
+  ];
+  if (article.series) {
+    breadcrumbItems.push({
+      name: article.series,
+      url: `${siteConfig.url}${seriesPathForTitle(article.series)}`,
+    });
+  }
+  breadcrumbItems.push({ name: article.title, url: canonicalUrl });
+  const breadcrumbLd = breadcrumbJsonLd(breadcrumbItems);
+
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "BlogPosting",
     headline: article.title,
     description: article.excerpt,
+    articleSection: article.category,
+    wordCount,
     datePublished: article.date,
     dateModified: article.updatedAt || article.date,
     inLanguage: "en",
-    image: `${siteConfig.url}/og/articles/${slug}.png`,
+    image: {
+      "@type": "ImageObject",
+      url: `${siteConfig.url}/og/articles/${slug}.png`,
+      width: 1200,
+      height: 630,
+    },
     keywords: article.tags?.join(", "),
-    mainEntityOfPage: `${siteConfig.url}/articles/${slug}`,
-    author: {
-      "@type": "Person",
-      name: siteConfig.author.name,
-      url: siteConfig.url,
-    },
-    url: `${siteConfig.url}/articles/${slug}`,
-    publisher: {
-      "@type": "Person",
-      name: siteConfig.author.name,
-    },
+    mainEntityOfPage: canonicalUrl,
+    isPartOf: article.series
+      ? {
+          "@type": "CreativeWorkSeries",
+          name: article.series,
+          url: `${siteConfig.url}${seriesPathForTitle(article.series)}`,
+        }
+      : { "@id": WEBSITE_ID },
+    ...(article.papers && article.papers.length > 0
+      ? {
+          citation: article.papers.map((p) => ({
+            "@type": "ScholarlyArticle",
+            name: p.title,
+            url: `https://arxiv.org/abs/${p.arxiv}`,
+            datePublished: String(p.year),
+          })),
+        }
+      : {}),
+    author: personEntity(),
+    url: canonicalUrl,
+    publisher: personEntity(),
   };
 
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
       />
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd).replace(/</g, "\\u003c") }}
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }}
       />
       <ArticleClient
         article={article}

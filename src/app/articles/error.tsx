@@ -1,4 +1,5 @@
 "use client";
+import { useEffect } from "react";
 import Link from "next/link";
 import { logError } from "@/lib/error-logger";
 
@@ -9,7 +10,9 @@ export default function ArticlesError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
-  logError(error, { digest: error.digest });
+  useEffect(() => {
+    logError(error, { digest: error.digest });
+  }, [error]);
   return (
     <div className="site-shell page-heading page-bottom">
       <h1>The writing couldn’t load.</h1>

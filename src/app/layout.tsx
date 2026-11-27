@@ -9,6 +9,7 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { ErrorBoundary } from "@/components/ErrorBoundary";
 
 import { siteConfig } from "@/config/site";
+import { PERSON_ID, serializeJsonLd } from "@/lib/seo";
 import { RouteAnnouncer } from "@/components/RouteAnnouncer";
 
 const newsreader = Newsreader({
@@ -52,6 +53,13 @@ export const metadata: Metadata = {
     "backend engineering",
     "PyTorch",
     "concurrency",
+    "FlashAttention",
+    "DeepSeek MLA",
+    "GRPO",
+    "distributed training",
+    "KV cache",
+    "AI infrastructure",
+    "systems engineering",
   ],
   authors: [{ name: siteConfig.author.name, url: siteConfig.author.github }],
   creator: siteConfig.author.name,
@@ -120,6 +128,7 @@ export default function RootLayout({
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
+    "@id": PERSON_ID,
     name: siteConfig.author.name,
     url: siteConfig.url,
     image: `${siteConfig.url}${siteConfig.ogImage}`,
@@ -142,7 +151,7 @@ export default function RootLayout({
       >
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }}
+          dangerouslySetInnerHTML={{ __html: serializeJsonLd(jsonLd) }}
         />
         <ThemeProvider
           attribute="data-theme"

@@ -48,6 +48,61 @@ const site = {
 await fs.mkdir(path.join(root, "public"), { recursive: true });
 await fs.writeFile(path.join(root, "public/feed.xml"), renderFeed(articles, site));
 
+const baseUrl = site.url.replace(/\/+$/, "");
+const llmInfra = articles
+  .filter((a) => a.series === "LLM & AI Infrastructure")
+  .sort((a, b) => (a.seriesOrder || 0) - (b.seriesOrder || 0));
+const modelSys = articles
+  .filter((a) => a.series === "Engineering Reliable Model Systems")
+  .sort((a, b) => (a.seriesOrder || 0) - (b.seriesOrder || 0));
+const standalone = articles.filter((a) => !a.series);
+
+let labCount = 12;
+try {
+  const manifest = JSON.parse(
+    await fs.readFile(path.join(root, "src/lib/labs-data/manifest.json"), "utf8")
+  );
+  if (Array.isArray(manifest.labs)) {
+    labCount = manifest.labs.length;
+  }
+} catch {
+  // manifest.json may not exist on a clean checkout before generate:labs runs
+}
+
+const llmsLines = [
+  `# ${site.title}`,
+  "",
+  `> ${site.description}`,
+  "",
+  "## Core Pages",
+  `- [Home](${baseUrl}/): Overview, selected writing, and research monographs`,
+  `- [Writing Archive](${baseUrl}/articles): All ${articles.length} technical essays and notes`,
+  `- [Engineering Labs](${baseUrl}/labs): ${labCount} reproducible CPU labs in Go, Python, and PyTorch`,
+  `- [Projects](${baseUrl}/projects): Selected systems and validation dossiers`,
+  `- [About](${baseUrl}/about): Background and engineering methodology`,
+  `- [RSS Feed](${baseUrl}/feed.xml): Full-text RSS with MathML`,
+  `- [Sitemap](${baseUrl}/sitemap.xml): XML sitemap`,
+  "",
+  "## Monograph: LLM & AI Infrastructure",
+  `- [Series Index](${baseUrl}/series/llm-ai-infra)`,
+  ...llmInfra.map(
+    (a) => `- [${a.title}](${baseUrl}/articles/${a.slug}): ${a.excerpt}`
+  ),
+  "",
+  "## Series: Engineering Reliable Model Systems",
+  `- [Series Index](${baseUrl}/series/reliable-model-systems)`,
+  ...modelSys.map(
+    (a) => `- [${a.title}](${baseUrl}/articles/${a.slug}): ${a.excerpt}`
+  ),
+  "",
+  "## Standalone Essays",
+  ...standalone.map(
+    (a) => `- [${a.title}](${baseUrl}/articles/${a.slug}): ${a.excerpt}`
+  ),
+  "",
+];
+await fs.writeFile(path.join(root, "public/llms.txt"), llmsLines.join("\n"));
+
 console.log(
-  `Generated ${articles.length} published articles (split index + content modules) and full-text public/feed.xml.`
+  `Generated ${articles.length} published articles (split index + content modules), full-text public/feed.xml, and public/llms.txt.`
 );

@@ -34,6 +34,11 @@ export default function GlobalError({
           --background: #faf9f5;
           --foreground: #141413;
           --muted-foreground: #5e5d59;
+          --accent: #a8492a;
+        }
+        .global-error-btn:focus-visible {
+          outline: 2px solid var(--accent);
+          outline-offset: 4px;
         }`}</style>
         <main style={{ maxWidth: "34rem", padding: "2rem", textAlign: "center" }}>
           <h1 style={{ fontSize: "1.75rem", fontWeight: 500, letterSpacing: "-0.03em" }}>
@@ -51,14 +56,17 @@ export default function GlobalError({
           </p>
           <button
             type="button"
+            className="global-error-btn"
             onClick={reset}
             style={{
-              padding: "0.75rem 1.125rem",
+              minHeight: "44px",
+              padding: "0.75rem 1.375rem",
               border: "1px solid var(--foreground)",
-              borderRadius: "4px",
+              borderRadius: "999px",
               background: "var(--foreground)",
               color: "var(--background)",
-              fontSize: "0.875rem",
+              fontSize: "0.90625rem",
+              fontWeight: 500,
               cursor: "pointer",
             }}
           >

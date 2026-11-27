@@ -144,7 +144,7 @@ export default function ArticlesClient({
           </p>
           <p className="writing-labs-callout">
             <Link className="text-link" href="/labs">
-              Browse all {labCount} Companion CPU Labs ↗
+              Browse all {labCount} Companion CPU Labs →
             </Link>
           </p>
         </div>
@@ -157,8 +157,8 @@ export default function ArticlesClient({
           <strong>{LLM_INFRA_SERIES.title}</strong>
           <span>
             {infraPapers > 0
-              ? `${infraPapers} foundational and frontier arXiv papers synthesized with LaTeX proofs, Roofline ledgers, and PyTorch CPU verifications ↗`
-              : "Foundational and frontier arXiv papers synthesized with LaTeX proofs, Roofline ledgers, and PyTorch CPU verifications ↗"}
+              ? `${infraPapers} foundational and frontier arXiv papers synthesized with LaTeX proofs, Roofline ledgers, and PyTorch CPU verifications →`
+              : "Foundational and frontier arXiv papers synthesized with LaTeX proofs, Roofline ledgers, and PyTorch CPU verifications →"}
           </span>
         </Link>
         <Link className="series-track-card" href={MODEL_SYSTEMS_SERIES.path}>
@@ -168,65 +168,87 @@ export default function ArticlesClient({
           <strong>{MODEL_SYSTEMS_SERIES.title}</strong>
           <span>
             Start the {seriesChapterWord(chapters)}-part engineering series from bounded Go workers
-            to a tiny cached decoder ↗
+            to a tiny cached decoder →
           </span>
         </Link>
       </div>
-      <form className="filters" role="search" action="/articles" onSubmit={submit}>
-        <div className="field search-field">
-          <label htmlFor="article-search">
-            Search writing, sections &amp; arXiv IDs <kbd className="search-kbd">/</kbd>
-          </label>
-          <Input
-            ref={inputRef}
-            id="article-search"
-            name="q"
-            type="search"
-            value={query}
-            onChange={(event) => onQueryInput(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Escape") {
-                if (query) {
-                  event.preventDefault();
-                  onQueryInput("");
-                } else {
-                  event.currentTarget.blur();
+      <search>
+        <form className="filters" action="/articles" onSubmit={submit}>
+          <div className="field search-field">
+            <label htmlFor="article-search">
+              Search writing, sections &amp; arXiv IDs{" "}
+              <kbd className="search-kbd" aria-hidden="true">
+                /
+              </kbd>
+            </label>
+            <Input
+              ref={inputRef}
+              id="article-search"
+              name="q"
+              type="search"
+              autoCorrect="off"
+              autoCapitalize="none"
+              spellCheck={false}
+              enterKeyHint="search"
+              aria-keyshortcuts="/"
+              value={query}
+              onChange={(event) => onQueryInput(event.target.value)}
+              onKeyDown={(event) => {
+                if (event.key === "Escape") {
+                  if (query) {
+                    event.preventDefault();
+                    onQueryInput("");
+                  } else {
+                    event.currentTarget.blur();
+                  }
                 }
-              }
-            }}
-            placeholder="MLA absorption, 2405.04434, FlashAttention, concurrency…"
-          />
-        </div>
-        <div className="field">
-          <label htmlFor="category">Topic</label>
-          <select
-            name="category"
-            id="category"
-            value={params.get("category") || ""}
-            onChange={(event) => event.currentTarget.form?.requestSubmit()}
-          >
-            <option value="">All topics</option>
-            {ARTICLE_CATEGORIES.map((category) => (
-              <option key={category}>{category}</option>
-            ))}
-          </select>
-        </div>
-        <div className="field">
-          <label htmlFor="series">Series</label>
-          <select
-            name="series"
-            id="series"
-            value={params.get("series") || ""}
-            onChange={(event) => event.currentTarget.form?.requestSubmit()}
-          >
-            <option value="">All writing</option>
-            {series.map((name) => (
-              <option key={name}>{name}</option>
-            ))}
-          </select>
-        </div>
-        <Button type="submit">Search</Button>
-      </form>
+              }}
+              placeholder="MLA absorption, 2405.04434, FlashAttention, concurrency…"
+            />
+          </div>
+          <div className="field">
+            <label htmlFor="category">Topic</label>
+            <select
+              name="category"
+              id="category"
+              value={params.get("category") || ""}
+              onChange={(event) => event.currentTarget.form?.requestSubmit()}
+            >
+              <option value="">All topics</option>
+              {ARTICLE_CATEGORIES.map((category) => (
+                <option key={category}>{category}</option>
+              ))}
+            </select>
+          </div>
+          <div className="field">
+            <label htmlFor="series">Series</label>
+            <select
+              name="series"
+              id="series"
+              value={params.get("series") || ""}
+              onChange={(event) => event.currentTarget.form?.requestSubmit()}
+            >
+              <option value="">All writing</option>
+              {series.map((name) => (
+                <option key={name}>{name}</option>
+              ))}
+            </select>
+          </div>
+          <Button type="submit">Search</Button>
+          {(query || params.get("category") || params.get("series")) && (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                setQuery("");
+                updateUrl(new URLSearchParams(), false);
+              }}
+            >
+              Reset
+            </Button>
+          )}
+        </form>
+      </search>
       <div className="quick-topic-chips" aria-label="Filter by concept">
         <span className="eyebrow">Quick filter:</span>
         {QUICK_TOPICS.map((topic) => {
@@ -261,16 +283,16 @@ export default function ArticlesClient({
           <h2>No articles found.</h2>
           <p>
             Try a broader term or{" "}
-            <Link
-              className="text-link"
-              href="/articles"
+            <button
+              type="button"
+              className="text-link bg-transparent border-0 p-0 cursor-pointer font-inherit"
               onClick={() => {
                 setQuery("");
-                setSearch("");
+                updateUrl(new URLSearchParams(), false);
               }}
             >
               clear the filters
-            </Link>
+            </button>
             .
           </p>
         </div>

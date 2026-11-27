@@ -2,15 +2,64 @@ import { pageMetadata } from "@/lib/page-metadata";
 import Link from "next/link";
 import { projects } from "@/config/data";
 import { getAllArticles } from "@/lib/markdown";
+import { siteConfig } from "@/config/site";
+import { breadcrumbJsonLd, collectionPageJsonLd, serializeJsonLd } from "@/lib/seo";
 export const metadata = pageMetadata(
   "Projects",
   "Agent engineering and reproducible Go, Python, and CPU model-inference experiments.",
   "/projects"
 );
+interface EvidenceLink {
+  href: string;
+  label: string;
+  isRaw?: boolean;
+}
+
+const PROJECT_EVIDENCE_LINKS: Record<string, EvidenceLink[]> = {
+  "pi-go": [
+    { href: "/labs/go/agent", label: "Teaching implementation →" },
+    { href: "/labs/go/gateway", label: "Gateway admission lab →" },
+  ],
+  "gemini-research": [
+    { href: "/labs/llm/flagship-2026", label: "2026 Flagship & Muon lab →" },
+    { href: "/labs/llm/roofline-flash", label: "Roofline & Online Softmax lab →" },
+    { href: "/series/llm-ai-infra", label: "Nine-part research monograph →" },
+  ],
+};
+
+const DEFAULT_EVIDENCE_LINKS: EvidenceLink[] = [
+  { href: "/labs", label: "Reproduction guide →" },
+  { href: "/labs/llm/kv-cache", label: "Decoder & KV cache lab →" },
+  { href: "/labs/results/cache-results.json", label: "Raw CPU measurements →", isRaw: true },
+];
+
 export default function Projects() {
   const articles = getAllArticles();
+  const collectionLd = collectionPageJsonLd({
+    name: "Projects",
+    description:
+      "Agent engineering and reproducible Go, Python, and CPU model-inference experiments.",
+    path: "/projects",
+    items: projects.map((p) => ({
+      name: p.title,
+      url: `${siteConfig.url}/projects#${p.id}`,
+      description: p.description,
+    })),
+  });
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: "Home", url: siteConfig.url },
+    { name: "Projects", url: `${siteConfig.url}/projects` },
+  ]);
   return (
     <div className="site-shell page-bottom">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(collectionLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }}
+      />
       <header className="page-heading">
         <p className="eyebrow">
           <span className="eyebrow-dot" />
@@ -35,7 +84,7 @@ export default function Projects() {
             </span>
             <span>
               {project.title}
-              <span aria-hidden="true">↘</span>
+              <span aria-hidden="true">↓</span>
             </span>
           </a>
         ))}
@@ -63,7 +112,7 @@ export default function Projects() {
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  Upstream reference ↗<span className="sr-only">(opens in a new tab)</span>
+                  Upstream reference ↗ <span className="sr-only">(opens in a new tab)</span>
                 </a>
               </div>
             )}
@@ -84,51 +133,16 @@ export default function Projects() {
             <section aria-label={`${project.title} evidence`}>
               <h3>Inspect the evidence</h3>
               <div className="inline-links">
-                <Link
-                  className="text-link"
-                  href={
-                    project.id === "pi-go"
-                      ? "/labs/go/agent"
-                      : project.id === "gemini-research"
-                        ? "/labs/llm/flagship-2026"
-                        : "/labs"
-                  }
-                >
-                  {project.id === "pi-go"
-                    ? "Teaching implementation ↗"
-                    : project.id === "gemini-research"
-                      ? "2026 Flagship & Muon lab ↗"
-                      : "Reproduction guide ↗"}
-                </Link>
-                <Link
-                  className="text-link"
-                  href={
-                    project.id === "pi-go"
-                      ? "/labs/go/gateway"
-                      : project.id === "gemini-research"
-                        ? "/labs/llm/roofline-flash"
-                        : "/labs/llm/kv-cache"
-                  }
-                >
-                  {project.id === "pi-go"
-                    ? "Gateway admission lab ↗"
-                    : project.id === "gemini-research"
-                      ? "Roofline & Online Softmax lab ↗"
-                      : "Decoder & KV cache lab ↗"}
-                </Link>
-                {project.id !== "pi-go" && (
-                  <a
-                    className="text-link"
-                    href={
-                      project.id === "gemini-research"
-                        ? "/series/llm-ai-infra"
-                        : "/labs/results/cache-results.json"
-                    }
-                  >
-                    {project.id === "gemini-research"
-                      ? "Nine-part research monograph ↗"
-                      : "Raw CPU measurements ↗"}
-                  </a>
+                {(PROJECT_EVIDENCE_LINKS[project.id] ?? DEFAULT_EVIDENCE_LINKS).map((item) =>
+                  item.isRaw ? (
+                    <a key={item.href} className="text-link" href={item.href}>
+                      {item.label}
+                    </a>
+                  ) : (
+                    <Link key={item.href} className="text-link" href={item.href}>
+                      {item.label}
+                    </Link>
+                  )
                 )}
                 <a className="text-link" href="/labs/engineering-labs.zip" download>
                   Download labs ↓

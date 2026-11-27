@@ -203,21 +203,20 @@ export function CodeCopyEnhancement() {
         });
       });
 
-    // Academic figure click-to-zoom lightbox
+    // Academic figure click-to-zoom lightbox using native <dialog>
     const zoomableImages = document.querySelectorAll<HTMLImageElement>("img.zoomable");
     if (zoomableImages.length > 0) {
-      const overlay = document.createElement("div");
-      overlay.className = "figure-lightbox";
-      overlay.setAttribute("role", "dialog");
-      overlay.setAttribute("aria-modal", "true");
-      overlay.setAttribute("aria-label", "Expanded figure view");
-      overlay.hidden = true;
+      const dialog = document.createElement("dialog");
+      dialog.className = "figure-lightbox";
+      dialog.setAttribute("aria-label", "Expanded figure view");
+      dialog.setAttribute("closedby", "any");
 
       const closeBtn = document.createElement("button");
       closeBtn.type = "button";
       closeBtn.className = "figure-lightbox-close";
       closeBtn.textContent = "Close (Esc)";
       closeBtn.setAttribute("aria-label", "Close expanded figure");
+      closeBtn.autofocus = true;
 
       const previewImg = document.createElement("img");
       previewImg.className = "figure-lightbox-img";
@@ -226,46 +225,93 @@ export function CodeCopyEnhancement() {
       const captionBox = document.createElement("p");
       captionBox.className = "figure-lightbox-caption";
 
-      overlay.append(closeBtn, previewImg, captionBox);
-      document.body.appendChild(overlay);
+      dialog.append(closeBtn, previewImg, captionBox);
+      document.body.appendChild(dialog);
 
       const closeLightbox = () => {
-        overlay.hidden = true;
-        document.body.style.overflow = "";
-      };
-
-      const onKeyDown = (e: KeyboardEvent) => {
-        if (e.key === "Escape" && !overlay.hidden) {
-          closeLightbox();
+        if (typeof dialog.close === "function" && dialog.open) {
+          dialog.close();
+        } else {
+          dialog.removeAttribute("open");
         }
       };
 
-      overlay.addEventListener("click", (e) => {
-        if (e.target === overlay || e.target === closeBtn) {
+      const onDialogClick = (e: MouseEvent) => {
+        if (e.target === dialog || e.target === closeBtn) {
           closeLightbox();
         }
-      });
-      window.addEventListener("keydown", onKeyDown);
+      };
+      dialog.addEventListener("click", onDialogClick);
+
+      // Light-dismiss fallback when closedby="any" is not natively supported
+      if (!("closedBy" in HTMLDialogElement.prototype)) {
+        let pressedOutside = false;
+        const onPointerDown = (e: PointerEvent) => {
+          pressedOutside = e.target === dialog;
+        };
+        const onPointerUp = (e: PointerEvent) => {
+          if (pressedOutside && e.target === dialog) {
+            closeLightbox();
+          }
+          pressedOutside = false;
+        };
+        dialog.addEventListener("pointerdown", onPointerDown);
+        dialog.addEventListener("pointerup", onPointerUp);
+        cleanups.push(() => {
+          dialog.removeEventListener("pointerdown", onPointerDown);
+          dialog.removeEventListener("pointerup", onPointerUp);
+        });
+      }
 
       zoomableImages.forEach((img) => {
+        img.tabIndex = 0;
+        img.setAttribute("role", "button");
+        img.setAttribute(
+          "aria-label",
+          `Expand figure${img.alt ? `: ${img.alt}` : ""}`
+        );
+
         const openLightbox = () => {
           previewImg.src = img.src;
           previewImg.alt = img.alt;
           const fig = img.closest("figure");
           const cap = fig?.querySelector("figcaption");
           captionBox.textContent = cap?.textContent || img.alt || "";
-          overlay.hidden = false;
-          document.body.style.overflow = "hidden";
-          closeBtn.focus();
+          if (typeof dialog.showModal === "function") {
+            if (!dialog.open) dialog.showModal();
+          } else {
+            dialog.setAttribute("open", "");
+          }
         };
+
+        const onKeyDown = (e: KeyboardEvent) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            openLightbox();
+          } else if (e.key === " ") {
+            e.preventDefault();
+          }
+        };
+        const onKeyUp = (e: KeyboardEvent) => {
+          if (e.key === " ") {
+            e.preventDefault();
+            openLightbox();
+          }
+        };
+
         img.addEventListener("click", openLightbox);
-        cleanups.push(() => img.removeEventListener("click", openLightbox));
+        img.addEventListener("keydown", onKeyDown);
+        img.addEventListener("keyup", onKeyUp);
+        cleanups.push(() => {
+          img.removeEventListener("click", openLightbox);
+          img.removeEventListener("keydown", onKeyDown);
+          img.removeEventListener("keyup", onKeyUp);
+        });
       });
 
       cleanups.push(() => {
-        window.removeEventListener("keydown", onKeyDown);
-        document.body.style.overflow = "";
-        overlay.remove();
+        dialog.removeEventListener("click", onDialogClick);
+        dialog.remove();
       });
     }
 

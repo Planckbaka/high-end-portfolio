@@ -1,15 +1,33 @@
 import { NextRequest, NextResponse } from "next/server";
 import { siteConfig } from "@/config/site";
 import { RATE_LIMIT, HTTP_STATUS, ERROR_MESSAGES } from "@/config/constants";
+import { getCloudflareContext } from "@opennextjs/cloudflare";
 import { contactSchema } from "@/lib/contact-schema";
 
 // OpenNext runs Next.js routes through Workers' Node.js compatibility layer.
 export const runtime = "nodejs";
 
-// NOTE: This rate limiter provides deterrence against casual abuse only.
+// NOTE: This rate limiter and idempotency cache provide deterrence/dedup only.
 // State is local to an isolate and is lost when that isolate is replaced.
 // For production-grade rate limiting, use Cloudflare WAF Rate Limiting rules.
 const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
+const idempotencyCache = new Map<string, { body: Record<string, unknown>; expiresAt: number }>();
+const IDEMPOTENCY_TTL_MS = 5 * 60 * 1000;
+
+function jsonResponse(
+  body: Record<string, unknown>,
+  status: number,
+  idempotencyKey?: string
+) {
+  const headers: Record<string, string> = {
+    "Cache-Control": "no-store",
+    "X-Content-Type-Options": "nosniff",
+  };
+  if (idempotencyKey) {
+    headers["Idempotency-Key"] = idempotencyKey;
+  }
+  return NextResponse.json(body, { status, headers });
+}
 
 function checkRateLimit(ip: string): boolean {
   const now = Date.now();
@@ -35,236 +53,139 @@ function checkRateLimit(ip: string): boolean {
   return true;
 }
 
-function escapeHtml(text: string): string {
-  const map: Record<string, string> = {
-    "&": "&amp;",
-    "<": "&lt;",
-    ">": "&gt;",
-    '"': "&quot;",
-    "'": "&#039;",
-  };
-  return text.replace(/[&<>"']/g, (char) => map[char]);
+const b64 = (text: string) => Buffer.from(text, "utf-8").toString("base64");
+const oneLine = (text: string) => text.replace(/[\r\n]+/g, " ").trim();
+const wrap76 = (text: string) => text.replace(/(.{76})/g, "$1\r\n");
+
+type EmailBinding = { send(message: unknown): Promise<void> };
+
+function buildMime(opts: { from: string; to: string; replyTo: string; subject: string; text: string; domain: string }) {
+  return [
+    `From: Portfolio Contact <${opts.from}>`,
+    `To: ${opts.to}`,
+    `Reply-To: ${opts.replyTo}`,
+    `Subject: =?UTF-8?B?${b64(opts.subject)}?=`,
+    `Date: ${new Date().toUTCString()}`,
+    `Message-ID: <${crypto.randomUUID()}@${opts.domain}>`,
+    "MIME-Version: 1.0",
+    'Content-Type: text/plain; charset="UTF-8"',
+    "Content-Transfer-Encoding: base64",
+    "",
+    wrap76(b64(opts.text)),
+  ].join("\r\n");
 }
 
 export async function POST(request: NextRequest) {
+  const idempotencyKey = request.headers.get("idempotency-key")?.trim() || undefined;
   try {
     // Rate limiting
     const ip = request.headers.get("cf-connecting-ip") || "unknown";
     if (!checkRateLimit(ip)) {
-      return NextResponse.json(
+      return jsonResponse(
         { error: ERROR_MESSAGES.RATE_LIMIT_EXCEEDED },
-        { status: HTTP_STATUS.TOO_MANY_REQUESTS }
+        HTTP_STATUS.TOO_MANY_REQUESTS,
+        idempotencyKey
       );
     }
 
     // Origin validation (CSRF protection)
     const origin = request.headers.get("origin");
-    const allowedOrigins = [siteConfig.url, "http://localhost:3000"];
+    const allowedOrigins = [
+      siteConfig.url,
+      "http://localhost:3000",
+      "http://localhost:8787",
+      "http://127.0.0.1:8787",
+    ];
     if (origin && !allowedOrigins.includes(origin)) {
-      return NextResponse.json({ error: "Invalid origin" }, { status: HTTP_STATUS.FORBIDDEN });
+      return jsonResponse({ error: "Invalid origin" }, HTTP_STATUS.FORBIDDEN, idempotencyKey);
+    }
+
+    if (idempotencyKey) {
+      const now = Date.now();
+      for (const [key, entry] of idempotencyCache) {
+        if (entry.expiresAt <= now) idempotencyCache.delete(key);
+      }
+      const cached = idempotencyCache.get(`${ip}:${idempotencyKey}`);
+      if (cached && cached.expiresAt > now) {
+        return jsonResponse(cached.body, HTTP_STATUS.OK, idempotencyKey);
+      }
     }
 
     let body: unknown;
     try {
       body = await request.json();
     } catch {
-      return NextResponse.json({ error: "Invalid JSON body" }, { status: HTTP_STATUS.BAD_REQUEST });
+      return jsonResponse({ error: "Invalid JSON body" }, HTTP_STATUS.BAD_REQUEST, idempotencyKey);
     }
     const parsed = contactSchema.safeParse(body);
     if (!parsed.success) {
-      return NextResponse.json(
+      return jsonResponse(
         { error: "Please check your name, email and message." },
-        { status: HTTP_STATUS.BAD_REQUEST }
+        HTTP_STATUS.BAD_REQUEST,
+        idempotencyKey
       );
     }
     const { name, email, message } = parsed.data;
-    const idempotencyKey = request.headers.get("idempotency-key");
-    if (idempotencyKey && !/^[a-zA-Z0-9_-]{16,128}$/.test(idempotencyKey)) {
-      return NextResponse.json({ error: "Invalid submission identifier" }, { status: HTTP_STATUS.BAD_REQUEST });
-    }
 
-    // Get config
-    const resendApiKey = process.env.RESEND_API_KEY;
-    const contactEmail = process.env.CONTACT_EMAIL || siteConfig.author.email;
+    // Cloudflare Email Routing `send_email` binding (free). The recipient must be a
+    // verified destination address and the sender an address on a domain with Email Routing.
+    const { env } = getCloudflareContext();
+    const envRecord = env as unknown as Record<string, unknown>;
+    const binding = envRecord.SEND_EMAIL as EmailBinding | undefined;
+    const contactEmail =
+      (envRecord.CONTACT_EMAIL as string | undefined) ||
+      process.env.CONTACT_EMAIL ||
+      siteConfig.author.email;
+    const fromAddress =
+      (envRecord.CONTACT_FROM as string | undefined) || process.env.CONTACT_FROM;
 
-    if (!resendApiKey) {
-      console.error("RESEND_API_KEY is not configured");
-      return NextResponse.json(
+    if (!binding || !fromAddress) {
+      console.error("SEND_EMAIL binding or CONTACT_FROM is not configured");
+      return jsonResponse(
         { error: "Email service is not configured. Please contact the administrator." },
-        { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+        HTTP_STATUS.INTERNAL_SERVER_ERROR,
+        idempotencyKey
       );
     }
 
-    // Escape user input to prevent XSS
-    const safeName = escapeHtml(name);
-    const safeEmail = escapeHtml(email);
-    const safeMessage = escapeHtml(message);
-
-    // Send email
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
-      signal: AbortSignal.timeout(10000),
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${resendApiKey}`,
-        ...(idempotencyKey ? { "Idempotency-Key": `contact/${idempotencyKey}` } : {}),
-      },
-      body: JSON.stringify({
-        from: process.env.CONTACT_FROM || "Portfolio Contact <onboarding@resend.dev>",
-        to: [contactEmail],
-        reply_to: email,
-        subject: `New Contact Form Message from ${safeName}`,
-        html: `
-          <!DOCTYPE html>
-          <html lang="en">
-            <head>
-              <meta charset="utf-8">
-              <style>
-                /* Matches the site's quiet-editorial palette:
-                   cream paper, ink text, rust accent. */
-                body {
-                  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Arial, 'PingFang SC', sans-serif;
-                  line-height: 1.6;
-                  color: #232521;
-                  background: #f7f6f2;
-                  max-width: 600px;
-                  margin: 0 auto;
-                  padding: 20px;
-                }
-                .header {
-                  border-bottom: 2px solid #232521;
-                  padding: 20px 0 16px;
-                }
-                .header h1 {
-                  margin: 0;
-                  font-size: 20px;
-                  font-weight: 600;
-                  letter-spacing: -0.02em;
-                }
-                .header .kicker {
-                  font-family: 'SF Mono', Menlo, Consolas, monospace;
-                  font-size: 11px;
-                  text-transform: uppercase;
-                  letter-spacing: 0.12em;
-                  color: #a33f2e;
-                  margin-bottom: 6px;
-                }
-                .content {
-                  padding: 24px 0;
-                }
-                .field {
-                  margin-bottom: 20px;
-                }
-                .label {
-                  font-family: 'SF Mono', Menlo, Consolas, monospace;
-                  font-size: 11px;
-                  text-transform: uppercase;
-                  letter-spacing: 0.1em;
-                  color: #62665e;
-                  margin-bottom: 4px;
-                }
-                .value {
-                  font-size: 16px;
-                  color: #232521;
-                }
-                .message-box {
-                  background: #fdfcf9;
-                  border: 1px solid #d8d9d0;
-                  border-left: 3px solid #a33f2e;
-                  padding: 16px;
-                  font-size: 15px;
-                  white-space: pre-wrap;
-                  word-wrap: break-word;
-                }
-                .footer {
-                  border-top: 1px solid #d8d9d0;
-                  padding: 16px 0 4px;
-                  font-size: 12px;
-                  color: #62665e;
-                }
-                .button {
-                  display: inline-block;
-                  background: #232521;
-                  color: #f7f6f2;
-                  padding: 10px 18px;
-                  text-decoration: none;
-                  font-size: 14px;
-                  font-weight: 500;
-                  margin-top: 8px;
-                }
-              </style>
-            </head>
-            <body>
-              <div class="header">
-                <div class="kicker">Portfolio / Contact</div>
-                <h1>New message from ${safeName}</h1>
-              </div>
-
-              <div class="content">
-                <div class="field">
-                  <div class="label">Name</div>
-                  <div class="value">${safeName}</div>
-                </div>
-
-                <div class="field">
-                  <div class="label">Email</div>
-                  <div class="value">
-                    <a href="mailto:${safeEmail}" style="color: #a33f2e; text-decoration: none;">${safeEmail}</a>
-                  </div>
-                </div>
-
-                <div class="field">
-                  <div class="label">Message</div>
-                  <div class="message-box">${safeMessage}</div>
-                </div>
-
-                <a href="mailto:${safeEmail}" class="button">Reply to ${safeName}</a>
-              </div>
-
-              <div class="footer">
-                <p style="margin: 0 0 8px 0;">
-                  Sent from the contact form at <strong>${siteConfig.url}</strong>
-                </p>
-                <p style="margin: 0; font-size: 11px;">
-                  ${new Date().toLocaleString("en-US", {
-                    timeZone: "Asia/Shanghai",
-                    dateStyle: "full",
-                    timeStyle: "long",
-                  })}
-                </p>
-              </div>
-            </body>
-          </html>
-        `,
-      }),
+    const safeName = oneLine(name);
+    const raw = buildMime({
+      from: fromAddress,
+      to: contactEmail,
+      replyTo: oneLine(email),
+      subject: `New Contact Form Message from ${safeName}`,
+      text: `Name: ${safeName}\nEmail: ${oneLine(email)}\n\n${message}\n\n-- \nSent from ${siteConfig.url}`,
+      domain: fromAddress.split("@")[1] ?? "localhost",
     });
 
-    if (!response.ok) {
-      console.error("Resend API error:", response.status);
-      return NextResponse.json(
-        { error: "Failed to send email. Please try again later." },
-        { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
-      );
+    const { EmailMessage } = await import(/* webpackIgnore: true */ /* turbopackIgnore: true */ "cloudflare:email");
+    await binding.send(new EmailMessage(fromAddress, contactEmail, raw));
+
+    const successBody = { success: true, message: "Email sent successfully!" };
+    if (idempotencyKey && idempotencyCache.size < 1000) {
+      idempotencyCache.set(`${ip}:${idempotencyKey}`, {
+        body: successBody,
+        expiresAt: Date.now() + IDEMPOTENCY_TTL_MS,
+      });
     }
 
-    return NextResponse.json(
-      { success: true, message: "Email sent successfully!" },
-      { status: HTTP_STATUS.OK }
-    );
+    return jsonResponse(successBody, HTTP_STATUS.OK, idempotencyKey);
   } catch (error) {
     if (
       (error instanceof DOMException || error instanceof Error) &&
       ["TimeoutError", "AbortError"].includes(error.name)
     ) {
-      return NextResponse.json(
+      return jsonResponse(
         { error: "Email service timed out. Please retry the same message." },
-        { status: HTTP_STATUS.GATEWAY_TIMEOUT }
+        HTTP_STATUS.GATEWAY_TIMEOUT,
+        idempotencyKey
       );
     }
     console.error("Contact form error:", error);
-    return NextResponse.json(
+    return jsonResponse(
       { error: "An unexpected error occurred. Please try again later." },
-      { status: HTTP_STATUS.INTERNAL_SERVER_ERROR }
+      HTTP_STATUS.INTERNAL_SERVER_ERROR,
+      idempotencyKey
     );
   }
 }

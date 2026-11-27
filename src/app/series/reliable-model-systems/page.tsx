@@ -2,6 +2,8 @@ import Link from "next/link";
 import { getAllArticles } from "@/lib/markdown";
 import { modelSystemsArticles, MODEL_SYSTEMS_SERIES, seriesChapterWord } from "@/lib/series";
 import { pageMetadata } from "@/lib/page-metadata";
+import { siteConfig } from "@/config/site";
+import { breadcrumbJsonLd, collectionPageJsonLd, serializeJsonLd } from "@/lib/seo";
 
 export const metadata = pageMetadata(
   MODEL_SYSTEMS_SERIES.title,
@@ -12,9 +14,49 @@ export const metadata = pageMetadata(
 export default function ModelSystemsSeries() {
   const articles = modelSystemsArticles(getAllArticles());
   const word = seriesChapterWord(articles.length);
+  const collectionLd = collectionPageJsonLd({
+    name: MODEL_SYSTEMS_SERIES.title,
+    description:
+      "A guided sequence of Go, Python and CPU model experiments, from bounded work to cached decoding.",
+    path: MODEL_SYSTEMS_SERIES.path,
+    items: articles.map((a) => ({
+      name: a.title,
+      url: `${siteConfig.url}/articles/${a.slug}`,
+      description: a.excerpt,
+    })),
+  });
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: "Home", url: siteConfig.url },
+    { name: "Writing", url: `${siteConfig.url}/articles` },
+    { name: MODEL_SYSTEMS_SERIES.title, url: `${siteConfig.url}${MODEL_SYSTEMS_SERIES.path}` },
+  ]);
 
   return (
     <div className="site-shell page-bottom">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(collectionLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }}
+      />
+      <nav className="paper-breadcrumb-bar" aria-label="Series navigation">
+        <div className="paper-breadcrumb-left">
+          <Link className="paper-crumb back-link" href="/articles">
+            ← Writing
+          </Link>
+          <span className="paper-crumb-sep" aria-hidden="true">
+            /
+          </span>
+          <span className="paper-crumb">Engineering Series</span>
+        </div>
+        <div className="paper-breadcrumb-actions">
+          <Link className="paper-util-link" href="/labs">
+            Companion Labs →
+          </Link>
+        </div>
+      </nav>
       <header className="page-heading">
         <p className="eyebrow">
           <span className="eyebrow-dot" />
@@ -27,7 +69,7 @@ export default function ModelSystemsSeries() {
           step by step.
         </h1>
         <p>
-          {seriesChapterWord(articles.length).replace(/^./, (c) => c.toUpperCase())} explanations,{" "}
+          {word.replace(/^./, (c) => c.toUpperCase())} explanations,{" "}
           {word} runnable experiments. Follow the boundaries between requests, tasks and tensors.
         </p>
       </header>
@@ -46,7 +88,7 @@ export default function ModelSystemsSeries() {
             or read Attention before KV&nbsp;Cache for the numerical path.
           </p>
           <Link className="text-link" href="/labs">
-            Environment and reproduction guide ↗
+            Environment and reproduction guide →
           </Link>
         </div>
       </section>
@@ -70,7 +112,7 @@ export default function ModelSystemsSeries() {
                 </Link>
                 {a.labPath && (
                   <Link className="text-link" href={`/${a.labPath}`}>
-                    Companion lab ↗
+                    Companion lab →
                   </Link>
                 )}
               </div>
@@ -80,13 +122,13 @@ export default function ModelSystemsSeries() {
       </ol>
       <div className="inline-links">
         <Link className="text-link" href="/series/llm-ai-infra">
-          Research monograph: LLM &amp; AI Infrastructure ↗
+          Research monograph: LLM &amp; AI Infrastructure →
         </Link>
         <Link className="text-link" href="/articles">
-          All writing ↗
+          All writing →
         </Link>
         <a className="text-link" href="/feed.xml">
-          Subscribe via RSS ↗
+          Subscribe via RSS →
         </a>
       </div>
     </div>

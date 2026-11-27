@@ -3,7 +3,7 @@
 
 name = "high-end-portfolio"
 main = ".open-next/worker.js"
-compatibility_date = "2026-04-23"
+compatibility_date = "2026-11-01"
 compatibility_flags = ["nodejs_compat"]
 
 # Workers 资源限制
@@ -22,3 +22,9 @@ binding = "ASSETS"
 # 只有一个生产环境：CI 的 production 门禁（deploy.yml）与本地 deploy 脚本
 # 部署的都是这里的默认 Worker。曾经存在的 [env.production] 块从未被任何
 # 脚本或 CI 使用（workers_dev=false 且无路由，部署即失联），已于 2026-10-11 删除。
+
+# 联系表单：Cloudflare Email Routing 的 send_email 绑定（免费）。
+# 仅能发送到已在 Email Routing 中验证的目标地址（即你自己的邮箱）。
+# 另需设置 CONTACT_FROM（如 contact@你的域名）与 CONTACT_EMAIL（收件人，需已验证）。
+[[send_email]]
+name = "SEND_EMAIL"

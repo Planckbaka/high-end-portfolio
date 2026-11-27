@@ -5,12 +5,17 @@ export function pageMetadata(title: string, description: string, path: string): 
   return {
     title,
     description,
-    alternates: { canonical: path },
+    alternates: {
+      canonical: path,
+      types: { "application/rss+xml": "/feed.xml" },
+    },
     openGraph: {
       title: `${title} | ${siteConfig.name}`,
       description,
       url: path,
       type: "website",
+      siteName: siteConfig.name,
+      locale: "en_US",
       images: [{ url: "/og-image.png", width: 1200, height: 630, alt: siteConfig.title }],
     },
     twitter: {
@@ -18,6 +23,7 @@ export function pageMetadata(title: string, description: string, path: string): 
       title: `${title} | ${siteConfig.name}`,
       description,
       images: ["/og-image.png"],
+      creator: siteConfig.author.twitter,
     },
   };
 }

@@ -2,14 +2,34 @@ import { pageMetadata } from "@/lib/page-metadata";
 import Image from "next/image";
 import Link from "next/link";
 import { socialLinks } from "@/config/data";
+import { siteConfig } from "@/config/site";
+import { breadcrumbJsonLd, personEntity, serializeJsonLd } from "@/lib/seo";
 export const metadata = pageMetadata(
   "About",
   "Akiwayne’s approach to backend systems, Python engineering, and understanding model inference.",
   "/about"
 );
 export default function About() {
+  const profileLd = {
+    "@context": "https://schema.org",
+    "@type": "ProfilePage",
+    url: `${siteConfig.url}/about`,
+    mainEntity: personEntity(),
+  };
+  const breadcrumbLd = breadcrumbJsonLd([
+    { name: "Home", url: siteConfig.url },
+    { name: "About", url: `${siteConfig.url}/about` },
+  ]);
   return (
     <div className="site-shell page-bottom">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(profileLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: serializeJsonLd(breadcrumbLd) }}
+      />
       <header className="page-heading">
         <p className="eyebrow">
           <span className="eyebrow-dot" />
@@ -73,8 +93,7 @@ export default function About() {
               <span key={link.name}>
                 {i > 0 ? " · " : ""}
                 <a href={link.url} target="_blank" rel="noopener noreferrer">
-                  {link.name}
-                  <span className="sr-only">(opens in a new tab)</span>
+                  {link.name} ↗ <span className="sr-only">(opens in a new tab)</span>
                 </a>
               </span>
             ))}{" "}
